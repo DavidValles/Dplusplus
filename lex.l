@@ -9,31 +9,31 @@ extern void yyerror (const char *s);
 
 %%
 
-"include"					return INCLUDE;
-"main"						return MAIN;
-"return"					return RETURN;
-"none"					 	return NONE;
+"include"                   return INCLUDE;
+"main"                      return MAIN;
+"return"                    return RETURN;
+"none"                      return NONE;
 
 "var"                       return VAR;
-"func"						return FUNC;
+"func"                      return FUNC;
 "integer"                   return INT;
 "decimal"                   return DECIMAL;
-"text"						return TEXT;
-"character"					return CHARACTER;
-"flag"					 	return FLAG;
-"array"					 	return ARRAY;
-"matrix"					return MATRIX;
+"text"                      return TEXT;
+"character"                 return CHARACTER;
+"flag"                      return FLAG;
+"array"                     return ARRAY;
+"matrix"                    return MATRIX;
 
 "if"                        return IF; 
 "else"                      return ELSE; 
-"else if"					return ELSEIF;
+"else if"                   return ELSEIF;
 
-"while"						return WHILE;
-"do"						return DO;
+"while"                     return WHILE;
+"do"                        return DO;
 
-"class"						return CLASS;
-"private"					return PRIVATE;
-"public"					return PUBLIC;
+"class"                     return CLASS;
+"private"                   return PRIVATE;
+"public"                    return PUBLIC;
 
 "print"                     return PRINT; 
 "read"                      return READ; 
@@ -47,14 +47,14 @@ extern void yyerror (const char *s);
 "not"                       return NOT; 
 
 [a-zA-Z][_a-zA-Z0-9]*       {
-    						yylval.stringValue = new std::string(yytext, yyleng); 
-							return ID; 
-			    			}
+                            yylval.stringValue = new std::string(yytext, yyleng); 
+                            return ID; 
+                            }
 
 0|[1-9][0-9]*               return ICONSTANT; 
 (0|[1-9][0-9]*)\.[0-9]*     return DCONSTANT; 
 \"(\\.|[^"])*\"             return SCONSTANT; 
-\'.\' 			            return CCONSTANT; 
+\'.\'                       return CCONSTANT; 
 
 [\{\}\=\:\;\,\.\+\-\*\/\<\>\(\)]  return yytext[0];
 

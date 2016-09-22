@@ -85,153 +85,153 @@ enum Type {
 %%
 
 /*
-	Basic program structure	
+    Basic program structure 
 */
 start       : includes variable_section functions MAIN block { cout<<"Apropiado."<<endl; }
             ;
 
 /*
-	Include section for global scope
+    Include section for global scope
 */
-includes	: INCLUDE SCONSTANT includes 
-		 	|
-			;
+includes    : INCLUDE SCONSTANT includes 
+            |
+            ;
 
 /*
-	Variable section for global scope
+    Variable section for global scope
 */
-variable_section	: variables variable_section
-				 	|
-					;
+variable_section    : variables variable_section
+                    |
+                    ;
 
 /*
-	Declaring one or more variables in one line
+    Declaring one or more variables in one line
 */
-variables 	: VAR type variable ';' 
-			;
+variables   : VAR type variable ';' 
+            ;
 
-variable	: ID variable_
-		 	| assignment variable_
-			;
+variable    : ID variable_
+            | assignment variable_
+            ;
 
-variable_ 	: ',' variable
-		   	|
-			;
+variable_   : ',' variable
+            |
+            ;
 
 /*
-	Function section for global scope
+    Function section for global scope
 */
-functions	: FUNC functions_ ID '(' params ')' block functions
-		  	|
-			;
+functions   : FUNC functions_ ID '(' params ')' block functions
+            |
+            ;
 
-functions_ 	: type
-			| NONE
-			;
+functions_  : type
+            | NONE
+            ;
 
 /*
-	Declaring zero to n paramaters
+    Declaring zero to n paramaters
 */
-params 		: type ID params_ 
-		 	|
-			;
+params      : type ID params_ 
+            |
+            ;
 
-params_		: ',' params
-		 	|
-			;
+params_     : ',' params
+            |
+            ;
 
 /*
-	Typical block of code with statements	
+    Typical block of code with statements   
 */
-block		: '{' block_ '}'
-	   		;
+block       : '{' block_ '}'
+            ;
 
-block_	 	: statement block_
-		 	|
-			;
-
-/*
-	Various statements available for blocks
-*/
-statement 	: assignment ';'
-			| cycle
-			| if 
-		   	| print
-			| READ ID ';'
-		    | variables 
-		    | RETURN ID ';'
-			;
+block_      : statement block_
+            |
+            ;
 
 /*
-	Assignments can have expressions, a string " ", 
-		and a character ' '
+    Various statements available for blocks
 */
-assignment 	: ID '=' assignment_
-			;
+statement   : assignment ';'
+            | cycle
+            | if 
+            | print
+            | READ ID ';'
+            | variables 
+            | RETURN ID ';'
+            ;
+
+/*
+    Assignments can have expressions, a string " ", 
+        and a character ' '
+*/
+assignment  : ID '=' assignment_
+            ;
 
 assignment_ : expression
-			| SCONSTANT 
-			| CCONSTANT 
-			;
+            | SCONSTANT 
+            | CCONSTANT 
+            ;
 
 /*
-	While and do while strucutre
+    While and do while strucutre
 */
-cycle		: DO block while
-	   	 	| while block
-			;
+cycle       : DO block while
+            | while block
+            ;
 
-while		: WHILE '(' condition ')'
-	   		;
+while       : WHILE '(' condition ')'
+            ;
 
 /*
-	If structure
+    If structure
 */
-if			: IF if_ else
-		  	;
+if          : IF if_ else
+            ;
 
-if_ 		: '(' condition ')' block else_if
-	  		;
+if_         : '(' condition ')' block else_if
+            ;
 
-else_if		: ELSEIF if_
-		 	|
-			;
+else_if     : ELSEIF if_
+            |
+            ;
 
-else		: ELSE block
-	  		|
-			;
+else        : ELSE block
+            |
+            ;
 
 /*
-	Conditional structure
+    Conditional structure
 */
-condition	: not expression condition_
-		 	;
+condition   : not expression condition_
+            ;
 
-condition_	: AND condition
-		 	| OR condition
-			|
-			;
+condition_  : AND condition
+            | OR condition
+            |
+            ;
 
-not			: NOT
-	  		|
-			;
+not         : NOT
+            |
+            ;
 
 /*
-	Print structure
+    Print structure
 */
-print		: PRINT '(' print_ ')' ';'
-	   		;
+print       : PRINT '(' print_ ')' ';'
+            ;
 
-print_		: expression print__
-			| SCONSTANT print__
-			;
+print_      : expression print__
+            | SCONSTANT print__
+            ;
 
-print__		: ',' print_
-		 	|
-		 	;
+print__     : ',' print_
+            |
+            ;
 
 /*
-	Various accepted types 
+    Various accepted types 
 */
 type        : INT 
             | DECIMAL 
@@ -242,7 +242,7 @@ type        : INT
 
 
 /*
-	Basic expression structure 
+    Basic expression structure 
 */
 expression  : exp expression_
             ;
@@ -264,10 +264,10 @@ exp_        : '+' exp
             | 
             ;
 
-term  	    : factor term_ 
+term        : factor term_ 
             ;
 
-term_    	: '*' term
+term_       : '*' term
             | '/' term
             | 
             ;
@@ -286,22 +286,22 @@ constvar    : ID
 %%
 
 void checkVariable(string id) {
-	if (varTable.find(id) == varTable.end()) {
-		cout<<"Undefined variable: "<<id<<endl;
-	}
+    if (varTable.find(id) == varTable.end()) {
+        cout<<"Undefined variable: "<<id<<endl;
+    }
 }
 
 int main(int argc, char **argv)
 {
-	if ((argc > 1) && (freopen(argv[1], "r", stdin) == NULL))
-	{
-		printf("Could not open file.\n");
-		exit( 1 );
-	}
-	
-	yyparse();
-	
-	return 0;
+    if ((argc > 1) && (freopen(argv[1], "r", stdin) == NULL))
+    {
+        printf("Could not open file.\n");
+        exit( 1 );
+    }
+    
+    yyparse();
+    
+    return 0;
 }
 
 void yyerror (const char *s) {
