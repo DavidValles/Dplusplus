@@ -1,6 +1,7 @@
 %{
 #include "y.tab.h"
 #include <string>
+#include <iostream>
 
 extern "C" int yylex();
 extern void yyerror (const char *s);
@@ -10,6 +11,8 @@ extern void yyerror (const char *s);
 
 "include" 					return INCLUDE;
 "main"						return MAIN;
+"return"					return RETURN;
+"none"					 	return NONE;
 
 "var"                       return VAR;
 "func"						return FUNC;
@@ -43,19 +46,21 @@ extern void yyerror (const char *s);
 "or"                        return OR; 
 "not"                       return NOT; 
 
-[\{\}\=\:\;\,\.\+\-\*\/\<\>\(\)]  return yytext[0];
-
 [a-zA-Z][_a-zA-Z0-9]*       {
     						yylval.stringValue = new std::string(yytext, yyleng); 
 							return ID; 
 			    			}
 
-[1-9][0-9]*                 return ICONSTANT; 
-[1-9][0-9]*\.[0-9]*         return DCONSTANT; 
+0|[1-9][0-9]*               return ICONSTANT; 
+(0|[1-9][0-9]*)\.[0-9]*     return DCONSTANT; 
 \"(\\.|[^"])*\"             return SCONSTANT; 
+\'.\' 			            return CCONSTANT; 
+
+[\{\}\=\:\;\,\.\+\-\*\/\<\>\(\)]  return yytext[0];
+
 [\n]                        {yylineno++;};
 [ \t]                       ; 
-.                           { ECHO; yyerror ("Unexpected character\n"); }
+.                           { cout<<yytext<<endl; yyerror ("Unexpected character"); }
 
 %%
 

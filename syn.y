@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 #include <unordered_map>
+#include <vector>
 #include <iostream>
 
 using namespace std;
@@ -22,8 +23,7 @@ extern "C"
 
 extern int yylineno;
 unordered_map<string, int> varTable;
-string variables [20];
-int cVar = 0;
+vector<string> variables;
 
 enum Type {
     Int = 1,
@@ -35,6 +35,8 @@ enum Type {
 %start start
 %token INCLUDE
 %token MAIN
+%token RETURN
+%token NONE 
                               
 %token VAR
 %token FUNC
@@ -72,6 +74,7 @@ enum Type {
 %token ICONSTANT 
 %token DCONSTANT 
 %token SCONSTANT 
+%token CCONSTANT 
 
 %union {
   string* stringValue;
@@ -81,15 +84,30 @@ enum Type {
 
 %%
 
-start       : includes variables { cout<<"Apropiado."<<endl; }
+/*
+	Basic program structure	
+*/
+start       : includes variable_section functions MAIN block { cout<<"Apropiado."<<endl; }
             ;
 
+/*
+	Include section for global scope
+*/
 includes	: INCLUDE SCONSTANT includes 
 		 	|
 			;
 
-variables 	: VAR type variable ';' variables
-		    |
+/*
+	Variable section for global scope
+*/
+variable_section	: variables variable_section
+				 	|
+					;
+
+/*
+	Declaring one or more variables in one line
+*/
+variables 	: VAR type variable ';' 
 			;
 
 variable	: ID variable_
@@ -100,23 +118,132 @@ variable_ 	: ',' variable
 		   	|
 			;
 
-type        : INT {
-			for (int i=0; i<cVar; i++) {
-			    varTable[variables[i]] = Int;
-			}
-			cVar = 0;
-		    }
-            | DECIMAL {
-			for (int i=0; i<cVar; i++) {
-			    varTable[variables[i]] = Float;
-			}
-			cVar = 0;
-		    }
+/*
+	Function section for global scope
+*/
+functions	: FUNC functions_ ID '(' params ')' block functions
+		  	|
+			;
+
+functions_ 	: type
+			| NONE
+			;
+
+/*
+	Declaring zero to n paramaters
+*/
+params 		: type ID params_ 
+		 	|
+			;
+
+params_		: ',' params
+		 	|
+			;
+
+/*
+	Typical block of code with statements	
+*/
+block		: '{' block_ '}'
+	   		;
+
+block_	 	: statement block_
+		 	|
+			;
+
+/*
+	Various statements available for blocks
+*/
+statement 	: assignment ';'
+			| cycle
+			| if 
+		   	| print
+			| READ ID ';'
+		    | variables 
+		    | RETURN ID ';'
+			;
+
+/*
+	Assignments can have expressions, a string " ", 
+		and a character ' '
+*/
+assignment 	: ID '=' assignment_
+			;
+
+assignment_ : expression
+			| SCONSTANT 
+			| CCONSTANT 
+			;
+
+/*
+	While and do while strucutre
+*/
+cycle		: DO block while
+	   	 	| while block
+			;
+
+while		: WHILE '(' condition ')'
+	   		;
+
+/*
+	If structure
+*/
+if			: IF if_ else
+		  	;
+
+if_ 		: '(' condition ')' block else_if
+	  		;
+
+else_if		: ELSEIF if_
+		 	|
+			;
+
+else		: ELSE block
+	  		|
+			;
+
+/*
+	Conditional structure
+*/
+condition	: not expression condition_
+		 	;
+
+condition_	: AND condition
+		 	| OR condition
+			|
+			;
+
+not			: NOT
+	  		|
+			;
+
+/*
+	Print structure
+*/
+print		: PRINT '(' print_ ')' ';'
+	   		;
+
+print_		: expression print__
+			| SCONSTANT print__
+			;
+
+print__		: ',' print_
+		 	|
+		 	;
+
+/*
+	Various accepted types 
+*/
+type        : INT 
+            | DECIMAL 
+            | TEXT 
+            | CHARACTER  
+            | FLAG
             ;
 
-assignment 	: ID '=' expression
-			| ID '=' SCONSTANT
 
+/*
+	Basic expression structure 
+*/
 expression  : exp expression_
             ;
 
@@ -129,7 +256,7 @@ expression_ :
             | NOTEQUALTO exp
             ;
 
-exp         : termino exp_ 
+exp         : term exp_ 
             ;
 
 exp_        : '+' exp
@@ -137,11 +264,11 @@ exp_        : '+' exp
             | 
             ;
 
-termino     : factor termino_ 
+term  	    : factor term_ 
             ;
 
-termino_    : '*' termino
-            | '/' termino
+term_    	: '*' term
+            | '/' term
             | 
             ;
 
@@ -151,17 +278,18 @@ factor      : '(' expression ')'
             | '-' constvar
             ;
 
-constvar    : ID { 
-				string id = *yylval.stringValue;
-				if (varTable.find(id) == varTable.end()) {
-					cout<<"Undefined variable: "<<id<<endl;
-				}
-			}
+constvar    : ID 
             | ICONSTANT 
             | DCONSTANT 
             ;
 
 %%
+
+void checkVariable(string id) {
+	if (varTable.find(id) == varTable.end()) {
+		cout<<"Undefined variable: "<<id<<endl;
+	}
+}
 
 int main(int argc, char **argv)
 {
