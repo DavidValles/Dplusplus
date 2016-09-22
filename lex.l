@@ -9,7 +9,7 @@ extern void yyerror (const char *s);
 
 %%
 
-"include" 					return INCLUDE;
+"include"					return INCLUDE;
 "main"						return MAIN;
 "return"					return RETURN;
 "none"					 	return NONE;
