@@ -1,0 +1,6 @@
+include "eyeee"
+include "you know it. txtx"
+include "another test"
+
+var integer var1 = (3 * 2 + 5) + 23, var2, var3;
+var decimal var4 = "checkcheck", var5, var6;
