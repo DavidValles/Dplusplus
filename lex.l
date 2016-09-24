@@ -47,8 +47,9 @@ extern void yyerror (const char *s);
 "not"                       return NOT; 
 
 [a-zA-Z][_a-zA-Z0-9]*       {
-                            yylval.stringValue = new std::string(yytext, yyleng); 
-                            return ID; 
+                                yylval.stringValue = 
+                                    new std::string(yytext, yyleng); 
+                                return ID; 
                             }
 
 0|[1-9][0-9]*               return ICONSTANT; 
@@ -58,9 +59,12 @@ extern void yyerror (const char *s);
 
 [\{\}\=\:\;\,\.\+\-\*\/\<\>\(\)]  return yytext[0];
 
-[\n]                        {yylineno++;};
+[\n]                        {  yylineno++;  };
 [ \t]                       ; 
-.                           { cout<<yytext<<endl; yyerror ("Unexpected character"); }
+.                           {   
+                                cout<<yytext<<endl; 
+                                yyerror ("Unexpected character"); 
+                            }
 
 %%
 

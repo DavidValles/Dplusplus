@@ -5,7 +5,7 @@
 }
 
 %{
-#include <stdio.h>     /* C declarations used in actions */
+#include <stdio.h>     
 #include <stdlib.h>
 
 #include <unordered_map>
@@ -86,12 +86,16 @@ enum Type {
 
 /*
     Basic program structure 
+    A program can have includes, global variables and functions (0...*)
+    It should always have a main method with a block
 */
-start       : includes variable_section functions MAIN block { cout<<"Apropiado."<<endl; }
+start       : includes variable_section functions MAIN block 
+            { cout<<"Apropiado."<<endl; }
             ;
 
 /*
     Include section for global scope
+    E.g. include "myLibrary.h"
 */
 includes    : INCLUDE SCONSTANT includes 
             |
@@ -99,6 +103,7 @@ includes    : INCLUDE SCONSTANT includes
 
 /*
     Variable section for global scope
+    E.g. var integer id1;
 */
 variable_section    : variables variable_section
                     |
@@ -106,6 +111,7 @@ variable_section    : variables variable_section
 
 /*
     Declaring one or more variables in one line
+    E.g. var integer id1, id2 = 3, id3 = 2 + 23 - id1;
 */
 variables   : VAR type variable ';' 
             ;
@@ -120,6 +126,7 @@ variable_   : ',' variable
 
 /*
     Function section for global scope
+    E.g.
 */
 functions   : FUNC functions_ ID '(' params ')' block functions
             |
@@ -285,6 +292,9 @@ constvar    : ID
 
 %%
 
+/* 
+    For variable table (currently in dev)
+*/
 void checkVariable(string id) {
     if (varTable.find(id) == varTable.end()) {
         cout<<"Undefined variable: "<<id<<endl;
