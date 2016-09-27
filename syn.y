@@ -26,8 +26,13 @@ unordered_map<string, int> varTable;
 vector<string> variables;
 
 enum Type {
-    Int = 1,
-    Float = 2
+    Integer = 1,
+    Decimal = 2,
+    Text = 3,
+    Character = 4,
+    Flag = 5,
+    Array = 6,
+    Matrix = 7
 };
 
 %}
@@ -274,6 +279,8 @@ type        : INT
             | TEXT 
             | CHARACTER  
             | FLAG
+            | ARRAY '(' ICONSTANT ')'
+            | MATRIX '(' ICONSTANT ',' ICONSTANT ')'
             ;
 
 

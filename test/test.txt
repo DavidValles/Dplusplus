@@ -41,4 +41,6 @@ func none checkIfs () {
 }
 
 main {
+    var array(5) myArray;
+    var matrix(10, 125) myMatrix;
 }
