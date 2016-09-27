@@ -85,12 +85,21 @@ enum Type {
 %%
 
 /*
+    A file in D++ can either be a program file with a main function or a 
+    class file with a class definition.
+*/
+start       : program
+            { cout<<"Main class: correct."<<endl; }
+            | class
+            { cout<<"User defined class: correct."<<endl; }
+            ;
+
+/*
     Basic program structure 
     A program can have includes, global variables and functions (0...*)
     It should always have a main method with a block
 */
-start       : includes variable_section functions MAIN block 
-            { cout<<"Apropiado."<<endl; }
+program     : includes variable_section functions MAIN block 
             ;
 
 /*
@@ -128,13 +137,16 @@ variable_   : ',' variable
     Function section for global scope
     E.g.
 */
-functions   : FUNC functions_ ID '(' params ')' block functions
+functions   : singlefunction functions
             |
             ;
 
-functions_  : type
-            | NONE
-            ;
+singlefunction  : FUNC singlefunction_ ID '(' params ')' block 
+                ;
+
+singlefunction_ : type
+                | NONE
+                ;
 
 /*
     Declaring zero to n paramaters
@@ -235,6 +247,23 @@ print_      : expression print__
 
 print__     : ',' print_
             |
+            ;
+
+/*
+    Class structure
+*/
+
+class       : CLASS ID '{' classblock '}' 
+            ;
+
+classblock  : classblock_ classblock
+            |
+            ;
+
+classblock_ : PRIVATE ':'
+            | PUBLIC ':'
+            | variables
+            | singlefunction
             ;
 
 /*
