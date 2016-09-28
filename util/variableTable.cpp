@@ -37,4 +37,8 @@ void VariableTable::displayTable() {
 	}
 }
 
+void VariableTable::clearVarTable() {
+    this->varTable.clear();
+}
+
 #endif

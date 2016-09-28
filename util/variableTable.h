@@ -13,6 +13,7 @@ public:
     void insertVariable(string id, int type);
     bool findVariable(string id);
     void displayTable();
+    void clearVarTable();
 
 private:
     unordered_map<string, Variable> varTable;

@@ -29,8 +29,9 @@ extern int yylineno;
     Utilities to find identifiers
     currTable indicates the curren table in scope
 */
-VariableTable varTable;
-VariableTable* currTable = &varTable;
+VariableTable globalTable;
+VariableTable funcTable;
+VariableTable* currTable = &globalTable;
 int currentType = 0;
 
 enum Type {
@@ -166,8 +167,14 @@ functions   : singlefunction functions
             ;
 
 singlefunction  : FUNC singlefunction_ ID 
-                /* insert id for func scope */
+                {
+                    currTable = &funcTable;
+                }
                 '(' params ')' block 
+                {
+                    (*currTable).clearVarTable();
+                    currTable = &globalTable;
+                }
                 ;
 
 singlefunction_ : type
@@ -177,7 +184,12 @@ singlefunction_ : type
 /*
     Declaring zero to n paramaters
 */
-params      : type ID params_ 
+params      : type ID  
+            {
+                string id = *yylval.stringValue;
+                (*currTable).insertVariable(id, currentType);
+            }
+                params_ 
             |
             ;
 
@@ -368,7 +380,8 @@ constvar    : ID
 void checkVariable() {
     string id = *yylval.stringValue;
     if (!(*currTable).findVariable(id)) {
-        cout<<"Variable not defined: "<<id<<endl;
+        cout<<"Error! Line: "<<yylineno<<". Variable not defined: "<<id<<
+            "."<<endl;
     }
 }
 
