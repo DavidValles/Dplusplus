@@ -11,10 +11,12 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include "util/variableTable.cpp"
 
 using namespace std;
 
 void yyerror (const char *s);
+void checkVariable();
 
 extern "C"
 {
@@ -22,8 +24,14 @@ extern "C"
 }
 
 extern int yylineno;
-unordered_map<string, int> varTable;
-vector<string> variables;
+
+/*
+    Utilities to find identifiers
+    currTable indicates the curren table in scope
+*/
+VariableTable varTable;
+VariableTable* currTable = &varTable;
+int currentType = 0;
 
 enum Type {
     Integer = 1,
@@ -32,7 +40,8 @@ enum Type {
     Character = 4,
     Flag = 5,
     Array = 6,
-    Matrix = 7
+    Matrix = 7,
+    None = 8
 };
 
 %}
@@ -94,9 +103,9 @@ enum Type {
     class file with a class definition.
 */
 start       : program
-            { cout<<"Main class: correct."<<endl; }
+                { cout<<"Main class compiled."<<endl; }
             | class
-            { cout<<"User defined class: correct."<<endl; }
+                { cout<<"User defined class compiled."<<endl; }
             ;
 
 /*
@@ -109,7 +118,7 @@ program     : includes variable_section functions MAIN block
 
 /*
     Include section for global scope
-    E.g. include "myLibrary.h"
+    E.g. include "myClass.h"
 */
 includes    : INCLUDE SCONSTANT includes 
             |
@@ -130,8 +139,18 @@ variable_section    : variables variable_section
 variables   : VAR type variable ';' 
             ;
 
-variable    : ID variable_
-            | assignment variable_
+variable    : ID 
+                {
+                    string id = *yylval.stringValue;
+                    (*currTable).insertVariable(id, currentType);
+                }
+            variable_
+            | ID 
+                {
+                    string id = *yylval.stringValue;
+                    (*currTable).insertVariable(id, currentType);
+                }
+            assignment variable_
             ;
 
 variable_   : ',' variable
@@ -146,11 +165,13 @@ functions   : singlefunction functions
             |
             ;
 
-singlefunction  : FUNC singlefunction_ ID '(' params ')' block 
+singlefunction  : FUNC singlefunction_ ID 
+                /* insert id for func scope */
+                '(' params ')' block 
                 ;
 
 singlefunction_ : type
-                | NONE
+                | NONE { currentType = Type::None; }
                 ;
 
 /*
@@ -177,20 +198,32 @@ block_      : statement block_
 /*
     Various statements available for blocks
 */
-statement   : assignment ';'
+statement   : ID 
+            {
+                checkVariable();
+            }
+                assignment ';'
             | cycle
             | if 
             | print
-            | READ ID ';'
+            | READ ID 
+            {
+                checkVariable();
+            }
+                ';'
             | variables 
-            | RETURN ID ';'
+            | RETURN ID 
+            {
+                checkVariable();
+            }
+                ';'
             ;
 
 /*
     Assignments can have expressions, a string " ", 
         and a character ' '
 */
-assignment  : ID '=' assignment_
+assignment  : '=' assignment_
             ;
 
 assignment_ : expression
@@ -274,13 +307,14 @@ classblock_ : PRIVATE ':'
 /*
     Various accepted types 
 */
-type        : INT 
-            | DECIMAL 
-            | TEXT 
-            | CHARACTER  
-            | FLAG
-            | ARRAY '(' ICONSTANT ')'
-            | MATRIX '(' ICONSTANT ',' ICONSTANT ')'
+type        : INT { currentType = Type::Integer; }
+            | DECIMAL { currentType = Type::Decimal; }
+            | TEXT { currentType = Type::Text; }
+            | CHARACTER  { currentType = Type::Character; }
+            | FLAG { currentType = Type::Flag; }
+            | ARRAY '(' ICONSTANT ')' { currentType = Type::Array; }
+            | MATRIX '(' ICONSTANT ',' ICONSTANT ')' 
+                { currentType = Type::Matrix; }
             ;
 
 
@@ -322,18 +356,19 @@ factor      : '(' expression ')'
             ;
 
 constvar    : ID 
+            {
+                checkVariable();
+            }
             | ICONSTANT 
             | DCONSTANT 
             ;
 
 %%
 
-/* 
-    For variable table (currently in dev)
-*/
-void checkVariable(string id) {
-    if (varTable.find(id) == varTable.end()) {
-        cout<<"Undefined variable: "<<id<<endl;
+void checkVariable() {
+    string id = *yylval.stringValue;
+    if (!(*currTable).findVariable(id)) {
+        cout<<"Variable not defined: "<<id<<endl;
     }
 }
 
@@ -347,6 +382,9 @@ int main(int argc, char **argv)
     
     yyparse();
     
+	cout<<"Displaying variable table"<<endl;
+    (*currTable).displayTable();
+	
     return 0;
 }
 
