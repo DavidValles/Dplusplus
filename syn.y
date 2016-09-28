@@ -30,7 +30,7 @@ extern int yylineno;
     currTable indicates the curren table in scope
 */
 VariableTable globalTable;
-VariableTable funcTable;
+VariableTable funcTable(&globalTable);
 VariableTable* currTable = &globalTable;
 int currentType = 0;
 
@@ -145,13 +145,13 @@ variable    : ID
                     string id = *yylval.stringValue;
                     (*currTable).insertVariable(id, currentType);
                 }
-            variable_
+                variable_
             | ID 
                 {
                     string id = *yylval.stringValue;
                     (*currTable).insertVariable(id, currentType);
                 }
-            assignment variable_
+                assignment variable_
             ;
 
 variable_   : ',' variable
@@ -167,14 +167,14 @@ functions   : singlefunction functions
             ;
 
 singlefunction  : FUNC singlefunction_ ID 
-                {
-                    currTable = &funcTable;
-                }
-                '(' params ')' block 
-                {
-                    (*currTable).clearVarTable();
-                    currTable = &globalTable;
-                }
+                    {
+                        currTable = &funcTable;
+                    }
+                    '(' params ')' block 
+                    {
+                        (*currTable).clearVarTable();
+                        currTable = &globalTable;
+                    }
                 ;
 
 singlefunction_ : type
@@ -185,10 +185,10 @@ singlefunction_ : type
     Declaring zero to n paramaters
 */
 params      : type ID  
-            {
-                string id = *yylval.stringValue;
-                (*currTable).insertVariable(id, currentType);
-            }
+                {
+                    string id = *yylval.stringValue;
+                    (*currTable).insertVariable(id, currentType);
+                }
                 params_ 
             |
             ;
@@ -211,23 +211,23 @@ block_      : statement block_
     Various statements available for blocks
 */
 statement   : ID 
-            {
-                checkVariable();
-            }
+                {
+                    checkVariable();
+                }
                 assignment ';'
             | cycle
             | if 
             | print
             | READ ID 
-            {
-                checkVariable();
-            }
+                {
+                    checkVariable();
+                }
                 ';'
             | variables 
             | RETURN ID 
-            {
-                checkVariable();
-            }
+                {
+                    checkVariable();
+                }
                 ';'
             ;
 
@@ -368,9 +368,9 @@ factor      : '(' expression ')'
             ;
 
 constvar    : ID 
-            {
-                checkVariable();
-            }
+                {
+                    checkVariable();
+                }
             | ICONSTANT 
             | DCONSTANT 
             ;

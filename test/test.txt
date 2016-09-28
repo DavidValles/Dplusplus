@@ -9,13 +9,13 @@ func integer function1 (decimal param1, integer param2) {
 	param1 = 5.93 + 2 + 3;
 	param2 = param1 + 12;
 
-	while (id1 > id2 and not id2 >= id3) {
+	while (id1 > id2 and not var2 >= var3) {
 		print("do something");
 	}
 
 	do {
 		print("do another.");
-	} while (5 + 3 == id3 or id2)
+	} while (5 + 3 == var6 or var5)
 
 	return param2;
 }
