@@ -30,7 +30,7 @@ extern int yylineno;
     currTable indicates the curren table in scope
 */
 VariableTable globalTable;
-VariableTable funcTable(&globalTable);
+VariableTable localTable(&globalTable);
 VariableTable* currTable = &globalTable;
 int currentType = 0;
 
@@ -168,10 +168,12 @@ functions   : singlefunction functions
 
 singlefunction  : FUNC singlefunction_ ID 
                     {
-                        currTable = &funcTable;
+                        currTable = &localTable;
                     }
                     '(' params ')' block 
                     {
+	                    cout<<"Displaying local variable table"<<endl;
+                        (*currTable).displayTable();
                         (*currTable).clearVarTable();
                         currTable = &globalTable;
                     }
@@ -395,7 +397,7 @@ int main(int argc, char **argv)
     
     yyparse();
     
-	cout<<"Displaying variable table"<<endl;
+	cout<<"Displaying global variable table"<<endl;
     (*currTable).displayTable();
 	
     return 0;

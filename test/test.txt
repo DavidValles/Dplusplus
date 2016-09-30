@@ -43,4 +43,7 @@ func none checkIfs () {
 main {
     var array(5) myArray;
     var matrix(10, 125) myMatrix;
+    id1 = 2;
+    var1 = var3;
+    var2 = 4;
 }
