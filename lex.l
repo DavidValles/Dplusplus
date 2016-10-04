@@ -61,7 +61,7 @@ extern void yyerror (const char *s);
 
 [\n]                        {  
                                 yylineno++;  
-                            };
+                            }
 [ \t]                       ; 
 .                           {   
                                 cout<<yytext<<endl; 

@@ -231,7 +231,7 @@ statement   : ID
                     checkVariable();
                 }
                 ';'
-            | functioncall
+            | functioncall ';'
             ;
 
 /*
@@ -251,10 +251,15 @@ assignment_ : expression
     Function call structure. Can have 0 to n parameters.
 */
 
-functioncall    : ID '(' functioncall_ ')' ';'
+functioncall    : ID '(' functioncall_ ')'
                 ;
 
-functioncall_   : ID functioncall__
+functioncall_   : ID 
+                    {
+                        checkVariable();
+                    }
+                    functioncall__
+                |
                 ;
 
 functioncall__    : ',' functioncall_
