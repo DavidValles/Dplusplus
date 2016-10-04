@@ -45,5 +45,7 @@ main {
     var matrix(10, 125) myMatrix;
     id1 = 2;
     var1 = var3;
+    checkIfs();
+    var1 = function2(id1, id2);
     var2 = 4;
 }

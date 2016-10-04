@@ -231,6 +231,7 @@ statement   : ID
                     checkVariable();
                 }
                 ';'
+            | functioncall
             ;
 
 /*
@@ -243,7 +244,22 @@ assignment  : '=' assignment_
 assignment_ : expression
             | SCONSTANT 
             | CCONSTANT 
+            | functioncall
             ;
+
+/* 
+    Function call structure. Can have 0 to n parameters.
+*/
+
+functioncall    : ID '(' functioncall_ ')' ';'
+                ;
+
+functioncall_   : ID functioncall__
+                ;
+
+functioncall__    : ',' functioncall_
+                |
+                ;
 
 /*
     While and do while strucutre
