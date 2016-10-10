@@ -12,11 +12,13 @@
 #include <vector>
 #include <iostream>
 #include "util/variableTable.cpp"
+#include "util/functionTable.cpp"
 
 using namespace std;
 
 void yyerror (const char *s);
 void checkVariable();
+void checkFunction();
 
 extern "C"
 {
@@ -33,6 +35,9 @@ VariableTable globalTable;
 VariableTable localTable(&globalTable);
 VariableTable* currTable = &globalTable;
 int currentType = 0;
+
+FunctionTable fglobalTable;
+FunctionTable* fcurrTable = &fglobalTable;
 
 enum Type {
     Integer = 1,
@@ -167,7 +172,8 @@ functions   : singlefunction functions
             ;
 
 singlefunction  : FUNC singlefunction_ ID 
-                    {
+                    {   string id = *yylval.stringValue;
+                        (*fcurrTable).insertFunction(id, currentType); 
                         currTable = &localTable;
                     }
                     '(' params ')' block 
@@ -187,7 +193,7 @@ singlefunction_ : type
     Declaring zero to n paramaters
 */
 params      : type ID  
-                {
+                {   
                     string id = *yylval.stringValue;
                     (*currTable).insertVariable(id, currentType);
                 }
@@ -251,11 +257,15 @@ assignment_ : expression
     Function call structure. Can have 0 to n parameters.
 */
 
-functioncall    : ID '(' functioncall_ ')'
+functioncall    : ID 
+                    {
+                        checkFunction();
+                    }
+                    '(' functioncall_ ')'
                 ;
 
 functioncall_   : ID 
-                    {
+                    {   
                         checkVariable();
                     }
                     functioncall__
@@ -408,6 +418,13 @@ void checkVariable() {
     }
 }
 
+void checkFunction() {
+    string id = *yylval.stringValue;
+    if(!(*fcurrTable).findFunction(id)) {
+        cout<<"Error! Line: "<<yylineno<<". Function not defined: "<<id<<"."<<endl;
+    }
+}
+
 int main(int argc, char **argv)
 {
     if ((argc > 1) && (freopen(argv[1], "r", stdin) == NULL))
@@ -420,6 +437,11 @@ int main(int argc, char **argv)
     
 	cout<<"Displaying global variable table"<<endl;
     (*currTable).displayTable();
+
+    
+    cout<<"Displaying global function table"<<endl;
+    (*fcurrTable).displayTable();
+    
 	
     return 0;
 }
