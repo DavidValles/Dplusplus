@@ -9,6 +9,6 @@ public:
     int operand2;
     int result;
     void display();
-}
+};
 
 #endif

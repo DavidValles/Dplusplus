@@ -11,8 +11,11 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include <stack>
 #include "util/variableTable.cpp"
 #include "util/functionTable.cpp"
+#include "util/cube.cpp"
+#include "util/typeAdapter.cpp"
 
 using namespace std;
 
@@ -39,10 +42,30 @@ int* currentType;
 FunctionTable fglobalTable;
 FunctionTable* fcurrTable = &fglobalTable;
 
+enum Ops {
+    Sum = 0;
+    Minus = 1;
+    Division = 2;
+    Multiplication = 3;
+    Modulo = 4;
+    GreaterThan = 5;
+    LessThan = 6;
+    Equal = 7;
+    And = 8;
+    Or = 9;
+    Not = 10;
+    NotEqualto = 11;
+    EqualTo = 12;
+    LessThanOrEqualTo = 13;
+    GreaterThanOrEqualTo = 14;
+    Floor = 15;
+}
+
 // Quadruples
-Stack<int> typeStack;
-Stack<int> operandStack;
-Stack<int> operatorStack;
+Cube cube;
+stack<int> typeStack;
+stack<int> operandStack;
+stack<int> operatorStack;
 vector<int> relationalOperators = { 
     Ops::GreaterThan,
     Ops::LessThan,
@@ -62,25 +85,6 @@ int Array = typeAdapter.getArrayMin();
 int Matrix = typeAdapter.getMatrixMin();
 int None = typeAdapter.getNoneMin();
 int Avail = typeAdapter.getAvailMin();
-
-enum Ops {
-    Sum = 0;
-    Minus = 1;
-    Division = 2;
-    Multiplication = 3;
-    Modulo = 4;
-    GreaterThan = 5;
-    LessThan = 6;
-    Equal = 7;
-    And = 8;
-    Or = 9;
-    Not = 10;
-    NotEqualto = 11;
-    EqualTo = 12;
-    LessThanOrEqualTo = 13;
-    GreaterThanOrEqualTo = 14;
-    Floor = 15;
-}
 %}
 
 %start start
