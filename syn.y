@@ -34,21 +34,19 @@ extern int yylineno;
 VariableTable globalTable;
 VariableTable localTable(&globalTable);
 VariableTable* currTable = &globalTable;
-int currentType = 0;
+int * currentType;
 
 FunctionTable fglobalTable;
 FunctionTable* fcurrTable = &fglobalTable;
 
-enum Type {
-    Integer = 1,
-    Decimal = 2,
-    Text = 3,
-    Character = 4,
-    Flag = 5,
-    Array = 6,
-    Matrix = 7,
-    None = 8
-};
+int Integer = 1000;
+int Decimal = 2000;
+int Text = 3000;
+int Character = 4000;
+int Flag = 5000;
+int Array = 6000;
+int Matrix = 7000;
+int None = 8000;
 
 %}
 
@@ -148,13 +146,15 @@ variables   : VAR type variable ';'
 variable    : ID 
                 {
                     string id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, currentType);
+                    (*currTable).insertVariable(id, *currentType);
+                    (*currentType)++;
                 }
                 variable_
             | ID 
                 {
                     string id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, currentType);
+                    (*currTable).insertVariable(id, *currentType);
+                    (*currentType)++;
                 }
                 assignment variable_
             ;
@@ -172,8 +172,10 @@ functions   : singlefunction functions
             ;
 
 singlefunction  : FUNC singlefunction_ ID 
-                    {   string id = *yylval.stringValue;
-                        (*fcurrTable).insertFunction(id, currentType); 
+                    {   
+                        string id = *yylval.stringValue;
+                        (*fcurrTable).insertFunction(id, *currentType); 
+                        (*currentType)++;
                         currTable = &localTable;
                     }
                     '(' params ')' block 
@@ -186,7 +188,7 @@ singlefunction  : FUNC singlefunction_ ID
                 ;
 
 singlefunction_ : type
-                | NONE { currentType = Type::None; }
+                | NONE { currentType = &None; }
                 ;
 
 /*
@@ -195,7 +197,8 @@ singlefunction_ : type
 params      : type ID  
                 {   
                     string id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, currentType);
+                    (*currTable).insertVariable(id, *currentType);
+                    (*currentType)++;
                 }
                 params_ 
             |
@@ -352,14 +355,14 @@ classblock_ : PRIVATE ':'
 /*
     Various accepted types 
 */
-type        : INT { currentType = Type::Integer; }
-            | DECIMAL { currentType = Type::Decimal; }
-            | TEXT { currentType = Type::Text; }
-            | CHARACTER  { currentType = Type::Character; }
-            | FLAG { currentType = Type::Flag; }
-            | ARRAY '(' ICONSTANT ')' { currentType = Type::Array; }
+type        : INT { currentType = &Integer; }
+            | DECIMAL { currentType = &Decimal; }
+            | TEXT { currentType = &Text; }
+            | CHARACTER  { currentType = &Character; }
+            | FLAG { currentType = &Flag; }
+            | ARRAY '(' ICONSTANT ')' { currentType = &Array; }
             | MATRIX '(' ICONSTANT ',' ICONSTANT ')' 
-                { currentType = Type::Matrix; }
+                { currentType = &Matrix; }
             ;
 
 
