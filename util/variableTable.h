@@ -14,6 +14,7 @@ public:
     bool findVariable(string id);
     void displayTable();
     void clearVarTable();
+    int getDirection(string id);
 
 private:
     unordered_map<string, Variable> varTable;

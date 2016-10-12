@@ -41,4 +41,9 @@ void VariableTable::clearVarTable() {
     this->varTable.clear();
 }
 
+int VariableTable::getDirection(string id) {
+    Variable var = this->varTable[id];
+    return var.direction;
+}
+
 #endif

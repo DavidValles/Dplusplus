@@ -8,9 +8,9 @@ using namespace std;
 Variable::Variable() {
 }
 
-Variable::Variable(string name, int type) {
+Variable::Variable(string name, int direction) {
     this->name = name;
-    this->type = type;
+    this->direction = direction;
 }
 
 #endif
