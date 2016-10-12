@@ -39,15 +39,48 @@ int* currentType;
 FunctionTable fglobalTable;
 FunctionTable* fcurrTable = &fglobalTable;
 
-int Integer = 1000;
-int Decimal = 2000;
-int Text = 3000;
-int Character = 4000;
-int Flag = 5000;
-int Array = 6000;
-int Matrix = 7000;
-int None = 8000;
+// Quadruples
+Stack<int> typeStack;
+Stack<int> operandStack;
+Stack<int> operatorStack;
+vector<int> relationalOperators = { 
+    Ops::GreaterThan,
+    Ops::LessThan,
+    Ops::Equal,
+    Ops::NotEqualto,
+    Ops::EqualTo,
+    Ops::LessThanOrEqualTo,
+    Ops::GreaterThanOrEqualTo,
+}
 
+int Integer = typeAdapter.getIntegerMin;
+int Decimal = typeAdapter.getDecimalMin;
+int Text = typeAdapter.getTextMin;
+int Character = typeAdapter.getCharacterMin;
+int Flag = typeAdapter.getFlagMin;
+int Array = typeAdapter.getArrayMin;
+int Matrix = typeAdapter.getMatrixMin;
+int None = typeAdapter.getNoneMin;
+int Avail = typeAdapter.getAvailMin;
+
+enum Ops {
+    Sum = 0;
+    Minus = 1;
+    Division = 2;
+    Multiplication = 3;
+    Modulo = 4;
+    GreaterThan = 5;
+    LessThan = 6;
+    Equal = 7;
+    And = 8;
+    Or = 9;
+    Not = 10;
+    NotEqualto = 11;
+    EqualTo = 12;
+    LessThanOrEqualTo = 13;
+    GreaterThanOrEqualTo = 14;
+    Floor = 15;
+}
 %}
 
 %start start
@@ -373,31 +406,79 @@ expression  : exp expression_
             ;
 
 expression_ : 
-            | '>' exp
-            | '<' exp
-            | LESSTHANOREQUALTO exp
-            | GREATERTHANOREQUALTO exp
-            | EQUALTO exp
-            | NOTEQUALTO exp
+            | '>' { operatorStack.push(Ops::GreaterThan); } 
+                exp
+                { checkOperator(Ops::GreaterThan); }
+            | '<' { operatorStack.push(Ops::LessThan); } 
+                exp
+                { checkOperator(Ops::LessThan); }
+            | LESSTHANOREQUALTO 
+                { operatorStack.push(Ops::LessThanOrEqualTo); } 
+                exp
+                { checkOperator(Ops::LessThanOrEqualTo); }
+            | GREATERTHANOREQUALTO 
+                { operatorStack.push(Ops::GreaterThanOrEqualTo); } 
+                exp
+                { checkOperator(Ops::GreaterThanOrEqualTo); }
+            | EQUALTO { operatorStack.push(Ops::EqualTo); } 
+                exp
+                { checkOperator(Ops::EqualTo); }
+            | NOTEQUALTO { operatorStack.push(Ops::NotEqualTo); } 
+                exp
+                { checkOperator(Ops::NotEqualTo); }
             ;
 
-exp         : term exp_ 
+exp         : term 
+                {
+                    checkOperator(Ops::Sum, Ops::Minus);
+                }
+                exp_ 
             ;
 
-exp_        : '+' exp
-            | '-' exp
+exp_        : '+'
+                {
+                    // Push operator 
+                    operatorStack.push(Ops::Sum);
+                }
+                exp
+            | '-'
+                {
+                    // Push operator 
+                    operatorStack.push(Ops::Minus);
+                } 
+                exp
             | 
             ;
 
-term        : factor term_ 
+term        : factor 
+                {
+                    checkOperator(Ops::Multiplication, Ops::Division);
+                }
+                term_ 
             ;
 
-term_       : '*' term
-            | '/' term
+term_       : '*'
+                {
+                    // Push operator 
+                    operatorStack.push(Ops::Multiplication);
+                } 
+                term
+            | '/'
+                {
+                    // Push operator 
+                    operatorStack.push(Ops::Division);
+                }
+                term
             | 
             ;
 
-factor      : '(' expression ')' 
+factor      :   {
+                    operatorStack.push(Ops::Floor);
+                }
+                '(' expression ')' 
+                {
+                    operatorStack.pop();
+                }
             | constvar 
             | '+' constvar
             | '-' constvar
@@ -406,12 +487,46 @@ factor      : '(' expression ')'
 constvar    : ID 
                 {
                     checkVariable();
+                    // Push operand and type
+                    int direction = (*currTable).getDirection(id);
+                    int type = typeAdapter.getType(direction);
+                    typeStack.push(type);
+                    operandStack.push(direction);
                 }
             | ICONSTANT 
             | DCONSTANT 
             ;
 
 %%
+
+void checkOperator(char c1, char c2 = -1) {
+    char oper = operatorStack.top();
+    operatorStack.pop();
+    if (oper == c1 || oper == c2 || 
+            relationalOperators.find(oper) != realtionalOperators.end()) {
+        int type2 = typeStack.top();
+        typeStack.pop();
+        int type1 = typeStack.top();
+        typeStack.pop();
+        int resultType = cube.cube[type1][type2][oper];
+
+        if (resultType != -1) {
+            int operand2 = operandStack.top();
+            operandStack.pop();
+            int operand1 = operandStack.top();
+            operandStack.pop();
+            Quadruple quadruple(oper, operand1, operand2, 
+                                    (*Avail));
+            quadruple.display();
+            operandStack.push_back(*Avail);    
+            (*Avail)++;
+            typeStack.push_back(resultType);
+        }
+        else {
+            cout<<"Type mismatch in +"<<endl;
+        }
+    }
+}
 
 void checkVariable() {
     string id = *yylval.stringValue;
