@@ -53,15 +53,15 @@ vector<int> relationalOperators = {
     Ops::GreaterThanOrEqualTo,
 }
 
-int Integer = typeAdapter.getIntegerMin;
-int Decimal = typeAdapter.getDecimalMin;
-int Text = typeAdapter.getTextMin;
-int Character = typeAdapter.getCharacterMin;
-int Flag = typeAdapter.getFlagMin;
-int Array = typeAdapter.getArrayMin;
-int Matrix = typeAdapter.getMatrixMin;
-int None = typeAdapter.getNoneMin;
-int Avail = typeAdapter.getAvailMin;
+int Integer = typeAdapter.getIntegerMin();
+int Decimal = typeAdapter.getDecimalMin();
+int Text = typeAdapter.getTextMin();
+int Character = typeAdapter.getCharacterMin();
+int Flag = typeAdapter.getFlagMin();
+int Array = typeAdapter.getArrayMin();
+int Matrix = typeAdapter.getMatrixMin();
+int None = typeAdapter.getNoneMin();
+int Avail = typeAdapter.getAvailMin();
 
 enum Ops {
     Sum = 0;
@@ -488,10 +488,10 @@ constvar    : ID
                 {
                     checkVariable();
                     // Push operand and type
-                    int direction = (*currTable).getDirection(id);
-                    int type = typeAdapter.getType(direction);
+                    int address = (*currTable).getAddress(id);
+                    int type = typeAdapter.getType(address);
                     typeStack.push(type);
-                    operandStack.push(direction);
+                    operandStack.push(address);
                 }
             | ICONSTANT 
             | DCONSTANT 

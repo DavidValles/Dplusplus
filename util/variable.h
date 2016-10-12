@@ -6,9 +6,9 @@ using namespace std;
 class Variable {
 public:
     Variable();
-    Variable(string name, int direction);
+    Variable(string name, int address);
     string name;
-    int direction;
+    int address;
 };
 
 #endif
