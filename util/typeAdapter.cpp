@@ -26,7 +26,7 @@ int typeAdapter::getDecimalMin() {
 	return decimalMin;
 }
 
-int typeAdapter::getTextMIn() {
+int typeAdapter::getTextMin() {
 	return textMin;
 }
 
