@@ -34,7 +34,7 @@ extern int yylineno;
 VariableTable globalTable;
 VariableTable localTable(&globalTable);
 VariableTable* currTable = &globalTable;
-int * currentType;
+int* currentType;
 
 FunctionTable fglobalTable;
 FunctionTable* fcurrTable = &fglobalTable;
