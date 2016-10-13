@@ -10,11 +10,11 @@ class VariableTable {
 public:
     VariableTable();
     VariableTable(VariableTable* parent);
-    void insertVariable(string id, int type);
+    void insertVariable(string id, int address);
     bool findVariable(string id);
     void displayTable();
     void clearVarTable();
-    int getDirection(string id);
+    int getAddress(string id);
 
 private:
     unordered_map<string, Variable> varTable;

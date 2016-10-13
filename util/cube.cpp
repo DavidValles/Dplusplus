@@ -133,7 +133,7 @@ Cube::Cube() {
 	//INT greaterthanorequalto
 	cube[0][0][14] = 4;// int geqt int = error
 	cube[0][1][14] = 4;// int geqt decimal = error
-	cube[0][2][14] = -1// int geqt text = error
+	cube[0][2][14] = -1;// int geqt text = error
 	cube[0][3][14] = -1; // int geqt character = error
 	cube[0][4][14] = -1; // int geqt flag = error
 

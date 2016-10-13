@@ -1,0 +1,9 @@
+main {
+    var integer idInt;
+    var decimal idDec;
+    var text idText;
+    var flag flag1, flag2;
+    idInt = idInt + idText;
+    idDec = idInt + idDec;
+    flag1 = flag1 == flag2;
+}

@@ -5,7 +5,7 @@
 
 using namespace std;
 
-typeAdapter::typeAdapter() {
+TypeAdapter::TypeAdapter() {
 	integerMin = 0;
 	integerMax = 999;
 	decimalMin = 1000;
@@ -16,29 +16,53 @@ typeAdapter::typeAdapter() {
 	characterMax = 3999;
 	flagMin = 4000;
 	flagMax = 4999;
+	arrayMin = 5000;
+	arrayMax = 5999;
+	matrixMin = 6000;
+	matrixMax = 6999;
+	noneMin = 7000;
+	noneMax = 7999;
+	availMin = 8000;
+	availMax = 8999;
 }
 
-int typeAdapter::getIntegerMin() {
+int TypeAdapter::getIntegerMin() {
 	return integerMin;
 }
 
-int typeAdapter::getDecimalMin() {
+int TypeAdapter::getDecimalMin() {
 	return decimalMin;
 }
 
-int typeAdapter::getTextMIn() {
+int TypeAdapter::getTextMin() {
 	return textMin;
 }
 
-int typeAdapter::getCharacterMin() {
+int TypeAdapter::getCharacterMin() {
 	return characterMin;
 }
 
-int typeAdapter::getFlagMin() {
+int TypeAdapter::getFlagMin() {
 	return flagMin;
 }
 
-int typeAdapter::getType(int address){
+int TypeAdapter::getArrayMin() {
+	return arrayMin;
+}
+
+int TypeAdapter::getMatrixMin() {
+	return matrixMin;
+}
+
+int TypeAdapter::getNoneMin() {
+	return noneMin;
+}
+
+int TypeAdapter::getAvailMin() {
+	return availMin;
+}
+
+int TypeAdapter::getType(int address){
 	if(integerMin <= address && address <= integerMax) {
 		return 0;
 	}
@@ -53,6 +77,18 @@ int typeAdapter::getType(int address){
 	}
 	else if(flagMin <= address && address <= flagMax) {
 		return 4;
+	}
+	else if(arrayMin <= address && address <= arrayMax) {
+		return 5;
+	}
+	else if(matrixMin <= address && address <= matrixMax) {
+		return 6;
+	}
+	else if(noneMin <= address && address <= noneMax) {
+		return 7;
+	}
+	else if(availMin <= address && address <= availMax) {
+		return 8;
 	}
 	else {
 		return -1;
