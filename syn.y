@@ -9,12 +9,14 @@
 #include <stdlib.h>
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <iostream>
 #include <stack>
 #include "util/variableTable.cpp"
 #include "util/functionTable.cpp"
 #include "util/cube.cpp"
+#include "util/quadruple.cpp"
 #include "util/typeAdapter.cpp"
 
 using namespace std;
@@ -22,6 +24,7 @@ using namespace std;
 void yyerror (const char *s);
 void checkVariable();
 void checkFunction();
+void checkOperator(int oper1, int oper2 = -1);
 
 extern "C"
 {
@@ -43,38 +46,39 @@ FunctionTable fglobalTable;
 FunctionTable* fcurrTable = &fglobalTable;
 
 enum Ops {
-    Sum = 0;
-    Minus = 1;
-    Division = 2;
-    Multiplication = 3;
-    Modulo = 4;
-    GreaterThan = 5;
-    LessThan = 6;
-    Equal = 7;
-    And = 8;
-    Or = 9;
-    Not = 10;
-    NotEqualto = 11;
-    EqualTo = 12;
-    LessThanOrEqualTo = 13;
-    GreaterThanOrEqualTo = 14;
-    Floor = 15;
-}
+    Sum = 0,
+    Minus = 1,
+    Division = 2,
+    Multiplication = 3,
+    Modulo = 4,
+    GreaterThan = 5,
+    LessThan = 6,
+    Equal = 7,
+    And = 8,
+    Or = 9,
+    Not = 10,
+    NotEqualTo = 11,
+    EqualTo = 12,
+    LessThanOrEqualTo = 13,
+    GreaterThanOrEqualTo = 14,
+    Floor = 15
+};
 
 // Quadruples
 Cube cube;
+TypeAdapter typeAdapter;
 stack<int> typeStack;
 stack<int> operandStack;
 stack<int> operatorStack;
-vector<int> relationalOperators = { 
+unordered_set<int> relationalOperators = { 
     Ops::GreaterThan,
     Ops::LessThan,
     Ops::Equal,
-    Ops::NotEqualto,
+    Ops::NotEqualTo,
     Ops::EqualTo,
     Ops::LessThanOrEqualTo,
-    Ops::GreaterThanOrEqualTo,
-}
+    Ops::GreaterThanOrEqualTo
+};
 
 int Integer = typeAdapter.getIntegerMin();
 int Decimal = typeAdapter.getDecimalMin();
@@ -434,6 +438,7 @@ expression_ :
 
 exp         : term 
                 {
+                    // cout<<"Checking operator + or -"<<endl;
                     checkOperator(Ops::Sum, Ops::Minus);
                 }
                 exp_ 
@@ -442,12 +447,14 @@ exp         : term
 exp_        : '+'
                 {
                     // Push operator 
+                    // cout<<"Pushing operator: + to operatorStack"<<endl;
                     operatorStack.push(Ops::Sum);
                 }
                 exp
             | '-'
                 {
                     // Push operator 
+                    // cout<<"Pushing operator: - to operatorStack"<<endl;
                     operatorStack.push(Ops::Minus);
                 } 
                 exp
@@ -456,6 +463,7 @@ exp_        : '+'
 
 term        : factor 
                 {
+                    // cout<<"Checking operator * or /"<<endl;
                     checkOperator(Ops::Multiplication, Ops::Division);
                 }
                 term_ 
@@ -464,12 +472,14 @@ term        : factor
 term_       : '*'
                 {
                     // Push operator 
+                    // cout<<"Pushing operator: - to operatorStack"<<endl;
                     operatorStack.push(Ops::Multiplication);
                 } 
                 term
             | '/'
                 {
                     // Push operator 
+                    // cout<<"Pushing operator: - to operatorStack"<<endl;
                     operatorStack.push(Ops::Division);
                 }
                 term
@@ -492,9 +502,13 @@ constvar    : ID
                 {
                     checkVariable();
                     // Push operand and type
+                    string id = *yylval.stringValue;
                     int address = (*currTable).getAddress(id);
                     int type = typeAdapter.getType(address);
+                    // cout<<"Pushing type: "<<type<<" to typeStack"<<endl;
                     typeStack.push(type);
+                    // cout<<"Pushing address: "<<address<<
+                    //     " to operandStack"<<endl;
                     operandStack.push(address);
                 }
             | ICONSTANT 
@@ -503,31 +517,35 @@ constvar    : ID
 
 %%
 
-void checkOperator(char c1, char c2 = -1) {
-    char oper = operatorStack.top();
-    operatorStack.pop();
-    if (oper == c1 || oper == c2 || 
-            relationalOperators.find(oper) != realtionalOperators.end()) {
-        int type2 = typeStack.top();
-        typeStack.pop();
-        int type1 = typeStack.top();
-        typeStack.pop();
-        int resultType = cube.cube[type1][type2][oper];
+void checkOperator(int oper1, int oper2) {
+    if (!operatorStack.empty()) {
+        int oper = operatorStack.top();
+        // cout<<"Operator "<<oper<<" popped."<<endl;
+        if (oper == oper1 || oper == oper2 || 
+                relationalOperators.find(oper) != relationalOperators.end()) {
+            operatorStack.pop();
+            int type2 = typeStack.top();
+            typeStack.pop();
+            int type1 = typeStack.top();
+            typeStack.pop();
+            // cout<<"Checking "<<type1<<" "<<oper<<" "<<type2<<endl;
+            int resultType = cube.cube[type1][type2][oper];
 
-        if (resultType != -1) {
-            int operand2 = operandStack.top();
-            operandStack.pop();
-            int operand1 = operandStack.top();
-            operandStack.pop();
-            Quadruple quadruple(oper, operand1, operand2, 
-                                    (*Avail));
-            quadruple.display();
-            operandStack.push_back(*Avail);    
-            (*Avail)++;
-            typeStack.push_back(resultType);
-        }
-        else {
-            cout<<"Type mismatch in +"<<endl;
+            if (resultType != -1) {
+                int operand2 = operandStack.top();
+                operandStack.pop();
+                int operand1 = operandStack.top();
+                operandStack.pop();
+                Quadruple quadruple(oper, operand1, operand2, 
+                                        Avail);
+                quadruple.display();
+                operandStack.push(Avail);    
+                Avail++;
+                typeStack.push(resultType);
+            }
+            else {
+                cout<<"Type mismatch in line: "<<yylineno<<endl;
+            }
         }
     }
 }
@@ -543,7 +561,8 @@ void checkVariable() {
 void checkFunction() {
     string id = *yylval.stringValue;
     if(!(*fcurrTable).findFunction(id)) {
-        cout<<"Error! Line: "<<yylineno<<". Function not defined: "<<id<<"."<<endl;
+        cout<<"Error! Line: "<<yylineno<<". Function not defined: "<<
+            id<<"."<<endl;
     }
 }
 
@@ -559,11 +578,6 @@ int main(int argc, char **argv)
     
 	cout<<"Displaying global variable table"<<endl;
     (*currTable).displayTable();
-
-    
-    cout<<"Displaying global function table"<<endl;
-    (*fcurrTable).displayTable();
-    
 	
     return 0;
 }

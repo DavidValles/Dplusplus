@@ -3,14 +3,18 @@
 
 using namespace std;
 
-class typeAdapter {
+class TypeAdapter {
 public:
-	typeAdapter();
+	TypeAdapter();
 	int getIntegerMin();
 	int getDecimalMin();
 	int getTextMin();
 	int getCharacterMin();
 	int getFlagMin();
+	int getArrayMin();
+	int getMatrixMin();
+	int getNoneMin();
+	int getAvailMin();
 	int getType(int address);
 	int integerMin;
 	int integerMax;
@@ -22,6 +26,14 @@ public:
 	int characterMax;
 	int flagMin;
 	int flagMax;
+	int arrayMin;
+	int arrayMax;
+	int matrixMin;
+	int matrixMax;
+	int noneMin;
+	int noneMax;
+	int availMin;
+	int availMax;
 };
 
 #endif

@@ -13,8 +13,8 @@ VariableTable::VariableTable(VariableTable* parent) {
     this->parent = parent;
 }
 
-void VariableTable::insertVariable(string id, int type) {
-    Variable newVar(id, type);
+void VariableTable::insertVariable(string id, int address) {
+    Variable newVar(id, address);
     this->varTable[id] = newVar;
 }
 
@@ -33,7 +33,7 @@ bool VariableTable::findVariable(string id) {
 void VariableTable::displayTable() {
 	for(unordered_map<string, Variable>::iterator it = this->varTable.begin(); 
             it != this->varTable.end(); it++) {
-		cout<<it->first<<" "<<it->second.type<<endl;
+		cout<<it->first<<" "<<it->second.address<<endl;
 	}
 }
 
@@ -41,9 +41,9 @@ void VariableTable::clearVarTable() {
     this->varTable.clear();
 }
 
-int VariableTable::getDirection(string id) {
+int VariableTable::getAddress(string id) {
     Variable var = this->varTable[id];
-    return var.direction;
+    return var.address;
 }
 
 #endif
