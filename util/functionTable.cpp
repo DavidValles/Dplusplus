@@ -13,12 +13,10 @@ void FunctionTable::insertFunction(string id, int type) {
 	this->funcTable[id] = newFunc;
 }
 
-Function FunctionTable::getFunction(string id) {
+void FunctionTable::addParameterToFunction(string id, int type) {
     if (this->findFunction(id)) {
-        return this->funcTable[id];
+        this->funcTable[id].addParameter(type);
     }
-    Function emptyFunction;
-    return emptyFunction;
 }
 
 bool FunctionTable::findFunction(string id) {

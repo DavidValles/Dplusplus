@@ -1,3 +1,8 @@
+func integer doSomething(integer id1, decimal id2,
+                            text id3) {
+    var character id4, id5;
+}
+
 main {
     var integer idInt, idInt1, idInt2;
     var decimal idDec;

@@ -222,6 +222,8 @@ singlefunction  : FUNC singlefunction_ ID
                     }
                     '(' params ')' block 
                     {
+                        cout<<"Displaying function table"<<endl;
+                        functionTable.displayTable();
 	                    cout<<"Displaying local variable table"<<endl;
                         (*currTable).displayTable();
                         (*currTable).clearVarTable();
@@ -238,8 +240,8 @@ singlefunction_ : type
 */
 params      : type 
                 {
-                    functionTable.getFunction(functionId).
-                        addParameter(typeAdapter.getType((*currentType))); 
+                    functionTable.addParameterToFunction(functionId, 
+                                        typeAdapter.getType((*currentType))); 
                 } 
                 ID  
                 {   

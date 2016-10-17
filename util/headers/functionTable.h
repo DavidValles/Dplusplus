@@ -10,7 +10,7 @@ class FunctionTable {
 public:
 	FunctionTable();
 	void insertFunction(string id, int type);
-    Function getFunction(string id);
+    void addParameterToFunction(string id, int type);
 	bool findFunction(string id);
 	void displayTable();
 	void clearFunTable();
