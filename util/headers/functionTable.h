@@ -9,15 +9,14 @@ using namespace std;
 class FunctionTable {
 public:
 	FunctionTable();
-	FunctionTable(FunctionTable* parent);
 	void insertFunction(string id, int type);
+    Function getFunction(string id);
 	bool findFunction(string id);
 	void displayTable();
 	void clearFunTable();
 
 private:
 	unordered_map<string, Function> funcTable;
-	FunctionTable* parent;
 };
 
 #endif

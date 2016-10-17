@@ -43,8 +43,8 @@ VariableTable localTable(&globalTable);
 VariableTable* currTable = &globalTable;
 int* currentType;
 
-FunctionTable fglobalTable;
-FunctionTable* fcurrTable = &fglobalTable;
+FunctionTable functionTable;
+string functionId;
 
 enum Ops {
     Sum = 0,
@@ -215,8 +215,8 @@ functions   : singlefunction functions
 
 singlefunction  : FUNC singlefunction_ ID 
                     {   
-                        string id = *yylval.stringValue;
-                        (*fcurrTable).insertFunction(id, *currentType); 
+                        functionId = *yylval.stringValue;
+                        functionTable.insertFunction(functionId, *currentType); 
                         typeAdapter.getNextAddress((*currentType));
                         currTable = &localTable;
                     }
@@ -229,14 +229,19 @@ singlefunction  : FUNC singlefunction_ ID
                     }
                 ;
 
-singlefunction_ : type
+singlefunction_ : type 
                 | NONE { currentType = &None; }
                 ;
 
 /*
     Declaring zero to n paramaters
 */
-params      : type ID  
+params      : type 
+                {
+                    functionTable.getFunction(functionId).
+                        addParameter(typeAdapter.getType((*currentType))); 
+                } 
+                ID  
                 {   
                     string id = *yylval.stringValue;
                     (*currTable).insertVariable(id, *currentType);
@@ -561,7 +566,7 @@ void checkVariable() {
 
 void checkFunction() {
     string id = *yylval.stringValue;
-    if(!(*fcurrTable).findFunction(id)) {
+    if(!functionTable.findFunction(id)) {
         cout<<"Error! Line: "<<yylineno<<". Function not defined: "<<
             id<<"."<<endl;
     }

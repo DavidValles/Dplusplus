@@ -6,11 +6,6 @@
 using namespace std;
 
 FunctionTable::FunctionTable() {
-	parent = NULL;
-}
-
-FunctionTable::FunctionTable(FunctionTable* parent) {
-	this->parent = parent;
 }
 
 void FunctionTable::insertFunction(string id, int type) {
@@ -18,13 +13,16 @@ void FunctionTable::insertFunction(string id, int type) {
 	this->funcTable[id] = newFunc;
 }
 
+Function FunctionTable::getFunction(string id) {
+    if (this->findFunction(id)) {
+        return this->funcTable[id];
+    }
+    Function emptyFunction;
+    return emptyFunction;
+}
+
 bool FunctionTable::findFunction(string id) {
 	if(this->funcTable.find(id) != this->funcTable.end()) {
-		return true;
-	}
-	if(!parent) return false;
-	auto parentTable = (*this->parent).funcTable;
-	if(parentTable.find(id) != parentTable.end()) {
 		return true;
 	}
 	return false;
@@ -32,7 +30,12 @@ bool FunctionTable::findFunction(string id) {
 
 void FunctionTable::displayTable() {
 	for(auto it = this->funcTable.begin(); it != this->funcTable.end(); it++) {
-		cout<<it->first<<" "<<it->second.type<<endl;
+		cout<<it->first<<" "<<it->second.type<<" Parameters: ";
+        auto parameters = it->second.getParameters();
+        for (int i=0; i < parameters.size(); i++) {
+            cout<<parameters[i]<<" ";
+        }
+        cout<<endl;
 	}
 }
 

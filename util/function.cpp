@@ -13,4 +13,12 @@ Function::Function(string name, int type) {
 	this->type = type;
 }
 
+vector<int> Function::getParameters() {
+    return this->parameters;
+}
+
+void Function::addParameter(int type) {
+    parameters.push_back(type);
+}
+
 #endif
