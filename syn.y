@@ -216,8 +216,8 @@ functions   : singlefunction functions
 singlefunction  : FUNC singlefunction_ ID 
                     {   
                         functionId = *yylval.stringValue;
-                        functionTable.insertFunction(functionId, *currentType); 
-                        typeAdapter.getNextAddress((*currentType));
+                        functionTable.insertFunction(functionId, 
+                                            typeAdapter.getType(*currentType)); 
                         currTable = &localTable;
                     }
                     '(' params ')' block 
