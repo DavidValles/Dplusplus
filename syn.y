@@ -196,7 +196,7 @@ variable    : ID
                 {
                     string id = *yylval.stringValue;
                     (*currTable).insertVariable(id, *currentType);
-                    (*currentType)++;
+                    typeAdapter.getNextAddress((*currentType));
                 }
                 assignment variable_
             ;
@@ -217,7 +217,7 @@ singlefunction  : FUNC singlefunction_ ID
                     {   
                         string id = *yylval.stringValue;
                         (*fcurrTable).insertFunction(id, *currentType); 
-                        (*currentType)++;
+                        typeAdapter.getNextAddress((*currentType));
                         currTable = &localTable;
                     }
                     '(' params ')' block 
@@ -240,7 +240,7 @@ params      : type ID
                 {   
                     string id = *yylval.stringValue;
                     (*currTable).insertVariable(id, *currentType);
-                    (*currentType)++;
+                    typeAdapter.getNextAddress((*currentType));
                 }
                 params_ 
             |
