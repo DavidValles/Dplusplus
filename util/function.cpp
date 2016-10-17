@@ -1,7 +1,7 @@
 #ifndef FUNCTION_CPP
 #define FUNCTION_CPP
 
-#include "function.h"
+#include "headers/function.h"
 
 using namespace std;
 

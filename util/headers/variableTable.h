@@ -1,7 +1,7 @@
 #ifndef VARIABLETABLE_H
 #define VARIABLETABLE_H
 
-#include "variable.cpp"
+#include "../variable.cpp"
 #include <iostream>
 
 using namespace std;

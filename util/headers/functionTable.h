@@ -1,7 +1,7 @@
 #ifndef FUNCTIONTABLE_H
 #define FUNCTIONTABLE_H
 
-#include "function.cpp"
+#include "../function.cpp"
 #include <iostream>
 
 using namespace std;

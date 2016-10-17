@@ -1,7 +1,7 @@
 #ifndef CUBE_CPP
 #define CUBE_CPP
 
-#include "cube.h"
+#include "headers/cube.h"
 
 using namespace std;
 

@@ -1,7 +1,7 @@
 #ifndef VARIABLE_CPP
 #define VARIABLE_CPP
 
-#include "variable.h"
+#include "headers/variable.h"
 
 using namespace std;
 

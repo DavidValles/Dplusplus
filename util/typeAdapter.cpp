@@ -1,7 +1,7 @@
 #ifndef TYPEADAPTER_CPP
 #define TYPEADAPTER_CPP
 
-#include "typeAdapter.h"
+#include "headers/typeAdapter.h"
 
 using namespace std;
 

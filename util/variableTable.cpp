@@ -1,7 +1,7 @@
 #ifndef VARIABLETABLE_CPP
 #define VARIABLETABLE_CPP
 
-#include "variableTable.h"
+#include "headers/variableTable.h"
 
 using namespace std;
 

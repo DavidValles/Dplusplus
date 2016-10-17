@@ -1,7 +1,7 @@
 #ifndef QUADRUPLE_CPP
 #define QUADRUPLE_CPP
 
-#include "quadruple.h"
+#include "headers/quadruple.h"
 
 Quadruple::Quadruple(int oper, int operand1, int operand2, int result) {
     this->oper = oper;
