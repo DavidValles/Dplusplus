@@ -15,7 +15,11 @@ public:
 	int getMatrixMin();
 	int getNoneMin();
 	int getAvailMin();
+
 	int getType(int address);
+    void getNextAddress(int& address);
+
+private:
 	int integerMin;
 	int integerMax;
 	int decimalMin;

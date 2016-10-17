@@ -13,6 +13,7 @@
 #include <vector>
 #include <iostream>
 #include <stack>
+
 #include "util/variableTable.cpp"
 #include "util/functionTable.cpp"
 #include "util/cube.cpp"
@@ -188,7 +189,7 @@ variable    : ID
                 {
                     string id = *yylval.stringValue;
                     (*currTable).insertVariable(id, *currentType);
-                    (*currentType)++;
+                    typeAdapter.getNextAddress((*currentType));
                 }
                 variable_
             | ID 

@@ -95,4 +95,35 @@ int TypeAdapter::getType(int address){
 	}
 }
 
+void TypeAdapter::getNextAddress(int &address){
+    address++;
+	if(address == integerMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == decimalMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == textMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == characterMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == flagMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == arrayMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == matrixMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == noneMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == availMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+}
+
 #endif

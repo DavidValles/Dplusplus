@@ -1,9 +1,9 @@
 main {
-    var integer idInt;
+    var integer idInt, idInt1, idInt2;
     var decimal idDec;
     var text idText;
     var flag flag1, flag2;
     idInt = idInt + idText;
-    idDec = idInt + idDec;
+    idDec = idInt + idDec + 2;
     flag1 = flag1 == flag2;
 }
