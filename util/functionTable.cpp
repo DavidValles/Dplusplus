@@ -26,6 +26,11 @@ bool FunctionTable::findFunction(string id) {
 	return false;
 }
 
+bool FunctionTable::checkTypeOfParameter(string func, int type, int param) {
+    auto parameters = funcTable[func].getParameters();
+    return parameters[param] == type;
+}
+
 void FunctionTable::displayTable() {
 	for(auto it = this->funcTable.begin(); it != this->funcTable.end(); it++) {
 		cout<<it->first<<" "<<it->second.type<<" Parameters: ";

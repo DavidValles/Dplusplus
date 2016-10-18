@@ -46,6 +46,10 @@ int* currentType;
 FunctionTable functionTable;
 string functionId;
 
+// Util for function parameter syntax checking
+string currentFunction;
+int currentParameter;
+
 enum Ops {
     Sum = 0,
     Minus = 1,
@@ -312,6 +316,10 @@ assignment_ : expression
 functioncall    : ID 
                     {
                         checkFunction();
+
+                        // Set current values for parameter checking
+                        currentFunction = *yylval.stringValue;
+                        currentParameter = 0;
                     }
                     '(' functioncall_ ')'
                 ;
@@ -319,6 +327,20 @@ functioncall    : ID
 functioncall_   : ID 
                     {   
                         checkVariable();
+
+                        // Get type of the parameter
+                        int address = (*currTable).
+                                            getAddress(*yylval.stringValue);
+                        int type = typeAdapter.getType(address);
+
+                        // Check if parameter matches type from function def
+                        if (!functionTable.checkTypeOfParameter(
+                                    currentFunction, type, currentParameter)) {
+                            cout<<"Wrong parameter type in function "<<
+                                currentFunction<<", parameter #"<<
+                                currentParameter + 1<<" in line "<<yylineno<<endl;
+                        }
+                        currentParameter++;
                     }
                     functioncall__
                 |

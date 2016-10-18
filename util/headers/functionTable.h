@@ -12,6 +12,7 @@ public:
 	void insertFunction(string id, int type);
     void addParameterToFunction(string id, int type);
 	bool findFunction(string id);
+    bool checkTypeOfParameter(string func, int type, int param);
 	void displayTable();
 	void clearFunTable();
 

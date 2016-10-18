@@ -11,4 +11,5 @@ main {
     idInt = idInt + idText;
     idDec = idInt + idDec;
     flag1 = flag1 == flag2;
+    doSomething(idInt, idDec, idDec);
 }
