@@ -24,6 +24,10 @@ TypeAdapter::TypeAdapter() {
 	noneMax = 7999;
 	availMin = 8000;
 	availMax = 8999;
+	integerConstantMin = 9000;
+	integerConstantMax = 9999;
+	decimalConstantMin = 10000;
+	decimalConstantMax = 10999;
 }
 
 int TypeAdapter::getIntegerMin() {
@@ -62,11 +66,21 @@ int TypeAdapter::getAvailMin() {
 	return availMin;
 }
 
+int TypeAdapter::getIntegerConstantMin() {
+	return integerConstantMin;
+}
+
+int TypeAdapter::getDecimalConstantMin() {
+	return decimalConstantMin;
+}
+
 int TypeAdapter::getType(int address){
-	if(integerMin <= address && address <= integerMax) {
+	if((integerMin <= address && address <= integerMax) ||
+        (integerConstantMin <= address &&  address <= integerConstantMax)) {
 		return 0;
 	}
-	else if(decimalMin <= address && address <= decimalMax) {
+	else if((decimalMin <= address && address <= decimalMax) ||
+        (decimalConstantMin <= address && address <= decimalConstantMax)) {
 		return 1;
 	}
 	else if(textMin <= address && address <= textMax) {
@@ -122,6 +136,12 @@ void TypeAdapter::getNextAddress(int &address){
         cout<<"Memory limit exceeded."<<endl;
 	}
 	else if(address == availMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == integerConstantMax) {
+        cout<<"Memory limit exceeded."<<endl;
+	}
+	else if(address == decimalConstantMax) {
         cout<<"Memory limit exceeded."<<endl;
 	}
 }

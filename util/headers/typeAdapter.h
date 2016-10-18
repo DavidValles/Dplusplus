@@ -15,6 +15,8 @@ public:
 	int getMatrixMin();
 	int getNoneMin();
 	int getAvailMin();
+    int getIntegerConstantMin();
+    int getDecimalConstantMin();
 
 	int getType(int address);
     void getNextAddress(int& address);
@@ -38,6 +40,10 @@ private:
 	int noneMax;
 	int availMin;
 	int availMax;
+    int integerConstantMin;
+    int integerConstantMax;
+    int decimalConstantMin;
+    int decimalConstantMax;
 };
 
 #endif

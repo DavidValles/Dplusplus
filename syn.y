@@ -16,6 +16,7 @@
 
 #include "util/variableTable.cpp"
 #include "util/functionTable.cpp"
+#include "util/constantTable.cpp"
 #include "util/cube.cpp"
 #include "util/quadruple.cpp"
 #include "util/typeAdapter.cpp"
@@ -25,6 +26,7 @@ using namespace std;
 void yyerror (const char *s);
 void checkVariable();
 void checkFunction();
+bool checkConstant();
 void checkOperator(int oper1, int oper2 = -1);
 
 extern "C"
@@ -43,12 +45,18 @@ VariableTable localTable(&globalTable);
 VariableTable* currTable = &globalTable;
 int* currentType;
 
+/*
+    Utilities for functions and syntax checking
+*/
 FunctionTable functionTable;
 string functionId;
-
-// Util for function parameter syntax checking
 string currentFunction;
 int currentParameter;
+
+/*
+    Utilities for constants
+*/
+ConstantTable constantTable;
 
 enum Ops {
     Sum = 0,
@@ -71,6 +79,7 @@ enum Ops {
 
 // Quadruples
 Cube cube;
+vector<Quadruple> quadruples;
 TypeAdapter typeAdapter;
 stack<int> typeStack;
 stack<int> operandStack;
@@ -94,6 +103,8 @@ int Array = typeAdapter.getArrayMin();
 int Matrix = typeAdapter.getMatrixMin();
 int None = typeAdapter.getNoneMin();
 int Avail = typeAdapter.getAvailMin();
+int IntegerConstant = typeAdapter.getIntegerConstantMin();
+int DecimalConstant = typeAdapter.getDecimalConstantMin();
 %}
 
 %start start
@@ -443,8 +454,7 @@ type        : INT { currentType = &Integer; }
 expression  : exp expression_
             ;
 
-expression_ : 
-            | '>' { operatorStack.push(Ops::GreaterThan); } 
+expression_ : '>' { operatorStack.push(Ops::GreaterThan); } 
                 exp
                 { checkOperator(Ops::GreaterThan); }
             | '<' { operatorStack.push(Ops::LessThan); } 
@@ -464,6 +474,7 @@ expression_ :
             | NOTEQUALTO { operatorStack.push(Ops::NotEqualTo); } 
                 exp
                 { checkOperator(Ops::NotEqualTo); }
+            |
             ;
 
 exp         : term 
@@ -542,7 +553,29 @@ constvar    : ID
                     operandStack.push(address);
                 }
             | ICONSTANT 
+                {
+                    string id = *yylval.stringValue;
+                    if (!checkConstant()) {
+                        constantTable.insertConstant(id, IntegerConstant);
+                        typeAdapter.getNextAddress(IntegerConstant);
+                    }
+                    int address = constantTable.getAddress(id);
+                    int type = typeAdapter.getType(address);
+                    typeStack.push(type);
+                    operandStack.push(address);
+                }
             | DCONSTANT 
+                {
+                    string id = *yylval.stringValue;
+                    if (!checkConstant()) {
+                        constantTable.insertConstant(id, DecimalConstant);
+                        typeAdapter.getNextAddress(DecimalConstant);
+                    }
+                    int address = constantTable.getAddress(id);
+                    int type = typeAdapter.getType(address);
+                    typeStack.push(type);
+                    operandStack.push(address);
+                }
             ;
 
 %%
@@ -568,7 +601,7 @@ void checkOperator(int oper1, int oper2) {
                 operandStack.pop();
                 Quadruple quadruple(oper, operand1, operand2, 
                                         Avail);
-                quadruple.display();
+                quadruples.push_back(quadruple);
                 operandStack.push(Avail);    
                 Avail++;
                 typeStack.push(resultType);
@@ -596,6 +629,12 @@ void checkFunction() {
     }
 }
 
+bool checkConstant() {
+    string id = *yylval.stringValue;
+    bool check = constantTable.findConstant(id);
+    return check;
+}
+
 int main(int argc, char **argv)
 {
     if ((argc > 1) && (freopen(argv[1], "r", stdin) == NULL))
@@ -608,6 +647,11 @@ int main(int argc, char **argv)
     
 	cout<<"Displaying global variable table"<<endl;
     (*currTable).displayTable();
+
+	cout<<"Displaying quadruples"<<endl;
+    for (int i=0; i<quadruples.size(); i++) {
+        quadruples[i].display();
+    }
 	
     return 0;
 }

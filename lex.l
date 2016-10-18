@@ -52,8 +52,18 @@ extern void yyerror (const char *s);
                                 return ID; 
                             }
 
-0|[1-9][0-9]*               return ICONSTANT; 
-(0|[1-9][0-9]*)\.[0-9]*     return DCONSTANT; 
+0|[1-9][0-9]*               { 
+                                yylval.stringValue = 
+                                    new std::string(yytext, yyleng); 
+                                return ICONSTANT; 
+                            }
+
+(0|[1-9][0-9]*)\.[0-9]*     {
+                                yylval.stringValue = 
+                                    new std::string(yytext, yyleng); 
+                                return DCONSTANT; 
+                            }
+
 \"(\\.|[^"])*\"             return SCONSTANT; 
 \'.\'                       return CCONSTANT; 
 

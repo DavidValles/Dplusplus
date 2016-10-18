@@ -8,8 +8,10 @@ main {
     var decimal idDec;
     var text idText;
     var flag flag1, flag2;
+    idInt = 1;
     idInt = idInt + idText;
-    idDec = idInt + idDec;
+    idInt = 4;
+    idDec = (idInt + idDec) * idInt - idDec + 25;
     flag1 = flag1 == flag2;
     doSomething(idInt, idDec, idDec);
 }

@@ -42,8 +42,10 @@ void VariableTable::clearVarTable() {
 }
 
 int VariableTable::getAddress(string id) {
-    Variable var = this->varTable[id];
-    return var.address;
+    if (this->varTable.find(id) != this->varTable.end()) {
+        return this->varTable[id].address;
+    }
+    return -1;
 }
 
 #endif
