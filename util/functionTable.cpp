@@ -28,6 +28,7 @@ bool FunctionTable::findFunction(string id) {
 
 bool FunctionTable::checkTypeOfParameter(string func, int type, int param) {
     auto parameters = funcTable[func].getParameters();
+    if (param >= parameters.size()) return false;
     return parameters[param] == type;
 }
 
