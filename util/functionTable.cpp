@@ -13,6 +13,13 @@ void FunctionTable::insertFunction(string id, int type) {
 	this->funcTable[id] = newFunc;
 }
 
+int FunctionTable::getParametersSize(string id) {
+    if (this->findFunction(id)) {
+        return this->funcTable[id].getParameters().size();
+    }
+    return -1;
+}
+
 void FunctionTable::addParameterToFunction(string id, int type) {
     if (this->findFunction(id)) {
         this->funcTable[id].addParameter(type);

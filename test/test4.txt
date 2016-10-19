@@ -1,0 +1,7 @@
+func none func1 (integer id1) {
+}
+
+main {
+    var integer id2;
+    func1(id2, id2);
+}

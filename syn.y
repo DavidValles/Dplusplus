@@ -350,7 +350,7 @@ assignment_ : expression
                 {
                     insertConstantToTable(CharacterConstant);
                 }
-            | functioncall
+            | functioncall /* TODO dafuq should i do here? */
             ;
 
 /* 
@@ -365,7 +365,15 @@ functioncall    : ID
                         currentFunction = *yylval.stringValue;
                         currentParameter = 0;
                     }
-                    '(' functioncall_ ')'
+                    '(' functioncall_ ')' 
+                    {
+                        if (functionTable.getParametersSize(currentFunction)
+                                != currentParameter) {
+                            cout<<"Incorrect number of parameters in function "
+                                <<currentFunction<<" in line "<<yylineno
+                                <<endl;
+                        }
+                    }
                 ;
 
 functioncall_   : ID 
