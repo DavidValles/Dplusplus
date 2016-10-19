@@ -3,6 +3,17 @@
 
 using namespace std;
 
+struct Section {
+    void set(int a, int b) {
+        min = a;
+        size = b;
+        max = min + size - 1;
+    }
+    int min;
+    int size;
+    int max;
+};
+
 class TypeAdapter {
 public:
 	TypeAdapter();
@@ -22,28 +33,17 @@ public:
     void getNextAddress(int& address);
 
 private:
-	int integerMin;
-	int integerMax;
-	int decimalMin;
-	int decimalMax;
-	int textMin;
-	int textMax;
-	int characterMin;
-	int characterMax;
-	int flagMin;
-	int flagMax;
-	int arrayMin;
-	int arrayMax;
-	int matrixMin;
-	int matrixMax;
-	int noneMin;
-	int noneMax;
-	int availMin;
-	int availMax;
-    int integerConstantMin;
-    int integerConstantMax;
-    int decimalConstantMin;
-    int decimalConstantMax;
+	Section integer;
+	Section decimal;
+	Section text;
+	Section character;
+	Section flag;
+	Section array;
+	Section matrix;
+	Section none;
+	Section avail;
+    Section integerConstant;
+    Section decimalConstant;
 };
 
 #endif

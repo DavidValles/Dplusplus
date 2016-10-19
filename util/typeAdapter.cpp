@@ -6,102 +6,91 @@
 using namespace std;
 
 TypeAdapter::TypeAdapter() {
-	integerMin = 0;
-	integerMax = 999;
-	decimalMin = 1000;
-	decimalMax = 1999;
-	textMin = 2000;
-	textMax = 2999;
-	characterMin = 3000;
-	characterMax = 3999;
-	flagMin = 4000;
-	flagMax = 4999;
-	arrayMin = 5000;
-	arrayMax = 5999;
-	matrixMin = 6000;
-	matrixMax = 6999;
-	noneMin = 7000;
-	noneMax = 7999;
-	availMin = 8000;
-	availMax = 8999;
-	integerConstantMin = 9000;
-	integerConstantMax = 9999;
-	decimalConstantMin = 10000;
-	decimalConstantMax = 10999;
+    integer.set(0, 1000);
+    decimal.set(integer.max + 1, 1000);
+    text.set(decimal.max + 1, 1000);
+    character.set(text.max + 1, 1000);
+    flag.set(character.max + 1, 1000);
+    array.set(flag.max + 1, 1000);
+    matrix.set(array.max + 1, 1000);
+    none.set(matrix.max + 1, 1000);
+    avail.set(none.max + 1, 1000);
+    integerConstant.set(avail.max + 1, 1000);
+    decimalConstant.set(integerConstant.max + 1, 1000);
 }
 
 int TypeAdapter::getIntegerMin() {
-	return integerMin;
+	return integer.min;
 }
 
 int TypeAdapter::getDecimalMin() {
-	return decimalMin;
+	return decimal.min;
 }
 
 int TypeAdapter::getTextMin() {
-	return textMin;
+	return text.min;
 }
 
 int TypeAdapter::getCharacterMin() {
-	return characterMin;
+	return character.min;
 }
 
 int TypeAdapter::getFlagMin() {
-	return flagMin;
+	return flag.min;
 }
 
 int TypeAdapter::getArrayMin() {
-	return arrayMin;
+	return array.min;
 }
 
 int TypeAdapter::getMatrixMin() {
-	return matrixMin;
+	return matrix.min;
 }
 
 int TypeAdapter::getNoneMin() {
-	return noneMin;
+	return none.min;
 }
 
 int TypeAdapter::getAvailMin() {
-	return availMin;
+	return avail.min;
 }
 
 int TypeAdapter::getIntegerConstantMin() {
-	return integerConstantMin;
+	return integerConstant.min;
 }
 
 int TypeAdapter::getDecimalConstantMin() {
-	return decimalConstantMin;
+	return decimalConstant.min;
 }
 
 int TypeAdapter::getType(int address){
-	if((integerMin <= address && address <= integerMax) ||
-        (integerConstantMin <= address &&  address <= integerConstantMax)) {
+	if((integer.min <= address && address <= integer.max) ||
+        (integerConstant.min <= address &&  address <= integerConstant.max)) {
 		return 0;
 	}
-	else if((decimalMin <= address && address <= decimalMax) ||
-        (decimalConstantMin <= address && address <= decimalConstantMax)) {
+	else if((decimal.min <= address && address <= decimal.max) ||
+        (decimalConstant.min <= address && address <= decimalConstant.max)) {
 		return 1;
 	}
-	else if(textMin <= address && address <= textMax) {
+	else if(text.min <= address && address <= text.max) {
 		return 2;
 	}
-	else if(characterMin <= address && address <= characterMax) {
+	else if(character.min <= address && address <= character.max) {
 		return 3;
 	}
-	else if(flagMin <= address && address <= flagMax) {
+	else if(flag.min <= address && address <= flag.max) {
 		return 4;
 	}
-	else if(arrayMin <= address && address <= arrayMax) {
+	else if(array.min <= address && address <= array.max) {
 		return 5;
 	}
-	else if(matrixMin <= address && address <= matrixMax) {
+	else if(matrix.min <= address && address <= matrix.max) {
 		return 6;
 	}
-	else if(noneMin <= address && address <= noneMax) {
+	else if(none.min <= address && address <= none.max) {
 		return 7;
 	}
-	else if(availMin <= address && address <= availMax) {
+	else if(avail.min <= address && address <= avail.max) {
 		return 8;
 	}
 	else {
@@ -111,37 +100,37 @@ int TypeAdapter::getType(int address){
 
 void TypeAdapter::getNextAddress(int &address){
     address++;
-	if(address == integerMax) {
+	if(address == integer.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == decimalMax) {
+	else if(address == decimal.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == textMax) {
+	else if(address == text.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == characterMax) {
+	else if(address == character.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == flagMax) {
+	else if(address == flag.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == arrayMax) {
+	else if(address == array.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == matrixMax) {
+	else if(address == matrix.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == noneMax) {
+	else if(address == none.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == availMax) {
+	else if(address == avail.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == integerConstantMax) {
+	else if(address == integerConstant.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
-	else if(address == decimalConstantMax) {
+	else if(address == decimalConstant.max) {
         cout<<"Memory limit exceeded."<<endl;
 	}
 }
