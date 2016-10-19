@@ -328,6 +328,9 @@ statement   : ID
             | variables 
             | RETURN ID 
                 {
+                    if (currTable == &globalTable) {
+                        cout<<"ERROR: Main cannot have a return value"<<endl;
+                    }
                     checkVariable();
                 }
                 ';'
