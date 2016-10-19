@@ -367,6 +367,8 @@ functioncall    : ID
                     }
                     '(' functioncall_ ')' 
                     {
+                        // Check if parameters in function call match 
+                        //    the necessary in the declaration
                         if (functionTable.getParametersSize(currentFunction)
                                 != currentParameter) {
                             cout<<"Incorrect number of parameters in function "
@@ -398,7 +400,7 @@ functioncall_   : ID
                 |
                 ;
 
-functioncall__    : ',' functioncall_
+functioncall__  : ',' functioncall_
                 |
                 ;
 
@@ -606,7 +608,8 @@ factor      :   {
 constvar    : ID 
                 {
                     checkVariable();
-                    // Push operand and type
+                    
+                    // Push operand and type to respective stacks
                     string id = *yylval.stringValue;
                     int address = (*currTable).getAddress(id);
                     int type = typeAdapter.getType(address);
@@ -625,6 +628,10 @@ constvar    : ID
 
 %%
 
+/*
+    Inserts a constant to the table of constants depending on its type
+    It also pushes the constant and type to their stacks 
+*/
 void insertConstantToTable(int &constantAddress) {
     string id = *yylval.stringValue;
     if (!checkConstant()) {
@@ -637,7 +644,14 @@ void insertConstantToTable(int &constantAddress) {
     operandStack.push(address);
 }
 
+/*
+    Checks if the top operator of the stack matches the wanted operators 
+        (the parameters).
+    i.e. checkOperator(Ops::Multiplication, Ops::Division)
 
+    Also can be called without parameters to check if the operator belongs to
+        the relationalOperators like <, >
+*/
 void checkOperator(int oper1, int oper2) {
     if (!operatorStack.empty()) {
         int oper = operatorStack.top();
@@ -648,9 +662,9 @@ void checkOperator(int oper1, int oper2) {
             typeStack.pop();
             int type1 = typeStack.top();
             typeStack.pop();
-            // cout<<"Checking "<<type1<<" "<<oper<<" "<<type2<<endl;
             int resultType = cube.cube[type1][type2][oper];
 
+            // Check if result is valid
             if (resultType != -1) {
                 int operand2 = operandStack.top();
                 operandStack.pop();
@@ -660,7 +674,7 @@ void checkOperator(int oper1, int oper2) {
                                         Avail);
                 quadruples.push_back(quadruple);
                 operandStack.push(Avail);    
-                Avail++;
+                typeAdapter.getNextAddress(Avail);
                 typeStack.push(resultType);
             }
             else {
@@ -670,6 +684,9 @@ void checkOperator(int oper1, int oper2) {
     }
 }
 
+/*
+    Checks if the variable id in the current yylval has been declared
+*/
 void checkVariable() {
     string id = *yylval.stringValue;
     if (!(*currTable).findVariable(id)) {
@@ -678,6 +695,9 @@ void checkVariable() {
     }
 }
 
+/*
+    Checks if the function id in the current yylval has been declared
+*/
 void checkFunction() {
     string id = *yylval.stringValue;
     if(!functionTable.findFunction(id)) {
@@ -686,6 +706,10 @@ void checkFunction() {
     }
 }
 
+/*
+    Checks if the constant id in the current yylval has been added to the
+        constant table
+*/
 bool checkConstant() {
     string id = *yylval.stringValue;
     bool check = constantTable.findConstant(id);
