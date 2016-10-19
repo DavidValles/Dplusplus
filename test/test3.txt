@@ -10,6 +10,7 @@ main {
     var flag flag1, flag2;
     idInt = 1;
     idInt = 4;
+    idText = "This is a test";
     idDec = (idInt + idDec) * idInt - idDec + 25;
     flag1 = flag1 == flag2;
     doSomething(idInt, idDec, idDec);

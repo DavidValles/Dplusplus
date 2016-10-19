@@ -24,6 +24,7 @@
 using namespace std;
 
 void yyerror (const char *s);
+void insertConstantToTable(int &constantAddress);
 void checkVariable();
 void checkFunction();
 bool checkConstant();
@@ -106,6 +107,8 @@ int None = typeAdapter.getNoneMin();
 int Avail = typeAdapter.getAvailMin();
 int IntegerConstant = typeAdapter.getIntegerConstantMin();
 int DecimalConstant = typeAdapter.getDecimalConstantMin();
+int StringConstant = typeAdapter.getStringConstantMin();
+int CharacterConstant = typeAdapter.getCharacterConstantMin();
 %}
 
 %start start
@@ -340,7 +343,13 @@ assignment  : '=' assignment_
 
 assignment_ : expression
             | SCONSTANT 
+                {
+                    insertConstantToTable(StringConstant);
+                }
             | CCONSTANT 
+                {
+                    insertConstantToTable(CharacterConstant);
+                }
             | functioncall
             ;
 
@@ -598,31 +607,28 @@ constvar    : ID
                 }
             | ICONSTANT 
                 {
-                    string id = *yylval.stringValue;
-                    if (!checkConstant()) {
-                        constantTable.insertConstant(id, IntegerConstant);
-                        typeAdapter.getNextAddress(IntegerConstant);
-                    }
-                    int address = constantTable.getAddress(id);
-                    int type = typeAdapter.getType(address);
-                    typeStack.push(type);
-                    operandStack.push(address);
+                    insertConstantToTable(IntegerConstant);
                 }
             | DCONSTANT 
                 {
-                    string id = *yylval.stringValue;
-                    if (!checkConstant()) {
-                        constantTable.insertConstant(id, DecimalConstant);
-                        typeAdapter.getNextAddress(DecimalConstant);
-                    }
-                    int address = constantTable.getAddress(id);
-                    int type = typeAdapter.getType(address);
-                    typeStack.push(type);
-                    operandStack.push(address);
+                    insertConstantToTable(DecimalConstant);
                 }
             ;
 
 %%
+
+void insertConstantToTable(int &constantAddress) {
+    string id = *yylval.stringValue;
+    if (!checkConstant()) {
+        constantTable.insertConstant(id, constantAddress);
+        typeAdapter.getNextAddress(constantAddress);
+    }
+    int address = constantTable.getAddress(id);
+    int type = typeAdapter.getType(address);
+    typeStack.push(type);
+    operandStack.push(address);
+}
+
 
 void checkOperator(int oper1, int oper2) {
     if (!operatorStack.empty()) {

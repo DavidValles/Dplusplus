@@ -17,6 +17,8 @@ TypeAdapter::TypeAdapter() {
     avail.set(none.max + 1, 1000);
     integerConstant.set(avail.max + 1, 1000);
     decimalConstant.set(integerConstant.max + 1, 1000);
+    stringConstant.set(decimalConstant.max + 1, 1000);
+    characterConstant.set(stringConstant.max + 1, 1000);
 }
 
 int TypeAdapter::getIntegerMin() {
@@ -63,6 +65,14 @@ int TypeAdapter::getDecimalConstantMin() {
 	return decimalConstant.min;
 }
 
+int TypeAdapter::getStringConstantMin() {
+	return stringConstant.min;
+}
+
+int TypeAdapter::getCharacterConstantMin() {
+	return characterConstant.min;
+}
+
 int TypeAdapter::getType(int address){
 	if((integer.min <= address && address <= integer.max) ||
         (integerConstant.min <= address &&  address <= integerConstant.max)) {
@@ -72,10 +82,12 @@ int TypeAdapter::getType(int address){
         (decimalConstant.min <= address && address <= decimalConstant.max)) {
 		return 1;
 	}
-	else if(text.min <= address && address <= text.max) {
+	else if((text.min <= address && address <= text.max) ||
+        (stringConstant.min <= address && address <= stringConstant.max)) {
 		return 2;
 	}
-	else if(character.min <= address && address <= character.max) {
+	else if((character.min <= address && address <= character.max) ||
+       (characterConstant.min <= address && address <= characterConstant.max)){
 		return 3;
 	}
 	else if(flag.min <= address && address <= flag.max) {

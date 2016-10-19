@@ -28,6 +28,8 @@ public:
 	int getAvailMin();
     int getIntegerConstantMin();
     int getDecimalConstantMin();
+    int getStringConstantMin();
+    int getCharacterConstantMin();
 
 	int getType(int address);
     void getNextAddress(int& address);
@@ -44,6 +46,8 @@ private:
 	Section avail;
     Section integerConstant;
     Section decimalConstant;
+    Section stringConstant;
+    Section characterConstant;
 };
 
 #endif
