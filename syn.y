@@ -74,7 +74,9 @@ enum Ops {
     EqualTo = 12,
     LessThanOrEqualTo = 13,
     GreaterThanOrEqualTo = 14,
-    Floor = 15
+    Print = 15,
+    Read = 16,
+    Floor = 17
 };
 
 // Quadruples
@@ -293,11 +295,7 @@ statement   : ID
             | cycle
             | if 
             | print
-            | READ ID 
-                {
-                    checkVariable();
-                }
-                ';'
+            | read 
             | variables 
             | RETURN ID 
                 {
@@ -409,11 +407,40 @@ not         : NOT
 print       : PRINT '(' print_ ')' ';'
             ;
 
-print_      : expression print__
+print_      : expression 
+                {  
+                    int address = operandStack.top();
+                    operandStack.pop();
+                    // TODO Check cube for print
+                    Quadruple quadruple(Ops::Print, -1, -1, address);
+                    quadruples.push_back(quadruple);
+                } 
+                print__
             | SCONSTANT print__
             ;
 
 print__     : ',' print_
+            |
+            ;
+
+/*
+    Print structure
+*/
+read       : READ '(' read_ ')' ';'
+            ;
+
+read_      : ID 
+                {  
+                    checkVariable();
+                    string id = *yylval.stringValue;
+                    int address = (*currTable).getAddress(id);
+                    Quadruple quadruple(Ops::Read, -1, -1, address);
+                    quadruples.push_back(quadruple);
+                } 
+                read__
+            ;
+
+read__     : ',' read_
             |
             ;
 
@@ -479,7 +506,6 @@ expression_ : '>' { operatorStack.push(Ops::GreaterThan); }
 
 exp         : term 
                 {
-                    // cout<<"Checking operator + or -"<<endl;
                     checkOperator(Ops::Sum, Ops::Minus);
                 }
                 exp_ 
@@ -488,14 +514,12 @@ exp         : term
 exp_        : '+'
                 {
                     // Push operator 
-                    // cout<<"Pushing operator: + to operatorStack"<<endl;
                     operatorStack.push(Ops::Sum);
                 }
                 exp
             | '-'
                 {
                     // Push operator 
-                    // cout<<"Pushing operator: - to operatorStack"<<endl;
                     operatorStack.push(Ops::Minus);
                 } 
                 exp
@@ -504,7 +528,6 @@ exp_        : '+'
 
 term        : factor 
                 {
-                    // cout<<"Checking operator * or /"<<endl;
                     checkOperator(Ops::Multiplication, Ops::Division);
                 }
                 term_ 
@@ -513,14 +536,12 @@ term        : factor
 term_       : '*'
                 {
                     // Push operator 
-                    // cout<<"Pushing operator: - to operatorStack"<<endl;
                     operatorStack.push(Ops::Multiplication);
                 } 
                 term
             | '/'
                 {
                     // Push operator 
-                    // cout<<"Pushing operator: - to operatorStack"<<endl;
                     operatorStack.push(Ops::Division);
                 }
                 term
@@ -546,10 +567,7 @@ constvar    : ID
                     string id = *yylval.stringValue;
                     int address = (*currTable).getAddress(id);
                     int type = typeAdapter.getType(address);
-                    // cout<<"Pushing type: "<<type<<" to typeStack"<<endl;
                     typeStack.push(type);
-                    // cout<<"Pushing address: "<<address<<
-                    //     " to operandStack"<<endl;
                     operandStack.push(address);
                 }
             | ICONSTANT 
