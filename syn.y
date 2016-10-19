@@ -89,7 +89,6 @@ stack<int> operatorStack;
 unordered_set<int> relationalOperators = { 
     Ops::GreaterThan,
     Ops::LessThan,
-    Ops::Equal,
     Ops::NotEqualTo,
     Ops::EqualTo,
     Ops::LessThanOrEqualTo,
@@ -290,8 +289,35 @@ block_      : statement block_
 statement   : ID 
                 {
                     checkVariable();
+                    string id = *yylval.stringValue;
+                    int address = (*currTable).getAddress(id);
+                    int type = typeAdapter.getType(address);
+                    operandStack.push(address);
+                    typeStack.push(type);
+                    operatorStack.push(Ops::Equal);
                 }
-                assignment ';'
+                assignment 
+                {
+                    int oper = operatorStack.top();
+                    operatorStack.pop();
+                    if (oper == Ops::Equal) {
+                        int assign = operandStack.top();
+                        operandStack.pop();
+                        int to = operandStack.top();
+                        operandStack.pop();
+                        int assignType = typeStack.top();
+                        typeStack.pop();
+                        int toType = typeStack.top();
+                        typeStack.pop();
+
+                        if (cube.cube[toType][assignType][Ops::Equal] == -1 ) {
+                            cout<<"Error in assignment with type"<<endl;
+                        }
+                        Quadruple quadruple(Ops::Equal, assign, -1, to);
+                        quadruples.push_back(quadruple);
+                    }
+                }
+                ';'
             | cycle
             | if 
             | print
@@ -601,7 +627,6 @@ constvar    : ID
 void checkOperator(int oper1, int oper2) {
     if (!operatorStack.empty()) {
         int oper = operatorStack.top();
-        // cout<<"Operator "<<oper<<" popped."<<endl;
         if (oper == oper1 || oper == oper2 || 
                 relationalOperators.find(oper) != relationalOperators.end()) {
             operatorStack.pop();
