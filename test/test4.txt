@@ -3,7 +3,8 @@ func none func1 (integer id1) {
 }
 
 main {
-    var integer id2;
-    func1(id2, id2);
-    return id2;
+    var integer id1, id2, id3;
+    var flag flag1;
+    if (id1 < id2 and not flag1) {
+    }
 }
