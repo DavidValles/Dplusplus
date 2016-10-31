@@ -148,8 +148,15 @@ int CharacterConstant = typeAdapter.getCharacterConstantMin();
     A file in D++ can either be a program file with a main function or a 
     class file with a class definition.
 */
-start       : program
-                { cout<<"Main class compiled."<<endl; }
+start       :   {
+                    Quadruple mainQ(Ops::Goto, -1, -1, -1);
+                    jumpStack.push(quadruples.size());
+                    quadruples.push_back(mainQ);
+                }
+                program
+                {
+                    cout<<"Main class compiled."<<endl;
+                }
             | class
                 { cout<<"User defined class compiled."<<endl; }
             ;
@@ -159,7 +166,14 @@ start       : program
     A program can have includes, global variables and functions (0...*)
     It should always have a main method with a block
 */
-program     : includes variable_section functions MAIN block 
+program     : includes variable_section functions MAIN
+                {
+                    // Add goto jump for main quadruple
+                    int mainGoTo = jumpStack.top();
+                    jumpStack.pop();
+                    quadruples[mainGoTo].result = quadruples.size();
+                }
+                block
             ;
 
 /*
