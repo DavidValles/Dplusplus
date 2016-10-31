@@ -306,8 +306,8 @@ statement   : ID
                 assignment 
                 {
                     int oper = operatorStack.top();
-                    operatorStack.pop();
                     if (oper == Ops::Equal) {
+                        operatorStack.pop();
                         int assign = operandStack.top();
                         operandStack.pop();
                         int to = operandStack.top();
@@ -447,7 +447,7 @@ cycle       : DO block while
                 }
             ;
 
-while       : WHILE '(' condition ')'
+while       : WHILE '(' expression ')'
             ;
 
 /*
@@ -456,7 +456,7 @@ while       : WHILE '(' condition ')'
 if          : IF if_ else
             ;
 
-if_         : '(' condition ')' block else_if
+if_         : '(' expression ')' block else_if
             ;
 
 else_if     : ELSEIF if_
@@ -464,21 +464,6 @@ else_if     : ELSEIF if_
             ;
 
 else        : ELSE block
-            |
-            ;
-
-/*
-    Conditional structure
-*/
-condition   : not expression condition_
-            ;
-
-condition_  : AND condition
-            | OR condition
-            |
-            ;
-
-not         : NOT
             |
             ;
 
@@ -559,10 +544,47 @@ type        : INT { currentType = &Integer; }
 /*
     Basic expression structure 
 */
-expression  : exp expression_
+expression  : and
+                {
+                    checkOperator(Ops::Or);
+                }
+                expression_
             ;
 
-expression_ : '>' { operatorStack.push(Ops::GreaterThan); } 
+expression_ : OR
+                {
+                    operatorStack.push(Ops::Or);
+                }
+                expression
+            |
+            ;
+
+and         : numexp
+                {
+                    checkOperator(Ops::And);
+                }
+                and_
+            ;
+
+and_        : AND
+                {
+                    operatorStack.push(Ops::And);
+                }
+                and
+            |
+            ;
+
+numexp      : NOT
+                {
+                    operatorStack.push(Ops::Not);
+                    operandStack.push(-1);
+                    typeStack.push(typeAdapter.getType(Flag));
+                }
+                exp numexp_ { checkOperator(Ops::Not); }
+            | exp numexp_
+            ;
+
+numexp_     : '>' { operatorStack.push(Ops::GreaterThan); } 
                 exp
                 { checkOperator(Ops::GreaterThan); }
             | '<' { operatorStack.push(Ops::LessThan); } 
@@ -594,13 +616,11 @@ exp         : term
 
 exp_        : '+'
                 {
-                    // Push operator 
                     operatorStack.push(Ops::Sum);
                 }
                 exp
             | '-'
                 {
-                    // Push operator 
                     operatorStack.push(Ops::Minus);
                 } 
                 exp
@@ -616,13 +636,11 @@ term        : factor
 
 term_       : '*'
                 {
-                    // Push operator 
                     operatorStack.push(Ops::Multiplication);
                 } 
                 term
             | '/'
                 {
-                    // Push operator 
                     operatorStack.push(Ops::Division);
                 }
                 term
