@@ -1,0 +1,11 @@
+main {
+	var integer id1 = 3;
+	while(id1 > 1) {
+		id1 = id1 - 1;
+	}
+
+	var integer id2 = 3;
+	do {
+		id2 = id2 - 3
+	}while(id2 > 1)
+}
