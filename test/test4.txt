@@ -1,11 +1,12 @@
-func none func1 (integer id1) {
+func integer func1 (integer id1) {
     return id1;
 }
 
 main {
     var integer id1, id2, id3;
     var flag flag1;
+    id2 = id1;
     if (id1 < id2 and not flag1) {
-        func1(id1);
+        id2 = func1(id1 + 1);
     }
 }

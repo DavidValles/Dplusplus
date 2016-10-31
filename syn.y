@@ -314,6 +314,7 @@ statement   : ID
             | variables 
             | RETURN ID 
                 {
+                    // TODO: Should do something with the value
                     if (currTable == &globalTable) {
                         cout<<"ERROR: Main cannot have a return value"<<endl;
                     }
@@ -339,7 +340,7 @@ assignment_ : expression
                 {
                     insertConstantToTable(CharacterConstant);
                 }
-            | functioncall /* TODO dafuq should i do here? */
+            | functioncall 
             ;
 
 /* 
@@ -374,15 +375,13 @@ functioncall    : ID
                     }
                 ;
 
-functioncall_   : ID 
+functioncall_   : expression 
                     {   
-                        // TODO: Podriamos manejar expresiones, no solo ids
-                        checkVariable();
-
-                        // Get type of the parameter
-                        int address = (*currTable).
-                                            getAddress(*yylval.stringValue);
-                        int type = typeAdapter.getType(address);
+                        // Get type of the parameter from the expression
+                        int address = operandStack.top(); 
+                        operandStack.pop();
+                        int type = typeStack.top();
+                        typeStack.pop();
 
                         // Check if parameter matches type from function def
                         if (!functionTable.checkTypeOfParameter(
