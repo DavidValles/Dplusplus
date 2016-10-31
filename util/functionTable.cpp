@@ -8,8 +8,8 @@ using namespace std;
 FunctionTable::FunctionTable() {
 }
 
-void FunctionTable::insertFunction(string id, int type) {
-	Function newFunc(id, type);
+void FunctionTable::insertFunction(string id, int type, int quadruple) {
+	Function newFunc(id, type, quadruple);
 	this->funcTable[id] = newFunc;
 }
 
@@ -31,6 +31,14 @@ bool FunctionTable::findFunction(string id) {
 		return true;
 	}
 	return false;
+}
+
+Function FunctionTable::getFunction(string id) {
+	if(this->findFunction(id)) {
+		return this->funcTable[id];
+	}
+    Function emptyFunction;
+	return emptyFunction;
 }
 
 bool FunctionTable::checkTypeOfParameter(string func, int type, int param) {

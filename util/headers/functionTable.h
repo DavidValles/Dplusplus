@@ -9,10 +9,11 @@ using namespace std;
 class FunctionTable {
 public:
 	FunctionTable();
-	void insertFunction(string id, int type);
+	void insertFunction(string id, int type, int quadruple);
     int getParametersSize(string id); 
     void addParameterToFunction(string id, int type);
 	bool findFunction(string id);
+    Function getFunction(string id);
     bool checkTypeOfParameter(string func, int type, int param);
 	void displayTable();
 	void clearFunTable();

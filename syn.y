@@ -80,7 +80,11 @@ enum Ops {
     Floor = 17,
     Goto = 18,
     GotoTrue = 19,
-    GotoFalse = 20
+    GotoFalse = 20,
+    Era = 21,
+    Param = 22,
+    GoSub = 23,
+    Return = 24
 };
 
 // Quadruples
@@ -240,7 +244,8 @@ singlefunction  : FUNC singlefunction_ ID
                     {   
                         functionId = *yylval.stringValue;
                         functionTable.insertFunction(functionId, 
-                                            typeAdapter.getType(*currentType)); 
+                                            typeAdapter.getType(*currentType),
+                                            quadruples.size()); 
                         currTable = &localTable;
                     }
                     '(' params ')' block 
@@ -251,6 +256,10 @@ singlefunction  : FUNC singlefunction_ ID
                         (*currTable).displayTable();
                         (*currTable).clearVarTable();
                         currTable = &globalTable;
+
+                        //Generate return quadruple
+                        Quadruple returnQ(Ops::Return, -1, -1, -1);
+                        quadruples.push_back(returnQ);
                     }
                 ;
 
@@ -371,6 +380,10 @@ functioncall    : ID
                         // Set current values for parameter checking
                         currentFunction = *yylval.stringValue;
                         currentParameter = 0;
+                        // TODO: El era deberia ser con un tag de la func
+                        Quadruple eraQ(Ops::Era, functionTable.getFunction
+                                (currentFunction).quadruple, -1, -1);
+                        quadruples.push_back(eraQ);
                     }
                     '(' functioncall_ ')' 
                     {
@@ -382,11 +395,15 @@ functioncall    : ID
                                 <<currentFunction<<" in line "<<yylineno
                                 <<endl;
                         }
+                        Quadruple goSubQ(Ops::GoSub, functionTable.getFunction
+                                (currentFunction).quadruple, -1, -1);
+                        quadruples.push_back(goSubQ);
                     }
                 ;
 
 functioncall_   : ID 
                     {   
+                        // TODO: Podriamos manejar expresiones, no solo ids
                         checkVariable();
 
                         // Get type of the parameter
@@ -401,6 +418,8 @@ functioncall_   : ID
                                 currentFunction<<", parameter #"<<
                                 currentParameter + 1<<" in line "<<yylineno<<endl;
                         }
+                        Quadruple paramQ(Ops::Param, address, -1, -1);
+                        quadruples.push_back(paramQ);
                         currentParameter++;
                     }
                     functioncall__
