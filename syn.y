@@ -77,7 +77,10 @@ enum Ops {
     GreaterThanOrEqualTo = 14,
     Print = 15,
     Read = 16,
-    Floor = 17
+    Floor = 17,
+    Goto = 18,
+    GotoTrue = 19,
+    GotoFalse = 20
 };
 
 // Quadruples
@@ -87,6 +90,7 @@ TypeAdapter typeAdapter;
 stack<int> typeStack;
 stack<int> operandStack;
 stack<int> operatorStack;
+stack<int> jumpStack;
 unordered_set<int> relationalOperators = { 
     Ops::GreaterThan,
     Ops::LessThan,
@@ -411,7 +415,36 @@ functioncall__  : ',' functioncall_
     While and do while strucutre
 */
 cycle       : DO block while
-            | while block
+            | while
+                {
+                    int cont = quadruples.size();
+                    jumpStack.push(cont);
+
+                    int aux = typeStack.top();
+                    if(aux != 4){
+                        cout<<"Semantic Error";
+                    }
+                    else{
+
+                        int address = operandStack.top();
+                        operandStack.pop();
+                        Quadruple quadruple(20, address, -1, -1);
+                        quadruples.push_back(quadruple);
+
+                        jumpStack.push(cont-1);
+                    }
+                }
+             block
+                {   
+                    int returnTop = jumpStack.top();
+                    jumpStack.pop();
+                    Quadruple quadruple(18, -1, -1, returnTop);
+
+                    int cont = quadruples.size();
+                    int gotoFalse = jumpStack.top();
+                    jumpStack.pop();
+                    quadruples[gotoFalse].result = cont;
+                }
             ;
 
 while       : WHILE '(' condition ')'
@@ -630,6 +663,8 @@ constvar    : ID
             ;
 
 %%
+
+
 
 /*
     Inserts a constant to the table of constants depending on its type
