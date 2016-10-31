@@ -414,7 +414,28 @@ functioncall__  : ',' functioncall_
 /*
     While and do while strucutre
 */
-cycle       : DO block while
+cycle       : DO
+                {
+                    int cont = quadruples.size();
+                    jumpStack.push(cont);
+                }
+              block while
+                {
+                    int aux = typeStack.top();
+                    if(aux != 4){
+                        cout<<"Semantic Error";
+                    }
+                    else{
+                        int gotoTrue = jumpStack.top();
+                        jumpStack.pop();
+
+                        int address = operandStack.top();
+                        operandStack.pop();
+                        typeStack.pop();
+                        Quadruple quadruple(19, address, -1, gotoTrue);
+                        quadruples.push_back(quadruple);
+                    }
+                }
             | while
                 {
                     int cont = quadruples.size();
@@ -428,6 +449,7 @@ cycle       : DO block while
 
                         int address = operandStack.top();
                         operandStack.pop();
+                        typeStack.pop();
                         Quadruple quadruple(20, address, -1, -1);
                         quadruples.push_back(quadruple);
 
