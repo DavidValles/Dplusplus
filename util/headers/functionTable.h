@@ -9,7 +9,7 @@ using namespace std;
 class FunctionTable {
 public:
 	FunctionTable();
-	void insertFunction(string id, int type, int quadruple);
+	void insertFunction(string id, int type, int quadruple, int rAddress);
     int getParametersSize(string id); 
     void addParameterToFunction(string id, int type);
 	bool findFunction(string id);

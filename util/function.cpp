@@ -8,10 +8,11 @@ using namespace std;
 Function::Function() {
 }
 
-Function::Function(string name, int type, int quadruple) {
+Function::Function(string name, int type, int quadruple, int returnAddress) {
 	this->name = name;
 	this->type = type;
 	this->quadruple = quadruple;
+	this->returnAddress = returnAddress;
 }
 
 vector<int> Function::getParameters() {

@@ -218,7 +218,8 @@ singlefunction  : FUNC singlefunction_ ID
                         functionId = *yylval.stringValue;
                         functionTable.insertFunction(functionId, 
                                             typeAdapter.getType(*currentType),
-                                            quadruples.size()); 
+                                            quadruples.size(), (*currentType)); 
+                        typeAdapter.getNextAddress((*currentType));
                         currTable = &localTable;
                     }
                     '(' params ')' block 
@@ -300,7 +301,8 @@ statement   : ID
                         typeStack.pop();
 
                         if (cube.cube[toType][assignType][Ops::Equal] == -1 ) {
-                            cout<<"Error in assignment with type"<<endl;
+                            cout<<"Error in assignment with type. Line "<<
+                                    yylineno<<endl;
                         }
                         Quadruple quadruple(Ops::Equal, assign, -1, to);
                         quadruples.push_back(quadruple);

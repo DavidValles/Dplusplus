@@ -8,8 +8,8 @@ using namespace std;
 FunctionTable::FunctionTable() {
 }
 
-void FunctionTable::insertFunction(string id, int type, int quadruple) {
-	Function newFunc(id, type, quadruple);
+void FunctionTable::insertFunction(string id, int type, int quadruple, int rAddress) {
+	Function newFunc(id, type, quadruple, rAddress);
 	this->funcTable[id] = newFunc;
 }
 
