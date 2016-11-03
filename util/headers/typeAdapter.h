@@ -1,40 +1,15 @@
 #ifndef TYPEADAPTER_H
 #define TYPEADAPTER_H
 
-using namespace std;
+#include "section.h"
 
-struct Section {
-    void set(int a, int b) {
-        min = a;
-        size = b;
-        max = min + size - 1;
-    }
-    int min;
-    int size;
-    int max;
-};
+using namespace std;
 
 class TypeAdapter {
 public:
 	TypeAdapter();
-	int getIntegerMin();
-	int getDecimalMin();
-	int getTextMin();
-	int getCharacterMin();
-	int getFlagMin();
-	int getArrayMin();
-	int getMatrixMin();
-	int getNoneMin();
-	int getAvailMin();
-    int getIntegerConstantMin();
-    int getDecimalConstantMin();
-    int getStringConstantMin();
-    int getCharacterConstantMin();
-
 	int getType(int address);
-    void getNextAddress(int& address);
 
-private:
 	Section integer;
 	Section decimal;
 	Section text;

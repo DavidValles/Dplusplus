@@ -21,11 +21,12 @@
 #include "util/quadruple.cpp"
 #include "util/typeAdapter.cpp"
 #include "util/operations.h"
+#include "util/headers/section.h"
 
 using namespace std;
 
 void yyerror (const char *s);
-void insertConstantToTable(int &constantAddress);
+void insertConstantToTable(Section &constantAddress);
 void checkVariable();
 void checkFunction();
 bool checkConstant();
@@ -46,7 +47,7 @@ extern int yylineno;
 VariableTable globalTable;
 VariableTable localTable(&globalTable);
 VariableTable* currTable = &globalTable;
-int* currentType;
+Section* currentType;
 
 /*
     Utilities for functions and syntax checking
@@ -77,19 +78,6 @@ unordered_set<int> relationalOperators = {
     Ops::GreaterThanOrEqualTo
 };
 
-int Integer = typeAdapter.getIntegerMin();
-int Decimal = typeAdapter.getDecimalMin();
-int Text = typeAdapter.getTextMin();
-int Character = typeAdapter.getCharacterMin();
-int Flag = typeAdapter.getFlagMin();
-int Array = typeAdapter.getArrayMin();
-int Matrix = typeAdapter.getMatrixMin();
-int None = typeAdapter.getNoneMin();
-int Avail = typeAdapter.getAvailMin();
-int IntegerConstant = typeAdapter.getIntegerConstantMin();
-int DecimalConstant = typeAdapter.getDecimalConstantMin();
-int StringConstant = typeAdapter.getStringConstantMin();
-int CharacterConstant = typeAdapter.getCharacterConstantMin();
 %}
 
 %start start
@@ -202,15 +190,15 @@ variables   : VAR type variable ';'
 variable    : ID 
                 {
                     string id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, *currentType);
-                    typeAdapter.getNextAddress((*currentType));
+                    (*currTable).insertVariable(id, (*currentType).current);
+                    (*currentType).setNextAddress();
                 }
                 variable_
             | ID 
                 {
                     string id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, *currentType);
-                    typeAdapter.getNextAddress((*currentType));
+                    (*currTable).insertVariable(id, (*currentType).current);
+                    (*currentType).setNextAddress();
                 }
                 assignment variable_
             ;
@@ -232,9 +220,9 @@ singlefunction  : FUNC singlefunction_ ID
                         // Insert function to table
                         currentFunction = *yylval.stringValue;
                         functionTable.insertFunction(currentFunction, 
-                                            typeAdapter.getType(*currentType),
-                                            quadruples.size(), (*currentType)); 
-                        typeAdapter.getNextAddress((*currentType));
+                                        (*currentType).type, quadruples.size(),
+                                        (*currentType).current); 
+                        (*currentType).setNextAddress();
 
                         // Switch scope to local table
                         currTable = &localTable;
@@ -246,7 +234,7 @@ singlefunction  : FUNC singlefunction_ ID
 
                         // Check last quadruple to determine if there was a
                         //      return value
-                        if (cFunction.type != typeAdapter.getType(None) && 
+                        if (cFunction.type != typeAdapter.none.type && 
                                 quadruples[quadruples.size() - 1].oper != 
                                 Ops::Endproc) {
                             cout<<"Error: function should have return value"<<
@@ -267,7 +255,7 @@ singlefunction  : FUNC singlefunction_ ID
                 ;
 
 singlefunction_ : type 
-                | NONE { currentType = &None; }
+                | NONE { currentType = &typeAdapter.none; }
                 ;
 
 /*
@@ -276,13 +264,13 @@ singlefunction_ : type
 params      : type 
                 {
                     functionTable.addParameterToFunction(currentFunction, 
-                                        typeAdapter.getType((*currentType))); 
+                                        (*currentType).type); 
                 } 
                 ID  
                 {   
                     string id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, *currentType);
-                    typeAdapter.getNextAddress((*currentType));
+                    (*currTable).insertVariable(id, (*currentType).current);
+                    (*currentType).setNextAddress();
                 }
                 params_ 
             |
@@ -367,11 +355,11 @@ assignment  : '=' assignment_
 assignment_ : expression
             | SCONSTANT 
                 {
-                    insertConstantToTable(StringConstant);
+                    insertConstantToTable(typeAdapter.stringConstant);
                 }
             | CCONSTANT 
                 {
-                    insertConstantToTable(CharacterConstant);
+                    insertConstantToTable(typeAdapter.characterConstant);
                 }
             | functioncall 
             ;
@@ -379,7 +367,6 @@ assignment_ : expression
 /* 
     Function call structure. Can have 0 to n parameters.
 */
-
 functioncall    : ID 
                     {
                         checkFunction();
@@ -413,9 +400,9 @@ functioncall    : ID
                         // Push the return value to operandStack
                         // Plus function address is moved to avail to deal with
                         //      recursive calls.
-                        if (cFunction.type != typeAdapter.getType(None)) {
-                            int tempReturn = Avail;
-                            typeAdapter.getNextAddress(Avail);
+                        if (cFunction.type != typeAdapter.none.type) {
+                            int tempReturn = typeAdapter.avail.current;
+                            typeAdapter.avail.setNextAddress();
 
                             Quadruple moveReturn(Ops::Equal,
                                     cFunction.returnAddress, -1, tempReturn);
@@ -595,14 +582,14 @@ classblock_ : PRIVATE ':'
 /*
     Various accepted types 
 */
-type        : INT { currentType = &Integer; }
-            | DECIMAL { currentType = &Decimal; }
-            | TEXT { currentType = &Text; }
-            | CHARACTER  { currentType = &Character; }
-            | FLAG { currentType = &Flag; }
-            | ARRAY '(' ICONSTANT ')' { currentType = &Array; }
+type        : INT { currentType = &typeAdapter.integer; }
+            | DECIMAL { currentType = &typeAdapter.decimal; }
+            | TEXT { currentType = &typeAdapter.text; }
+            | CHARACTER  { currentType = &typeAdapter.character; }
+            | FLAG { currentType = &typeAdapter.flag; }
+            | ARRAY '(' ICONSTANT ')' { currentType = &typeAdapter.array; }
             | MATRIX '(' ICONSTANT ',' ICONSTANT ')' 
-                { currentType = &Matrix; }
+                { currentType = &typeAdapter.matrix; }
             ;
 
 
@@ -643,7 +630,7 @@ numexp      : NOT
                 {
                     operatorStack.push(Ops::Not);
                     operandStack.push(-1);
-                    typeStack.push(typeAdapter.getType(Flag));
+                    typeStack.push(typeAdapter.flag.type);
                 }
                 exp numexp_ { checkOperator(Ops::Not); }
             | exp numexp_
@@ -737,11 +724,11 @@ constvar    : ID
                 }
             | ICONSTANT 
                 {
-                    insertConstantToTable(IntegerConstant);
+                    insertConstantToTable(typeAdapter.integerConstant);
                 }
             | DCONSTANT 
                 {
-                    insertConstantToTable(DecimalConstant);
+                    insertConstantToTable(typeAdapter.decimalConstant);
                 }
             ;
 
@@ -753,14 +740,14 @@ constvar    : ID
     Inserts a constant to the table of constants depending on its type
     It also pushes the constant and type to their stacks 
 */
-void insertConstantToTable(int &constantAddress) {
+void insertConstantToTable(Section &constant) {
     string id = *yylval.stringValue;
     if (!checkConstant()) {
-        constantTable.insertConstant(id, constantAddress);
-        typeAdapter.getNextAddress(constantAddress);
+        constantTable.insertConstant(id, constant.current);
+        constant.setNextAddress();
     }
     int address = constantTable.getAddress(id);
-    int type = typeAdapter.getType(address);
+    int type = constant.type;
     typeStack.push(type);
     operandStack.push(address);
 }
@@ -792,10 +779,10 @@ void checkOperator(int oper1, int oper2) {
                 int operand1 = operandStack.top();
                 operandStack.pop();
                 Quadruple quadruple(oper, operand1, operand2, 
-                                        Avail);
+                                        typeAdapter.avail.current);
                 quadruples.push_back(quadruple);
-                operandStack.push(Avail);    
-                typeAdapter.getNextAddress(Avail);
+                operandStack.push(typeAdapter.avail.current);    
+                typeAdapter.avail.setNextAddress();
                 typeStack.push(resultType);
             }
             else {
@@ -841,7 +828,7 @@ void returnProcess() {
     Function function =
             functionTable.getFunction(currentFunction);
 
-    if (function.type == typeAdapter.getType(None)) {
+    if (function.type == typeAdapter.none.type) {
         cout<<"None functions cannot have a return statement"
                 <<endl;
     }
