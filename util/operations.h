@@ -23,6 +23,6 @@ enum Ops {
     Era = 21,
     Param = 22,
     GoSub = 23,
-    Return = 24
+    Endproc = 24
 };
 

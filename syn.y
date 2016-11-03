@@ -30,6 +30,7 @@ void checkVariable();
 void checkFunction();
 bool checkConstant();
 void checkOperator(int oper1, int oper2 = -1);
+void returnProcess();
 
 extern "C"
 {
@@ -51,7 +52,6 @@ int* currentType;
     Utilities for functions and syntax checking
 */
 FunctionTable functionTable;
-string functionId;
 string currentFunction;
 int currentParameter;
 
@@ -229,25 +229,40 @@ functions   : singlefunction functions
 
 singlefunction  : FUNC singlefunction_ ID 
                     {   
-                        functionId = *yylval.stringValue;
-                        functionTable.insertFunction(functionId, 
+                        // Insert function to table
+                        currentFunction = *yylval.stringValue;
+                        functionTable.insertFunction(currentFunction, 
                                             typeAdapter.getType(*currentType),
                                             quadruples.size(), (*currentType)); 
                         typeAdapter.getNextAddress((*currentType));
+
+                        // Switch scope to local table
                         currTable = &localTable;
                     }
-                    '(' params ')' block 
+                    '(' params ')' block
                     {
+                        Function cFunction = 
+                                functionTable.getFunction(currentFunction);
+
+                        // Check last quadruple to determine if there was a
+                        //      return value
+                        if (cFunction.type != typeAdapter.getType(None) && 
+                                quadruples[quadruples.size() - 1].oper != 
+                                Ops::Endproc) {
+                            cout<<"Error: function should have return value"<<
+                                    endl;
+                        }
+
+                        // For debugging purposes
                         cout<<"Displaying function table"<<endl;
                         functionTable.displayTable();
 	                    cout<<"Displaying local variable table"<<endl;
                         (*currTable).displayTable();
+
+                        // Clear the local variable table and change to global
+                        //      scope
                         (*currTable).clearVarTable();
                         currTable = &globalTable;
-
-                        //Generate return quadruple
-                        Quadruple returnQ(Ops::Return, -1, -1, -1);
-                        quadruples.push_back(returnQ);
                     }
                 ;
 
@@ -260,7 +275,7 @@ singlefunction_ : type
 */
 params      : type 
                 {
-                    functionTable.addParameterToFunction(functionId, 
+                    functionTable.addParameterToFunction(currentFunction, 
                                         typeAdapter.getType((*currentType))); 
                 } 
                 ID  
@@ -280,10 +295,21 @@ params_     : ',' params
 /*
     Typical block of code with statements   
 */
-block       : '{' block_ '}'
+block       : '{' block_ return '}'
             ;
 
 block_      : statement block_
+            |
+            ;
+
+return      : RETURN expression
+                {
+                    if (currTable == &globalTable) {
+                        cout<<"Error: cannot have return in main."<<endl;
+                    }
+                    returnProcess();
+                }
+                ';'
             |
             ;
 
@@ -328,15 +354,6 @@ statement   : ID
             | print
             | read 
             | variables 
-            | RETURN ID 
-                {
-                    // TODO: Should do something with the value
-                    if (currTable == &globalTable) {
-                        cout<<"ERROR: Main cannot have a return value"<<endl;
-                    }
-                    checkVariable();
-                }
-                ';'
             | functioncall ';'
             ;
 
@@ -377,6 +394,9 @@ functioncall    : ID
                     }
                     '(' functioncall_ ')' 
                     {
+                        Function cFunction =
+                                functionTable.getFunction(currentFunction);
+
                         // Check if parameters in function call match 
                         //    the necessary in the declaration
                         if (functionTable.getParametersSize(currentFunction)
@@ -385,8 +405,16 @@ functioncall    : ID
                                 <<currentFunction<<" in line "<<yylineno
                                 <<endl;
                         }
-                        Quadruple goSubQ(Ops::GoSub, functionTable.getFunction
-                                (currentFunction).quadruple, -1, -1);
+
+                        // Push the return value to operandStack
+                        // Plus function address is moved to avail to deal with
+                        //      recursive calls.
+                        if (cFunction.type != typeAdapter.getType(None)) {
+                            //TODO:
+                        }
+
+                        Quadruple goSubQ(Ops::GoSub, cFunction.quadruple,
+                                -1, -1);
                         quadruples.push_back(goSubQ);
                     }
                 ;
@@ -799,6 +827,37 @@ bool checkConstant() {
     string id = *yylval.stringValue;
     bool check = constantTable.findConstant(id);
     return check;
+}
+
+void returnProcess() {
+    Function function =
+            functionTable.getFunction(currentFunction);
+
+    if (function.type == typeAdapter.getType(None)) {
+        cout<<"None functions cannot have a return statement"
+                <<endl;
+    }
+
+    int returnAddress = operandStack.top();
+    operandStack.pop();
+    int returnType = typeStack.top();
+    typeStack.pop();
+
+    if (function.type != returnType) {
+        cout<<"Error in line "<<yylineno<<
+                ": Incorrect return type."<<endl;
+    }
+
+    Quadruple assignReturn(Ops::Equal, returnAddress, -1,
+            function.returnAddress);
+    quadruples.push_back(assignReturn);
+
+    operandStack.push(function.returnAddress);
+    typeStack.push(function.type);
+
+    //Generate return quadruple
+    Quadruple returnQ(Ops::Endproc, -1, -1, -1);
+    quadruples.push_back(returnQ);
 }
 
 int main(int argc, char **argv)

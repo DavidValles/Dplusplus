@@ -37,7 +37,7 @@ void Quadruple::display() {
         case 21: operS = "Era"; break;
         case 22: operS = "Param"; break;
         case 23: operS = "Gosub"; break;
-        case 24: operS = "Return"; break;
+        case 24: operS = "Endproc"; break;
         default: operS = "Not Found"; break;
     }
     cout<<operS<<" "<<operand1<<" "<<operand2<<" "<<result<<endl;

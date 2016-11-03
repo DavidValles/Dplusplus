@@ -1,4 +1,5 @@
 func integer func1 (integer id1) {
+    id1 = id1 + 12;
     return id1;
 }
 
