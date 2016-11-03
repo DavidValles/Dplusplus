@@ -406,16 +406,24 @@ functioncall    : ID
                                 <<endl;
                         }
 
+                        Quadruple goSubQ(Ops::GoSub, cFunction.quadruple,
+                                -1, -1);
+                        quadruples.push_back(goSubQ);
+
                         // Push the return value to operandStack
                         // Plus function address is moved to avail to deal with
                         //      recursive calls.
                         if (cFunction.type != typeAdapter.getType(None)) {
-                            //TODO:
-                        }
+                            int tempReturn = Avail;
+                            typeAdapter.getNextAddress(Avail);
 
-                        Quadruple goSubQ(Ops::GoSub, cFunction.quadruple,
-                                -1, -1);
-                        quadruples.push_back(goSubQ);
+                            Quadruple moveReturn(Ops::Equal,
+                                    cFunction.returnAddress, -1, tempReturn);
+                            quadruples.push_back(moveReturn);
+
+                            operandStack.push(tempReturn);
+                            typeStack.push(cFunction.type);
+                        }
                     }
                 ;
 
