@@ -505,18 +505,89 @@ while       : WHILE '(' expression ')'
 /*
     If structure
 */
-if          : IF if_ else
+if          : IF
+                {
+                    jumpStack.push(-1);
+                }
+              if_ else
             ;
 
-if_         : '(' expression ')' block else_if
+if_         : '(' expression ')' 
+                    {
+                        int cont = quadruples.size();
+
+                        int aux = typeStack.top();
+                        if(aux != 4){
+                            cout<<"Semantic Error";
+                        } 
+                        else{
+
+                            int address = operandStack.top();
+                            operandStack.pop();
+                            typeStack.pop();
+                            Quadruple quadruple(20, address, -1, -1);
+                            quadruples.push_back(quadruple);
+
+                            jumpStack.push(cont-1);
+                        }  
+                    }
+                block else_if
             ;
 
-else_if     : ELSEIF if_
+else_if     : ELSEIF 
+                {   
+                    int cont = quadruples.size() - 1;
+                    int gotoFalse = jumpStack.top();
+                    jumpStack.pop();
+                    quadruples[gotoFalse].result = cont;
+
+                    Quadruple quadruple(18, -1, -1, -1);
+                    quadruples.push_back(quadruple);
+                    jumpStack.push(cont);
+                }
+              if_
             |
             ;
 
-else        : ELSE block
-            |
+else        : ELSE
+                {
+                    int cont = quadruples.size() - 1;
+                    int gotoFalse = jumpStack.top();
+                    jumpStack.pop();
+                    quadruples[gotoFalse].result = cont;
+
+                    Quadruple quadruple(18, -1, -1, -1);
+                    quadruples.push_back(quadruple);
+                    jumpStack.push(cont);
+                } 
+              block
+                {
+                    int cont = quadruples.size() - 1;
+                    int gotoJump = jumpStack.top();
+
+                    while(gotoJump != -1){
+                        jumpStack.pop();
+                        quadruples[gotoJump].result = cont;
+                        gotoJump = jumpStack.top();
+                    }
+                    if(gotoJump == -1){
+                        jumpStack.pop();
+                    }
+                }
+            |   
+                {   
+                    int cont = quadruples.size() - 1;
+                    int gotoJump = jumpStack.top();
+
+                    while(gotoJump != -1){
+                        jumpStack.pop();
+                        quadruples[gotoJump].result = cont;
+                        gotoJump = jumpStack.top();
+                    }
+                    if(gotoJump == -1){
+                        jumpStack.pop();
+                    }
+                }
             ;
 
 /*
