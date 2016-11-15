@@ -10,18 +10,33 @@ public:
 	TypeAdapter();
 	int getType(int address);
 
-	Section integer;
-	Section decimal;
-	Section text;
-	Section character;
-	Section flag;
-	Section array;
-	Section matrix;
 	Section none;
-	Section avail;
+
+    // Global scope variables
+	Section integerG;
+	Section decimalG;
+	Section textG;
+	Section characterG;
+	Section flagG;
+
+    // Local scope
+	Section integerL;
+	Section decimalL;
+	Section textL;
+	Section characterL;
+	Section flagL;
+
+    // Temporal 
+	Section integerT;
+	Section decimalT;
+	Section textT;
+	Section characterT;
+	Section flagT;
+
+    // Constants
     Section integerConstant;
     Section decimalConstant;
-    Section stringConstant;
+    Section textConstant;
     Section characterConstant;
 };
 

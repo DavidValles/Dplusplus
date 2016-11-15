@@ -1,4 +1,5 @@
 func integer func1 (integer id1) {
+    var character c1, c2;
     id1 = id1 + 12;
     return id1;
 }

@@ -30,6 +30,7 @@ void insertConstantToTable(Section &constantAddress);
 void checkVariable();
 void checkFunction();
 bool checkConstant();
+int getTemporalAddress(int type);
 void checkOperator(int oper1, int oper2 = -1);
 void returnProcess();
 
@@ -355,7 +356,7 @@ assignment  : '=' assignment_
 assignment_ : expression
             | SCONSTANT 
                 {
-                    insertConstantToTable(typeAdapter.stringConstant);
+                    insertConstantToTable(typeAdapter.textConstant);
                 }
             | CCONSTANT 
                 {
@@ -401,8 +402,7 @@ functioncall    : ID
                         // Plus function address is moved to avail to deal with
                         //      recursive calls.
                         if (cFunction.type != typeAdapter.none.type) {
-                            int tempReturn = typeAdapter.avail.current;
-                            typeAdapter.avail.setNextAddress();
+                            int tempReturn = getTemporalAddress(cFunction.type);
 
                             Quadruple moveReturn(Ops::Equal,
                                     cFunction.returnAddress, -1, tempReturn);
@@ -653,14 +653,47 @@ classblock_ : PRIVATE ':'
 /*
     Various accepted types 
 */
-type        : INT { currentType = &typeAdapter.integer; }
-            | DECIMAL { currentType = &typeAdapter.decimal; }
-            | TEXT { currentType = &typeAdapter.text; }
-            | CHARACTER  { currentType = &typeAdapter.character; }
-            | FLAG { currentType = &typeAdapter.flag; }
-            | ARRAY '(' ICONSTANT ')' { currentType = &typeAdapter.array; }
-            | MATRIX '(' ICONSTANT ',' ICONSTANT ')' 
-                { currentType = &typeAdapter.matrix; }
+type        : INT   
+                { 
+                    if (currTable == &globalTable) {
+                        currentType = &typeAdapter.integerG; 
+                    } else {
+                        currentType = &typeAdapter.integerL;
+                    }
+                }
+            | DECIMAL
+                { 
+                    if (currTable == &globalTable) {
+                        currentType = &typeAdapter.decimalG; 
+                    } else {
+                        currentType = &typeAdapter.decimalL;
+                    }
+                }
+            | TEXT 
+                { 
+                    if (currTable == &globalTable) {
+                        currentType = &typeAdapter.textG; 
+                    } else {
+                        currentType = &typeAdapter.textL;
+                    }
+                }
+            | CHARACTER  
+                { 
+                    if (currTable == &globalTable) {
+                        currentType = &typeAdapter.characterG; 
+                    } else {
+                        currentType = &typeAdapter.characterL;
+                    }
+                }
+            | FLAG 
+                { 
+                    if (currTable == &globalTable) {
+                        currentType = &typeAdapter.flagG; 
+                    } else {
+                        currentType = &typeAdapter.flagL;
+                    }
+                }
+                /* TODO: Array and Matrix;
             ;
 
 
@@ -701,7 +734,7 @@ numexp      : NOT
                 {
                     operatorStack.push(Ops::Not);
                     operandStack.push(-1);
-                    typeStack.push(typeAdapter.flag.type);
+                    typeStack.push(typeAdapter.flagG.type);
                 }
                 exp numexp_ { checkOperator(Ops::Not); }
             | exp numexp_
@@ -849,11 +882,10 @@ void checkOperator(int oper1, int oper2) {
                 operandStack.pop();
                 int operand1 = operandStack.top();
                 operandStack.pop();
-                Quadruple quadruple(oper, operand1, operand2, 
-                                        typeAdapter.avail.current);
+                int tempAddress = getTemporalAddress(resultType);
+                Quadruple quadruple(oper, operand1, operand2, tempAddress);
                 quadruples.push_back(quadruple);
-                operandStack.push(typeAdapter.avail.current);    
-                typeAdapter.avail.setNextAddress();
+                operandStack.push(tempAddress);    
                 typeStack.push(resultType);
             }
             else {
@@ -893,6 +925,34 @@ bool checkConstant() {
     string id = *yylval.stringValue;
     bool check = constantTable.findConstant(id);
     return check;
+}
+
+/*
+    Retruns a temporal addres for a certain type
+*/
+int getTemporalAddress(int type) {
+    int tempAddress;
+    if (type == typeAdapter.integerT.type) {
+        tempAddress = typeAdapter.integerT.current;
+        typeAdapter.integerT.setNextAddress();
+    } 
+    else if (type == typeAdapter.decimalT.type) {
+        tempAddress = typeAdapter.decimalT.current;
+        typeAdapter.decimalT.setNextAddress();
+    } 
+    else if (type == typeAdapter.textT.type) {
+        tempAddress = typeAdapter.textT.current;
+        typeAdapter.textT.setNextAddress();
+    } 
+    else if (type == typeAdapter.characterT.type) {
+        tempAddress = typeAdapter.characterT.current;
+        typeAdapter.characterT.setNextAddress();
+    } 
+    else if (type == typeAdapter.flagT.type) {
+        tempAddress = typeAdapter.flagT.current;
+        typeAdapter.flagT.setNextAddress();
+    } 
+    return tempAddress; 
 }
 
 void returnProcess() {
