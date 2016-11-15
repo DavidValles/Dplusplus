@@ -45,6 +45,9 @@ int VariableTable::getAddress(string id) {
     if (this->varTable.find(id) != this->varTable.end()) {
         return this->varTable[id].address;
     }
+    if (this->parent && this->parent->getAddress(id) != -1) {
+        return this->parent->getAddress(id);
+    }
     return -1;
 }
 

@@ -1,19 +1,9 @@
-func integer doSomething(integer id1, decimal id2,
-                            text id3) {
-    var character id4, id5;
+var integer a, b;
+
+func none uno(integer a) {
+    a = a+b*a;
 }
 
 main {
-    var integer idInt, idInt1, idInt2;
-    var decimal idDec;
-    var text idText;
-    var flag flag1, flag2;
-    idInt = 1;
-    idInt = 4;
-    idText = "This is a test";
-    idDec = (idInt + idDec) * idInt - idDec + 25;
-    flag1 = flag1 == flag2;
-    doSomething(idInt, idDec, idDec);
-    print(idInt + 5 - 10, idDec * 2.5, flag1);
-    read(idInt, idText);
+    a = a+b*a;
 }

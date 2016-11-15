@@ -11,4 +11,7 @@ main {
     if (id1 < id2 and not flag1) {
         id2 = func1(id1 + 1);
     }
+    else {
+    }
+    var decimal d1;
 }
