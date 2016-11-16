@@ -26,6 +26,7 @@
 using namespace std;
 
 void yyerror (const char *s);
+void addGotoAndFillGotoFalse();
 void insertConstantToTable(Section &constantAddress);
 void checkRedefinition();
 void checkVariable();
@@ -476,7 +477,7 @@ cycle       : DO
                         int address = operandStack.top();
                         operandStack.pop();
                         typeStack.pop();
-                        Quadruple quadruple(19, address, -1, gotoTrue);
+                        Quadruple quadruple(Ops::GotoTrue, address, -1, gotoTrue);
                         quadruples.push_back(quadruple);
                     }
                 }
@@ -494,7 +495,7 @@ cycle       : DO
                         int address = operandStack.top();
                         operandStack.pop();
                         typeStack.pop();
-                        Quadruple quadruple(20, address, -1, -1);
+                        Quadruple quadruple(Ops::GotoFalse, address, -1, -1);
                         quadruples.push_back(quadruple);
 
                         jumpStack.push(cont-1);
@@ -504,7 +505,7 @@ cycle       : DO
                 {   
                     int returnTop = jumpStack.top();
                     jumpStack.pop();
-                    Quadruple quadruple(18, -1, -1, returnTop);
+                    Quadruple quadruple(Ops::Goto, -1, -1, returnTop);
 
                     int cont = quadruples.size();
                     int gotoFalse = jumpStack.top();
@@ -523,26 +524,35 @@ if          : IF
                 {
                     jumpStack.push(-1);
                 }
-              if_ else
+                if_ else
+                {
+                    int gotoJump = jumpStack.top();
+
+                    while(gotoJump != -1){
+                        jumpStack.pop();
+                        quadruples[gotoJump].result = quadruples.size();
+                        gotoJump = jumpStack.top();
+                    }
+                    if(gotoJump == -1){
+                        jumpStack.pop();
+                    }
+                }
             ;
 
 if_         : '(' expression ')' 
                     {
-                        int cont = quadruples.size();
-
                         int aux = typeStack.top();
                         if(aux != 4){
                             cout<<"Semantic Error";
                         } 
                         else{
-
                             int address = operandStack.top();
                             operandStack.pop();
                             typeStack.pop();
-                            Quadruple quadruple(20, address, -1, -1);
+                            Quadruple quadruple(Ops::GotoFalse, address, -1, -1);
                             quadruples.push_back(quadruple);
 
-                            jumpStack.push(cont-1);
+                            jumpStack.push(quadruples.size() - 1);
                         }  
                     }
                 block else_if
@@ -550,14 +560,7 @@ if_         : '(' expression ')'
 
 else_if     : ELSEIF 
                 {   
-                    int cont = quadruples.size() - 1;
-                    int gotoFalse = jumpStack.top();
-                    jumpStack.pop();
-                    quadruples[gotoFalse].result = cont;
-
-                    Quadruple quadruple(18, -1, -1, -1);
-                    quadruples.push_back(quadruple);
-                    jumpStack.push(cont);
+                    addGotoAndFillGotoFalse();
                 }
               if_
             |
@@ -565,43 +568,10 @@ else_if     : ELSEIF
 
 else        : ELSE
                 {
-                    int cont = quadruples.size() - 1;
-                    int gotoFalse = jumpStack.top();
-                    jumpStack.pop();
-                    quadruples[gotoFalse].result = cont;
-
-                    Quadruple quadruple(18, -1, -1, -1);
-                    quadruples.push_back(quadruple);
-                    jumpStack.push(cont);
+                    addGotoAndFillGotoFalse();
                 } 
               block
-                {
-                    int cont = quadruples.size() - 1;
-                    int gotoJump = jumpStack.top();
-
-                    while(gotoJump != -1){
-                        jumpStack.pop();
-                        quadruples[gotoJump].result = cont;
-                        gotoJump = jumpStack.top();
-                    }
-                    if(gotoJump == -1){
-                        jumpStack.pop();
-                    }
-                }
             |   
-                {   
-                    int cont = quadruples.size() - 1;
-                    int gotoJump = jumpStack.top();
-
-                    while(gotoJump != -1){
-                        jumpStack.pop();
-                        quadruples[gotoJump].result = cont;
-                        gotoJump = jumpStack.top();
-                    }
-                    if(gotoJump == -1){
-                        jumpStack.pop();
-                    }
-                }
             ;
 
 /*
@@ -852,7 +822,19 @@ constvar    : ID
 
 %%
 
+/*
 
+*/
+void addGotoAndFillGotoFalse() {
+    int gotoFalse = jumpStack.top();
+    jumpStack.pop();
+
+    Quadruple quadruple(Ops::Goto, -1, -1, -1);
+    quadruples.push_back(quadruple);
+
+    quadruples[gotoFalse].result = quadruples.size();
+    jumpStack.push(quadruples.size() - 1);
+}
 
 /*
     Inserts a constant to the table of constants depending on its type

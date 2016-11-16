@@ -1,19 +1,23 @@
-var integer a = 2, b = 3 * 2;
-
-func integer func1 (integer id1) {
-    var character c1, c2;
-    id1 = id1 + 12;
-    return id1;
-}
-
 main {
     var integer id1 = 3, id2, id3;
-    var flag flag1;
-    id2 = id1;
-    if (id1 < id2 and not flag1) {
-        id2 = func1(id1 + 1);
+    id1 = id2;
+    if (id1 < id2) {
+        id1 = id2;
+        id2 = id1;
+        id1 = id2;
+    }
+    else if (id3 < id2) {
+        id1 = id2;
+    }
+    else if (id3 < id2) {
+        id1 = id2;
+    }
+    else if (id3 < id2) {
+        id1 = id2;
     }
     else {
+        id1 = id2;
+        id2 = id1;
     }
-    var decimal d1;
+    id1 = 3;
 }
