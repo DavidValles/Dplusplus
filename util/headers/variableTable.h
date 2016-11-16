@@ -14,6 +14,9 @@ public:
     bool findVariable(string id);
     void displayTable();
     void clearVarTable();
+    void insertFirstDimension(string id, int dim);
+    void insertSecondDimension(string id, int dim);
+    int getDimension(string id, int dim);
     int getAddress(string id);
 
 private:

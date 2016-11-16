@@ -1,10 +1,5 @@
 main {
-    var integer id1, id2, id3;
-    id1 = id2;
-    do {
-        id1 = id2;
-        id2 = id1;
-        id1 = id2;
-    } while(id1)
-    id1 = 3;
+    var decimal id2;
+    var integer id1;
+    var integer id3;
 }

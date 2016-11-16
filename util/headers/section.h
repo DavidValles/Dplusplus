@@ -10,8 +10,8 @@ struct Section {
         type = c;
     }
 
-    void setNextAddress() {
-        current += 1;
+    void setNextAddress(int i = 1) {
+        current += i;
         if (current == max) {
             cout<<"Memory limit exceeded"<<endl;
         }

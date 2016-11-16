@@ -9,6 +9,8 @@ public:
     Variable(string name, int address);
     string name;
     int address;
+    int dimension1;
+    int dimension2;
 };
 
 #endif

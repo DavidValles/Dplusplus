@@ -43,6 +43,7 @@ extern "C"
 
 extern int yylineno;
 bool declaring = false;
+string id;
 
 /*
     Utilities to find identifiers
@@ -206,9 +207,22 @@ variables   : VAR
 variable    : ID 
                 {
                     checkRedefinition();
-                    string id = *yylval.stringValue;
+                    id = *yylval.stringValue;
                     (*currTable).insertVariable(id, (*currentType).current);
                     (*currentType).setNextAddress();
+                } 
+                dimension
+                {
+                    int dim1 = currTable->getDimension(id, 1);
+                    int dim2 = currTable->getDimension(id, 2);
+                    if (dim2 != 0) {
+                        currentType->setNextAddress(
+                            currTable->getDimension(id, 1) *
+                            currTable->getDimension(id, 2) - 1);
+                    } else if (dim1 != 0) {
+                        currentType->setNextAddress(
+                            currTable->getDimension(id, 1) - 1);
+                    }
                 }
                 variable_
             | assignment variable_
@@ -218,9 +232,28 @@ variable_   : ',' variable
             |
             ;
 
+dimension   : '(' ICONSTANT 
+                {
+                    string constant = *yylval.stringValue;
+                    int constantInt = stoi(constant);
+                    currTable->insertFirstDimension(id, constantInt);
+                }
+                dimension_ ')'
+            |
+            ;
+
+dimension_  : ',' ICONSTANT
+                {
+                    string constant = *yylval.stringValue;
+                    int constantInt = stoi(constant);
+                    currTable->insertSecondDimension(id, constantInt);
+                }
+            |
+            ;
+
 assignment  : ID 
                 {
-                    string id = *yylval.stringValue;
+                    id = *yylval.stringValue;
                     if (declaring) {
                         checkRedefinition();
                         (*currTable).insertVariable(id, (*currentType).current);
@@ -320,7 +353,7 @@ params      : type
                 } 
                 ID  
                 {   
-                    string id = *yylval.stringValue;
+                    id = *yylval.stringValue;
                     (*currTable).insertVariable(id, (*currentType).current);
                     (*currentType).setNextAddress();
                 }
@@ -623,7 +656,7 @@ read       : READ '(' read_ ')' ';'
 read_      : ID 
                 {  
                     checkVariable();
-                    string id = *yylval.stringValue;
+                    id = *yylval.stringValue;
                     int address = (*currTable).getAddress(id);
                     Quadruple quadruple(Ops::Read, -1, -1, address);
                     quadruples.push_back(quadruple);
@@ -822,7 +855,7 @@ constvar    : ID
                     checkVariable();
                     
                     // Push operand and type to respective stacks
-                    string id = *yylval.stringValue;
+                    id = *yylval.stringValue;
                     int address = (*currTable).getAddress(id);
                     int type = typeAdapter.getType(address);
                     typeStack.push(type);

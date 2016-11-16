@@ -41,6 +41,21 @@ void VariableTable::clearVarTable() {
     this->varTable.clear();
 }
 
+void VariableTable::insertFirstDimension(string id, int dim) {
+    varTable[id].dimension1 = dim;
+}
+
+void VariableTable::insertSecondDimension(string id, int dim) {
+    varTable[id].dimension2 = dim;
+}
+
+int VariableTable::getDimension(string id, int dim) {
+    int dimSize = 0;
+    if (dim == 1) dimSize = varTable[id].dimension1;
+    else if (dim == 2) dimSize = varTable[id].dimension2;
+    return dimSize;
+}
+
 int VariableTable::getAddress(string id) {
     if (this->varTable.find(id) != this->varTable.end()) {
         return this->varTable[id].address;
