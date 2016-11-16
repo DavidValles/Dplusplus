@@ -466,8 +466,7 @@ cycle       : DO
                 }
               block while
                 {
-                    int aux = typeStack.top();
-                    if(aux != 4){
+                    if(typeStack.top() != 4){
                         cout<<"Semantic Error";
                     }
                     else{
@@ -486,8 +485,7 @@ cycle       : DO
                     int cont = quadruples.size();
                     jumpStack.push(cont);
 
-                    int aux = typeStack.top();
-                    if(aux != 4){
+                    if(typeStack.top() != 4){
                         cout<<"Semantic Error";
                     }
                     else{
@@ -541,8 +539,7 @@ if          : IF
 
 if_         : '(' expression ')' 
                     {
-                        int aux = typeStack.top();
-                        if(aux != 4){
+                        if(typeStack.top() != 4){
                             cout<<"Semantic Error";
                         } 
                         else{
