@@ -237,10 +237,13 @@ singlefunction  : FUNC singlefunction_ ID
                         //      return value
                         if (cFunction.type != typeAdapter.none.type && 
                                 quadruples[quadruples.size() - 1].oper != 
-                                Ops::Endproc) {
+                                Ops::Return) {
                             cout<<"Error: function should have return value"<<
                                     endl;
                         }
+                        
+                        Quadruple qEndproc(Ops::Endproc, -1, -1, -1);
+                        quadruples.push_back(qEndproc);
 
                         // For debugging purposes
                         cout<<"Displaying function table"<<endl;
@@ -982,7 +985,7 @@ void returnProcess() {
     typeStack.push(function.type);
 
     //Generate return quadruple
-    Quadruple returnQ(Ops::Endproc, -1, -1, -1);
+    Quadruple returnQ(Ops::Return, -1, -1, -1);
     quadruples.push_back(returnQ);
 }
 
@@ -1001,6 +1004,7 @@ int main(int argc, char **argv)
 
 	cout<<"Displaying quadruples"<<endl;
     for (int i=0; i<quadruples.size(); i++) {
+        cout<<i+1<<". ";
         quadruples[i].display();
     }
 	
