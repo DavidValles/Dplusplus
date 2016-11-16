@@ -143,9 +143,13 @@ unordered_set<int> relationalOperators = {
 start       :   program
                 {
                     cout<<"Main class compiled."<<endl;
+                    Quadruple qEnd(Ops::End, -1 , -1, -1);
+                    quadruples.push_back(qEnd);
                 }
             | class
-                { cout<<"User defined class compiled."<<endl; }
+                { 
+                    cout<<"User defined class compiled."<<endl; 
+                }
             ;
 
 /*
