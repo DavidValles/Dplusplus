@@ -461,34 +461,41 @@ functioncall__  : ',' functioncall_
 */
 cycle       : DO
                 {
-                    int cont = quadruples.size();
-                    jumpStack.push(cont);
+                    // Keep track of where to return after while
+                    jumpStack.push(quadruples.size());
                 }
-              block while
+                block while
                 {
-                    if(typeStack.top() != 4){
-                        cout<<"Semantic Error";
+                    // Verify that the expression yielded a boolean value
+                    if (typeStack.top() != typeAdapter.flagG.type) {
+                        cout<<"Error! Line "<<yylineno<<". Condition in while"
+                                <<" must be a flag."<<endl;
                     }
-                    else{
+                    else {
+                        // Quadruple index of where to return
                         int gotoTrue = jumpStack.top();
                         jumpStack.pop();
 
+                        // Get while condition's address
                         int address = operandStack.top();
                         operandStack.pop();
                         typeStack.pop();
-                        Quadruple quadruple(Ops::GotoTrue, address, -1, gotoTrue);
+
+                        Quadruple quadruple(Ops::GotoTrue, address, -1, 
+                                gotoTrue);
                         quadruples.push_back(quadruple);
                     }
                 }
             | while
                 {
-                    int cont = quadruples.size();
-                    jumpStack.push(cont);
-
-                    if(typeStack.top() != 4){
-                        cout<<"Semantic Error";
+                    // Verify that the expression yielded a boolean value
+                    if (typeStack.top() != typeAdapter.flagG.type) {
+                        cout<<"Error! Line "<<yylineno<<". Condition in while"
+                                <<" must be a flag."<<endl;
                     }
                     else{
+                        // Keep track of GoToFalse
+                        jumpStack.push(quadruples.size());
 
                         int address = operandStack.top();
                         operandStack.pop();
@@ -496,19 +503,23 @@ cycle       : DO
                         Quadruple quadruple(Ops::GotoFalse, address, -1, -1);
                         quadruples.push_back(quadruple);
 
-                        jumpStack.push(cont-1);
+                        // Keep track of where to return at the end of while 
+                        //      block.
+                        jumpStack.push(quadruples.size() - 1);
                     }
                 }
-             block
+                block
                 {   
+                    // Where to return after while block.
                     int returnTop = jumpStack.top();
                     jumpStack.pop();
                     Quadruple quadruple(Ops::Goto, -1, -1, returnTop);
+                    quadruples.push_back(quadruple);
 
-                    int cont = quadruples.size();
+                    // Fill out goToFalse
                     int gotoFalse = jumpStack.top();
                     jumpStack.pop();
-                    quadruples[gotoFalse].result = cont;
+                    quadruples[gotoFalse].result = quadruples.size();
                 }
             ;
 
@@ -520,38 +531,44 @@ while       : WHILE '(' expression ')'
 */
 if          : IF
                 {
+                    // Floor for else if GoTo generation
                     jumpStack.push(-1);
                 }
                 if_ else
                 {
                     int gotoJump = jumpStack.top();
 
-                    while(gotoJump != -1){
+                    // Fill out all GoTo from if and else ifs
+                    while (gotoJump != -1) {
                         jumpStack.pop();
                         quadruples[gotoJump].result = quadruples.size();
                         gotoJump = jumpStack.top();
                     }
-                    if(gotoJump == -1){
+                    if (gotoJump == -1) {
                         jumpStack.pop();
                     }
                 }
             ;
 
 if_         : '(' expression ')' 
-                    {
-                        if(typeStack.top() != 4){
-                            cout<<"Semantic Error";
-                        } 
-                        else{
-                            int address = operandStack.top();
-                            operandStack.pop();
-                            typeStack.pop();
-                            Quadruple quadruple(Ops::GotoFalse, address, -1, -1);
-                            quadruples.push_back(quadruple);
+                {
+                    // Verify that the expression yielded a boolean value
+                    if(typeStack.top() != typeAdapter.flagG.type){
+                        cout<<"Error! Line "<<yylineno<<". Condition in if"
+                                <<" must be a flag."<<endl;
+                    } 
+                    else {
+                        // Gotofalse after if or else if expression
+                        int address = operandStack.top();
+                        operandStack.pop();
+                        typeStack.pop();
+                        Quadruple quadruple(Ops::GotoFalse, address, -1, -1);
+                        quadruples.push_back(quadruple);
 
-                            jumpStack.push(quadruples.size() - 1);
-                        }  
-                    }
+                        // Keep track of where GoToFalse is
+                        jumpStack.push(quadruples.size() - 1);
+                    }  
+                }
                 block else_if
             ;
 
@@ -820,7 +837,7 @@ constvar    : ID
 %%
 
 /*
-
+    Generates a goto after a condition block and fills its previous GoToFalse.
 */
 void addGotoAndFillGotoFalse() {
     int gotoFalse = jumpStack.top();
