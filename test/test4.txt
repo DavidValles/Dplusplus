@@ -1,3 +1,5 @@
+var integer a = 2, b = 3 * 2;
+
 func integer func1 (integer id1) {
     var character c1, c2;
     id1 = id1 + 12;
@@ -5,7 +7,7 @@ func integer func1 (integer id1) {
 }
 
 main {
-    var integer id1, id2, id3;
+    var integer id1 = 3, id2, id3;
     var flag flag1;
     id2 = id1;
     if (id1 < id2 and not flag1) {

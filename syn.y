@@ -27,6 +27,7 @@ using namespace std;
 
 void yyerror (const char *s);
 void insertConstantToTable(Section &constantAddress);
+void checkRedefinition();
 void checkVariable();
 void checkFunction();
 bool checkConstant();
@@ -40,6 +41,7 @@ extern "C"
 }
 
 extern int yylineno;
+bool declaring = false;
 
 /*
     Utilities to find identifiers
@@ -137,12 +139,7 @@ unordered_set<int> relationalOperators = {
     A file in D++ can either be a program file with a main function or a 
     class file with a class definition.
 */
-start       :   {
-                    Quadruple mainQ(Ops::Goto, -1, -1, -1);
-                    jumpStack.push(quadruples.size());
-                    quadruples.push_back(mainQ);
-                }
-                program
+start       :   program
                 {
                     cout<<"Main class compiled."<<endl;
                 }
@@ -155,7 +152,13 @@ start       :   {
     A program can have includes, global variables and functions (0...*)
     It should always have a main method with a block
 */
-program     : includes variable_section functions MAIN
+program     : includes variable_section 
+                {
+                    Quadruple mainQ(Ops::Goto, -1, -1, -1);
+                    jumpStack.push(quadruples.size());
+                    quadruples.push_back(mainQ);
+                }
+                functions MAIN
                 {
                     // Add goto jump for main quadruple
                     int mainGoTo = jumpStack.top();
@@ -185,27 +188,67 @@ variable_section    : variables variable_section
     Declaring one or more variables in one line
     E.g. var integer id1, id2 = 3, id3 = 2 + 23 - id1;
 */
-variables   : VAR type variable ';' 
+variables   : VAR 
+                { 
+                    declaring = true; 
+                } 
+                type variable ';' 
+                { 
+                    declaring = false; 
+                }
             ;
 
 variable    : ID 
                 {
+                    checkRedefinition();
                     string id = *yylval.stringValue;
                     (*currTable).insertVariable(id, (*currentType).current);
                     (*currentType).setNextAddress();
                 }
                 variable_
-            | ID 
-                {
-                    string id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, (*currentType).current);
-                    (*currentType).setNextAddress();
-                }
-                assignment variable_
+            | assignment variable_
             ;
 
 variable_   : ',' variable
             |
+            ;
+
+assignment  : ID 
+                {
+                    string id = *yylval.stringValue;
+                    if (declaring) {
+                        checkRedefinition();
+                        (*currTable).insertVariable(id, (*currentType).current);
+                        (*currentType).setNextAddress();
+                    }
+                    int address = (*currTable).getAddress(id);
+                    int type = typeAdapter.getType(address);
+                    operandStack.push(address);
+                    typeStack.push(type);
+                    operatorStack.push(Ops::Equal);
+                }
+                assignment_ 
+                {
+                    int oper = operatorStack.top();
+                    if (oper == Ops::Equal) {
+                        operatorStack.pop();
+                        int assign = operandStack.top();
+                        operandStack.pop();
+                        int to = operandStack.top();
+                        operandStack.pop();
+                        int assignType = typeStack.top();
+                        typeStack.pop();
+                        int toType = typeStack.top();
+                        typeStack.pop();
+
+                        if (cube.cube[toType][assignType][Ops::Equal] == -1 ) {
+                            cout<<"Error in assignment with type. Line "<<
+                                    yylineno<<endl;
+                        }
+                        Quadruple quadruple(Ops::Equal, assign, -1, to);
+                        quadruples.push_back(quadruple);
+                    }
+                }
             ;
 
 /*
@@ -308,39 +351,7 @@ return      : RETURN expression
 /*
     Various statements available for blocks
 */
-statement   : ID 
-                {
-                    checkVariable();
-                    string id = *yylval.stringValue;
-                    int address = (*currTable).getAddress(id);
-                    int type = typeAdapter.getType(address);
-                    operandStack.push(address);
-                    typeStack.push(type);
-                    operatorStack.push(Ops::Equal);
-                }
-                assignment 
-                {
-                    int oper = operatorStack.top();
-                    if (oper == Ops::Equal) {
-                        operatorStack.pop();
-                        int assign = operandStack.top();
-                        operandStack.pop();
-                        int to = operandStack.top();
-                        operandStack.pop();
-                        int assignType = typeStack.top();
-                        typeStack.pop();
-                        int toType = typeStack.top();
-                        typeStack.pop();
-
-                        if (cube.cube[toType][assignType][Ops::Equal] == -1 ) {
-                            cout<<"Error in assignment with type. Line "<<
-                                    yylineno<<endl;
-                        }
-                        Quadruple quadruple(Ops::Equal, assign, -1, to);
-                        quadruples.push_back(quadruple);
-                    }
-                }
-                ';'
+statement   : assignment ';'
             | cycle
             | if 
             | print
@@ -353,10 +364,10 @@ statement   : ID
     Assignments can have expressions, a string " ", 
         and a character ' '
 */
-assignment  : '=' assignment_
+assignment_ : '=' assignment__
             ;
 
-assignment_ : expression
+assignment__: expression
             | SCONSTANT 
                 {
                     insertConstantToTable(typeAdapter.textConstant);
@@ -899,6 +910,17 @@ void checkOperator(int oper1, int oper2) {
 }
 
 /*
+    Checks if the variable id in the current yylval has already been declared
+*/
+void checkRedefinition() {
+    string id = *yylval.stringValue;
+    if ((*currTable).findVariable(id)) {
+        cout<<"Error! Line: "<<yylineno
+            <<". Variable has already been defined: "<<id<<"."<<endl;
+    }
+}
+
+/*
     Checks if the variable id in the current yylval has been declared
 */
 void checkVariable() {
@@ -1004,7 +1026,7 @@ int main(int argc, char **argv)
 
 	cout<<"Displaying quadruples"<<endl;
     for (int i=0; i<quadruples.size(); i++) {
-        cout<<i+1<<". ";
+        cout<<i<<". ";
         quadruples[i].display();
     }
 	
