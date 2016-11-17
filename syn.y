@@ -33,7 +33,7 @@ void checkVariable();
 void checkFunction();
 bool checkConstant();
 int getTemporalAddress(int type);
-void checkOperator(int oper1, int oper2 = -1);
+void checkOperator(int oper1, int oper2 = -1, bool isRelational = false);
 void returnProcess();
 
 extern "C"
@@ -811,24 +811,24 @@ numexp      : NOT
 
 numexp_     : '>' { operatorStack.push(Ops::GreaterThan); }
                 exp
-                { checkOperator(Ops::GreaterThan); }
+                { checkOperator(Ops::GreaterThan, -1, true); }
             | '<' { operatorStack.push(Ops::LessThan); }
                 exp
-                { checkOperator(Ops::LessThan); }
+                { checkOperator(Ops::LessThan, -1, true); }
             | LESSTHANOREQUALTO
                 { operatorStack.push(Ops::LessThanOrEqualTo); }
                 exp
-                { checkOperator(Ops::LessThanOrEqualTo); }
+                { checkOperator(Ops::LessThanOrEqualTo, -1, true); }
             | GREATERTHANOREQUALTO
                 { operatorStack.push(Ops::GreaterThanOrEqualTo); }
                 exp
-                { checkOperator(Ops::GreaterThanOrEqualTo); }
+                { checkOperator(Ops::GreaterThanOrEqualTo, -1, true); }
             | EQUALTO { operatorStack.push(Ops::EqualTo); }
                 exp
-                { checkOperator(Ops::EqualTo); }
+                { checkOperator(Ops::EqualTo, -1, true); }
             | NOTEQUALTO { operatorStack.push(Ops::NotEqualTo); }
                 exp
-                { checkOperator(Ops::NotEqualTo); }
+                { checkOperator(Ops::NotEqualTo, -1, true); }
             |
             ;
 
@@ -1059,11 +1059,12 @@ void insertConstantToTable(Section &constant) {
     Also can be called without parameters to check if the operator belongs to
         the relationalOperators like <, >
 */
-void checkOperator(int oper1, int oper2) {
+void checkOperator(int oper1, int oper2, bool isRelational) {
     if (!operatorStack.empty()) {
         int oper = operatorStack.top();
         if (oper == oper1 || oper == oper2 ||
-                relationalOperators.find(oper) != relationalOperators.end()) {
+                (relationalOperators.find(oper) != relationalOperators.end()
+                && isRelational)) {
             operatorStack.pop();
             int type2 = typeStack.top();
             typeStack.pop();

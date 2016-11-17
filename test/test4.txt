@@ -1,5 +1,5 @@
 main {
     var integer id1, id2;
-    var flag f1;
-    f1 = id1 + 2 < id2;
+    if(not (id1 + 2 < id2 * id1)) {
+    }
 }
