@@ -5,7 +5,7 @@
 }
 
 %{
-#include <stdio.h>     
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <unordered_map>
@@ -43,7 +43,8 @@ extern "C"
 
 extern int yylineno;
 bool declaring = false;
-string id;
+string id, dId;
+bool hasDimension = false;
 
 /*
     Utilities to find identifiers
@@ -74,7 +75,8 @@ stack<int> typeStack;
 stack<int> operandStack;
 stack<int> operatorStack;
 stack<int> jumpStack;
-unordered_set<int> relationalOperators = { 
+stack<string> dimensionStack;
+unordered_set<int> relationalOperators = {
     Ops::GreaterThan,
     Ops::LessThan,
     Ops::NotEqualTo,
@@ -89,8 +91,8 @@ unordered_set<int> relationalOperators = {
 %token INCLUDE
 %token MAIN
 %token RETURN
-%token NONE 
-                              
+%token NONE
+
 %token VAR
 %token FUNC
 %token INT
@@ -100,45 +102,45 @@ unordered_set<int> relationalOperators = {
 %token FLAG
 %token ARRAY
 %token MATRIX
-                              
-%token IF 
-%token ELSE 
+
+%token IF
+%token ELSE
 %token ELSEIF
-                              
+
 %token WHILE
 %token DO
-                              
+
 %token CLASS
 %token PRIVATE
 %token PUBLIC
-                              
-%token PRINT 
-%token READ 
-                              
-%token NOTEQUALTO 
-%token EQUALTO 
-%token LESSTHANOREQUALTO 
-%token GREATERTHANOREQUALTO 
-%token AND 
-%token OR 
-%token NOT 
 
-%token ID 
-%token ICONSTANT 
-%token DCONSTANT 
-%token SCONSTANT 
-%token CCONSTANT 
+%token PRINT
+%token READ
+
+%token NOTEQUALTO
+%token EQUALTO
+%token LESSTHANOREQUALTO
+%token GREATERTHANOREQUALTO
+%token AND
+%token OR
+%token NOT
+
+%token ID
+%token ICONSTANT
+%token DCONSTANT
+%token SCONSTANT
+%token CCONSTANT
 
 %union {
   string* stringValue;
   float floatValue;
   int intValue;
-} 
+}
 
 %%
 
 /*
-    A file in D++ can either be a program file with a main function or a 
+    A file in D++ can either be a program file with a main function or a
     class file with a class definition.
 */
 start       :   program
@@ -148,17 +150,17 @@ start       :   program
                     quadruples.push_back(qEnd);
                 }
             | class
-                { 
-                    cout<<"User defined class compiled."<<endl; 
+                {
+                    cout<<"User defined class compiled."<<endl;
                 }
             ;
 
 /*
-    Basic program structure 
+    Basic program structure
     A program can have includes, global variables and functions (0...*)
     It should always have a main method with a block
 */
-program     : includes variable_section 
+program     : includes variable_section
                 {
                     Quadruple mainQ(Ops::Goto, -1, -1, -1);
                     jumpStack.push(quadruples.size());
@@ -178,7 +180,7 @@ program     : includes variable_section
     Include section for global scope
     E.g. include "myClass.h"
 */
-includes    : INCLUDE SCONSTANT includes 
+includes    : INCLUDE SCONSTANT includes
             |
             ;
 
@@ -194,25 +196,27 @@ variable_section    : variables variable_section
     Declaring one or more variables in one line
     E.g. var integer id1, id2 = 3, id3 = 2 + 23 - id1;
 */
-variables   : VAR 
-                { 
-                    declaring = true; 
-                } 
-                type variable ';' 
-                { 
-                    declaring = false; 
+variables   : VAR
+                {
+                    // This is used for assignment rule.
+                    declaring = true;
+                }
+                type variable ';'
+                {
+                    declaring = false;
                 }
             ;
 
-variable    : ID 
+variable    : ID
                 {
-                    checkRedefinition();
                     id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, (*currentType).current);
-                    (*currentType).setNextAddress();
-                } 
+                    checkRedefinition();
+                    currTable->insertVariable(id, currentType->current);
+                    currentType->setNextAddress();
+                }
                 dimension
                 {
+                    // Add dimension if such exist
                     int dim1 = currTable->getDimension(id, 1);
                     int dim2 = currTable->getDimension(id, 2);
                     if (dim2 != 0) {
@@ -232,7 +236,7 @@ variable_   : ',' variable
             |
             ;
 
-dimension   : '(' ICONSTANT 
+dimension   : '(' ICONSTANT
                 {
                     string constant = *yylval.stringValue;
                     int constantInt = stoi(constant);
@@ -251,21 +255,42 @@ dimension_  : ',' ICONSTANT
             |
             ;
 
-assignment  : ID 
+assignment  : ID
                 {
                     id = *yylval.stringValue;
+
+                    // If the assignment rule comes from a block rule it should
+                    // be checked and if it has a dimension, pushed to stack.
+                    if (!declaring) {
+                        checkVariable();
+                        if (currTable->getDimension(id, 1)) {
+                            dimensionStack.push(id);
+                        }
+                    }
+                }
+                dim
+                {
+                    id = *yylval.stringValue;
+
+                    // If the assignment rule is used by the variable rule
+                    // this means it is being declaring and has to be checked
+                    // for redefinition and insert it into the table.
                     if (declaring) {
                         checkRedefinition();
-                        (*currTable).insertVariable(id, (*currentType).current);
-                        (*currentType).setNextAddress();
+                        currTable->insertVariable(id, currentType->current);
+                        currentType->setNextAddress();
                     }
-                    int address = (*currTable).getAddress(id);
-                    int type = typeAdapter.getType(address);
-                    operandStack.push(address);
-                    typeStack.push(type);
+
+                    // If it had dimension it was already processed.
+                    if (!hasDimension) {
+                        int address = currTable->getAddress(id);
+                        int type = typeAdapter.getType(address);
+                        operandStack.push(address);
+                        typeStack.push(type);
+                    }
                     operatorStack.push(Ops::Equal);
                 }
-                assignment_ 
+                assignment_
                 {
                     int oper = operatorStack.top();
                     if (oper == Ops::Equal) {
@@ -297,32 +322,32 @@ functions   : singlefunction functions
             |
             ;
 
-singlefunction  : FUNC singlefunction_ ID 
-                    {   
+singlefunction  : FUNC singlefunction_ ID
+                    {
                         // Insert function to table
                         currentFunction = *yylval.stringValue;
-                        functionTable.insertFunction(currentFunction, 
-                                        (*currentType).type, quadruples.size(),
-                                        (*currentType).current); 
-                        (*currentType).setNextAddress();
+                        functionTable.insertFunction(currentFunction,
+                                        currentType->type, quadruples.size(),
+                                        currentType->current);
+                        currentType->setNextAddress();
 
                         // Switch scope to local table
                         currTable = &localTable;
                     }
                     '(' params ')' block
                     {
-                        Function cFunction = 
+                        Function cFunction =
                                 functionTable.getFunction(currentFunction);
 
                         // Check last quadruple to determine if there was a
                         //      return value
-                        if (cFunction.type != typeAdapter.none.type && 
-                                quadruples[quadruples.size() - 1].oper != 
+                        if (cFunction.type != typeAdapter.none.type &&
+                                quadruples[quadruples.size() - 1].oper !=
                                 Ops::Return) {
                             cout<<"Error: function should have return value"<<
                                     endl;
                         }
-                        
+
                         Quadruple qEndproc(Ops::Endproc, -1, -1, -1);
                         quadruples.push_back(qEndproc);
 
@@ -330,34 +355,34 @@ singlefunction  : FUNC singlefunction_ ID
                         cout<<"Displaying function table"<<endl;
                         functionTable.displayTable();
 	                    cout<<"Displaying local variable table"<<endl;
-                        (*currTable).displayTable();
+                        currTable->displayTable();
 
                         // Clear the local variable table and change to global
                         //      scope
-                        (*currTable).clearVarTable();
+                        currTable->clearVarTable();
                         currTable = &globalTable;
                     }
                 ;
 
-singlefunction_ : type 
+singlefunction_ : type
                 | NONE { currentType = &typeAdapter.none; }
                 ;
 
 /*
     Declaring zero to n paramaters
 */
-params      : type 
+params      : type
                 {
-                    functionTable.addParameterToFunction(currentFunction, 
-                                        (*currentType).type); 
-                } 
-                ID  
-                {   
-                    id = *yylval.stringValue;
-                    (*currTable).insertVariable(id, (*currentType).current);
-                    (*currentType).setNextAddress();
+                    functionTable.addParameterToFunction(currentFunction,
+                                        currentType->type);
                 }
-                params_ 
+                ID
+                {
+                    id = *yylval.stringValue;
+                    currTable->insertVariable(id, currentType->current);
+                    currentType->setNextAddress();
+                }
+                params_
             |
             ;
 
@@ -366,7 +391,7 @@ params_     : ',' params
             ;
 
 /*
-    Typical block of code with statements   
+    Typical block of code with statements
 */
 block       : '{' block_ return '}'
             ;
@@ -391,36 +416,36 @@ return      : RETURN expression
 */
 statement   : assignment ';'
             | cycle
-            | if 
+            | if
             | print
-            | read 
-            | variables 
+            | read
+            | variables
             | functioncall ';'
             ;
 
 /*
-    Assignments can have expressions, a string " ", 
+    Assignments can have expressions, a string " ",
         and a character ' '
 */
 assignment_ : '=' assignment__
             ;
 
 assignment__: expression
-            | SCONSTANT 
+            | SCONSTANT
                 {
                     insertConstantToTable(typeAdapter.textConstant);
                 }
-            | CCONSTANT 
+            | CCONSTANT
                 {
                     insertConstantToTable(typeAdapter.characterConstant);
                 }
-            | functioncall 
+            | functioncall
             ;
 
-/* 
+/*
     Function call structure. Can have 0 to n parameters.
 */
-functioncall    : ID 
+functioncall    : ID
                     {
                         checkFunction();
 
@@ -432,12 +457,12 @@ functioncall    : ID
                                 (currentFunction).quadruple, -1, -1);
                         quadruples.push_back(eraQ);
                     }
-                    '(' functioncall_ ')' 
+                    '(' functioncall_ ')'
                     {
                         Function cFunction =
                                 functionTable.getFunction(currentFunction);
 
-                        // Check if parameters in function call match 
+                        // Check if parameters in function call match
                         //    the necessary in the declaration
                         if (functionTable.getParametersSize(currentFunction)
                                 != currentParameter) {
@@ -466,10 +491,10 @@ functioncall    : ID
                     }
                 ;
 
-functioncall_   : expression 
-                    {   
+functioncall_   : expression
+                    {
                         // Get type of the parameter from the expression
-                        int address = operandStack.top(); 
+                        int address = operandStack.top();
                         operandStack.pop();
                         int type = typeStack.top();
                         typeStack.pop();
@@ -518,7 +543,7 @@ cycle       : DO
                         operandStack.pop();
                         typeStack.pop();
 
-                        Quadruple quadruple(Ops::GotoTrue, address, -1, 
+                        Quadruple quadruple(Ops::GotoTrue, address, -1,
                                 gotoTrue);
                         quadruples.push_back(quadruple);
                     }
@@ -540,13 +565,13 @@ cycle       : DO
                         Quadruple quadruple(Ops::GotoFalse, address, -1, -1);
                         quadruples.push_back(quadruple);
 
-                        // Keep track of where to return at the end of while 
+                        // Keep track of where to return at the end of while
                         //      block.
                         jumpStack.push(quadruples.size() - 1);
                     }
                 }
                 block
-                {   
+                {
                     // Where to return after while block.
                     int returnTop = jumpStack.top();
                     jumpStack.pop();
@@ -587,13 +612,13 @@ if          : IF
                 }
             ;
 
-if_         : '(' expression ')' 
+if_         : '(' expression ')'
                 {
                     // Verify that the expression yielded a boolean value
                     if(typeStack.top() != typeAdapter.flagG.type){
                         cout<<"Error! Line "<<yylineno<<". Condition in if"
                                 <<" must be a flag."<<endl;
-                    } 
+                    }
                     else {
                         // Gotofalse after if or else if expression
                         int address = operandStack.top();
@@ -604,13 +629,13 @@ if_         : '(' expression ')'
 
                         // Keep track of where GoToFalse is
                         jumpStack.push(quadruples.size() - 1);
-                    }  
+                    }
                 }
                 block else_if
             ;
 
-else_if     : ELSEIF 
-                {   
+else_if     : ELSEIF
+                {
                     addGotoAndFillGotoFalse();
                 }
               if_
@@ -620,9 +645,9 @@ else_if     : ELSEIF
 else        : ELSE
                 {
                     addGotoAndFillGotoFalse();
-                } 
+                }
               block
-            |   
+            |
             ;
 
 /*
@@ -631,14 +656,14 @@ else        : ELSE
 print       : PRINT '(' print_ ')' ';'
             ;
 
-print_      : expression 
-                {  
+print_      : expression
+                {
                     int address = operandStack.top();
                     operandStack.pop();
                     // TODO Check cube for print
                     Quadruple quadruple(Ops::Print, -1, -1, address);
                     quadruples.push_back(quadruple);
-                } 
+                }
                 print__
             | SCONSTANT print__
             ;
@@ -653,14 +678,23 @@ print__     : ',' print_
 read       : READ '(' read_ ')' ';'
             ;
 
-read_      : ID 
-                {  
+read_      : ID
+                {
                     checkVariable();
                     id = *yylval.stringValue;
-                    int address = (*currTable).getAddress(id);
-                    Quadruple quadruple(Ops::Read, -1, -1, address);
-                    quadruples.push_back(quadruple);
-                } 
+                    if (currTable->getDimension(id, 1)) {
+                        dimensionStack.push(id);
+                    }
+                }
+                dim
+                {
+                    if (!hasDimension) {
+                        id = *yylval.stringValue;
+                        int address = currTable->getAddress(id);
+                        Quadruple quadruple(Ops::Read, -1, -1, address);
+                        quadruples.push_back(quadruple);
+                    }
+                }
                 read__
             ;
 
@@ -672,7 +706,7 @@ read__     : ',' read_
     Class structure
 */
 
-class       : CLASS ID '{' classblock '}' 
+class       : CLASS ID '{' classblock '}'
             ;
 
 classblock  : classblock_ classblock
@@ -686,44 +720,44 @@ classblock_ : PRIVATE ':'
             ;
 
 /*
-    Various accepted types 
+    Various accepted types
 */
-type        : INT   
-                { 
+type        : INT
+                {
                     if (currTable == &globalTable) {
-                        currentType = &typeAdapter.integerG; 
+                        currentType = &typeAdapter.integerG;
                     } else {
                         currentType = &typeAdapter.integerL;
                     }
                 }
             | DECIMAL
-                { 
+                {
                     if (currTable == &globalTable) {
-                        currentType = &typeAdapter.decimalG; 
+                        currentType = &typeAdapter.decimalG;
                     } else {
                         currentType = &typeAdapter.decimalL;
                     }
                 }
-            | TEXT 
-                { 
+            | TEXT
+                {
                     if (currTable == &globalTable) {
-                        currentType = &typeAdapter.textG; 
+                        currentType = &typeAdapter.textG;
                     } else {
                         currentType = &typeAdapter.textL;
                     }
                 }
-            | CHARACTER  
-                { 
+            | CHARACTER
+                {
                     if (currTable == &globalTable) {
-                        currentType = &typeAdapter.characterG; 
+                        currentType = &typeAdapter.characterG;
                     } else {
                         currentType = &typeAdapter.characterL;
                     }
                 }
-            | FLAG 
-                { 
+            | FLAG
+                {
                     if (currTable == &globalTable) {
-                        currentType = &typeAdapter.flagG; 
+                        currentType = &typeAdapter.flagG;
                     } else {
                         currentType = &typeAdapter.flagL;
                     }
@@ -733,7 +767,7 @@ type        : INT
 
 
 /*
-    Basic expression structure 
+    Basic expression structure
 */
 expression  : and
                 {
@@ -775,99 +809,215 @@ numexp      : NOT
             | exp numexp_
             ;
 
-numexp_     : '>' { operatorStack.push(Ops::GreaterThan); } 
+numexp_     : '>' { operatorStack.push(Ops::GreaterThan); }
                 exp
                 { checkOperator(Ops::GreaterThan); }
-            | '<' { operatorStack.push(Ops::LessThan); } 
+            | '<' { operatorStack.push(Ops::LessThan); }
                 exp
                 { checkOperator(Ops::LessThan); }
-            | LESSTHANOREQUALTO 
-                { operatorStack.push(Ops::LessThanOrEqualTo); } 
+            | LESSTHANOREQUALTO
+                { operatorStack.push(Ops::LessThanOrEqualTo); }
                 exp
                 { checkOperator(Ops::LessThanOrEqualTo); }
-            | GREATERTHANOREQUALTO 
-                { operatorStack.push(Ops::GreaterThanOrEqualTo); } 
+            | GREATERTHANOREQUALTO
+                { operatorStack.push(Ops::GreaterThanOrEqualTo); }
                 exp
                 { checkOperator(Ops::GreaterThanOrEqualTo); }
-            | EQUALTO { operatorStack.push(Ops::EqualTo); } 
+            | EQUALTO { operatorStack.push(Ops::EqualTo); }
                 exp
                 { checkOperator(Ops::EqualTo); }
-            | NOTEQUALTO { operatorStack.push(Ops::NotEqualTo); } 
+            | NOTEQUALTO { operatorStack.push(Ops::NotEqualTo); }
                 exp
                 { checkOperator(Ops::NotEqualTo); }
             |
             ;
 
-exp         : term 
+exp         : term
                 {
                     checkOperator(Ops::Sum, Ops::Minus);
                 }
-                exp_ 
+                exp_
             ;
 
 exp_        : '+'
                 {
+                    cout<<"Pushing +"<<endl;
                     operatorStack.push(Ops::Sum);
                 }
                 exp
             | '-'
                 {
                     operatorStack.push(Ops::Minus);
-                } 
+                }
                 exp
-            | 
+            |
             ;
 
-term        : factor 
+term        : factor
                 {
                     checkOperator(Ops::Multiplication, Ops::Division);
                 }
-                term_ 
+                term_
             ;
 
 term_       : '*'
                 {
                     operatorStack.push(Ops::Multiplication);
-                } 
+                }
                 term
             | '/'
                 {
                     operatorStack.push(Ops::Division);
                 }
                 term
-            | 
+            |
             ;
 
 factor      :   {
                     operatorStack.push(Ops::Floor);
                 }
-                '(' expression ')' 
+                '(' expression ')'
                 {
                     operatorStack.pop();
                 }
-            | constvar 
-            | '+' constvar
+            | constvar
+            | '+' constvar /* TODO: solve this */
             | '-' constvar
             ;
 
-constvar    : ID 
+constvar    : ID
                 {
-                    checkVariable();
-                    
-                    // Push operand and type to respective stacks
                     id = *yylval.stringValue;
-                    int address = (*currTable).getAddress(id);
-                    int type = typeAdapter.getType(address);
-                    typeStack.push(type);
-                    operandStack.push(address);
+                    cout<<"constvar "<<id<<endl;
+                    if (currTable->getDimension(id, 1)) {
+                        dimensionStack.push(id);
+                        operatorStack.push(Ops::Floor);
+                    }
+                    checkVariable();
                 }
-            | ICONSTANT 
+                dim
+                {
+                    if (hasDimension) {
+                        dimensionStack.pop();
+                        operatorStack.pop();
+                    }
+                    else {
+                        // Push operand and type to respective stacks
+                        id = *yylval.stringValue;
+                        int address = currTable->getAddress(id);
+                        int type = typeAdapter.getType(address);
+                        typeStack.push(type);
+                        operandStack.push(address);
+                    }
+                }
+            | ICONSTANT
                 {
                     insertConstantToTable(typeAdapter.integerConstant);
                 }
-            | DCONSTANT 
+            | DCONSTANT
                 {
                     insertConstantToTable(typeAdapter.decimalConstant);
+                }
+            ;
+
+dim         : '[' expression
+                {
+                    dId = dimensionStack.top();
+                    int dim1 = currTable->getDimension(dId, 1);
+                    if (!dim1) {
+                        cout<<"Error! Line "<<yylineno<<". Variable has no "
+                            <<"such dimension: "<<dId<<endl;
+                    }
+                    if (typeStack.top() != typeAdapter.integerG.type) {
+                        cout<<"Error! Line "<<yylineno<<". Index must be an"
+                            <<" integer."<<endl;
+                    }
+                    hasDimension = true;
+                    int dim2 = currTable->getDimension(dId, 2);
+                    int index = operandStack.top();
+                    typeStack.pop();
+                    operandStack.pop();
+
+                    Quadruple qCheck(Ops::Check, 0, dim1, index);
+                    quadruples.push_back(qCheck);
+
+                    if (!dim2) {
+                        int baseAddress = currTable->getAddress(dId);
+                        int result = typeAdapter.integerT.current * -1;
+                        Quadruple qS1(Ops::Sum, baseAddress, index, result);
+                        quadruples.push_back(qS1);
+
+                        typeAdapter.integerT.setNextAddress();
+
+                        operandStack.push(result);
+                        typeStack.push(typeAdapter.integerT.type);
+                    }
+                    else {
+                        Quadruple qS1D2(Ops::Multiplication, index, dim2,
+                                typeAdapter.integerT.current);
+                        quadruples.push_back(qS1D2);
+
+                        operandStack.push(typeAdapter.integerT.current);
+                        typeStack.push(typeAdapter.integerT.type);
+                        typeAdapter.integerT.setNextAddress();
+                    }
+                }
+                dim_ ']'
+            |
+                {
+                    if (currTable->findVariable(id)) {
+                        hasDimension = false;
+                        int dim1 = currTable->getDimension(id, 1);
+                        if (dim1) {
+                            cout<<"Error! Line "<<yylineno<<". Specify index for"
+                                <<" first dimension of variable "<<id<<endl;
+                        }
+                    }
+                }
+            ;
+
+dim_        : ',' expression
+                {
+                    int dim2 = currTable->getDimension(dId, 2);
+                    if (!dim2) {
+                        cout<<"Error! Line "<<yylineno<<". Variable has no "
+                            <<"such dimension: "<<dId<<endl;
+                    }
+                    hasDimension = true;
+                    // Get the result from the expression
+                    int index = operandStack.top();
+                    typeStack.pop();
+                    operandStack.pop();
+
+                    Quadruple qCheck(Ops::Check, 0, dim2, index);
+                    quadruples.push_back(qCheck);
+
+                    int s2 = operandStack.top();
+                    typeStack.pop();
+                    operandStack.pop();
+
+                    int s1d2s2 = typeAdapter.integerT.current;
+                    typeAdapter.integerT.setNextAddress();
+                    Quadruple qs1d2s2(Ops::Sum, index, s2, s1d2s2);
+                    quadruples.push_back(qs1d2s2);
+
+                    int baseAddress = currTable->getAddress(dId);
+                    int result = typeAdapter.integerT.current * -1;
+
+                    typeAdapter.integerT.setNextAddress();
+                    Quadruple qS1(Ops::Sum, baseAddress, s1d2s2, result);
+                    quadruples.push_back(qS1);
+
+                    operandStack.push(result);
+                    typeStack.push(typeAdapter.integerT.type);
+                }
+            |
+                {
+                    int dim2 = currTable->getDimension(dId, 2);
+                    if (dim2) {
+                        cout<<"Error! Line "<<yylineno<<". Specify index for"
+                            <<" second dimension of variable "<<id<<endl;
+                    }
                 }
             ;
 
@@ -889,7 +1039,7 @@ void addGotoAndFillGotoFalse() {
 
 /*
     Inserts a constant to the table of constants depending on its type
-    It also pushes the constant and type to their stacks 
+    It also pushes the constant and type to their stacks
 */
 void insertConstantToTable(Section &constant) {
     string id = *yylval.stringValue;
@@ -904,7 +1054,7 @@ void insertConstantToTable(Section &constant) {
 }
 
 /*
-    Checks if the top operator of the stack matches the wanted operators 
+    Checks if the top operator of the stack matches the wanted operators
         (the parameters).
     i.e. checkOperator(Ops::Multiplication, Ops::Division)
 
@@ -914,7 +1064,7 @@ void insertConstantToTable(Section &constant) {
 void checkOperator(int oper1, int oper2) {
     if (!operatorStack.empty()) {
         int oper = operatorStack.top();
-        if (oper == oper1 || oper == oper2 || 
+        if (oper == oper1 || oper == oper2 ||
                 relationalOperators.find(oper) != relationalOperators.end()) {
             operatorStack.pop();
             int type2 = typeStack.top();
@@ -932,7 +1082,7 @@ void checkOperator(int oper1, int oper2) {
                 int tempAddress = getTemporalAddress(resultType);
                 Quadruple quadruple(oper, operand1, operand2, tempAddress);
                 quadruples.push_back(quadruple);
-                operandStack.push(tempAddress);    
+                operandStack.push(tempAddress);
                 typeStack.push(resultType);
             }
             else {
@@ -947,7 +1097,7 @@ void checkOperator(int oper1, int oper2) {
 */
 void checkRedefinition() {
     string id = *yylval.stringValue;
-    if ((*currTable).findVariable(id)) {
+    if (currTable->findVariable(id)) {
         cout<<"Error! Line: "<<yylineno
             <<". Variable has already been defined: "<<id<<"."<<endl;
     }
@@ -958,7 +1108,7 @@ void checkRedefinition() {
 */
 void checkVariable() {
     string id = *yylval.stringValue;
-    if (!(*currTable).findVariable(id)) {
+    if (!currTable->findVariable(id)) {
         cout<<"Error! Line: "<<yylineno<<". Variable not defined: "<<id<<
             "."<<endl;
     }
@@ -993,24 +1143,24 @@ int getTemporalAddress(int type) {
     if (type == typeAdapter.integerT.type) {
         tempAddress = typeAdapter.integerT.current;
         typeAdapter.integerT.setNextAddress();
-    } 
+    }
     else if (type == typeAdapter.decimalT.type) {
         tempAddress = typeAdapter.decimalT.current;
         typeAdapter.decimalT.setNextAddress();
-    } 
+    }
     else if (type == typeAdapter.textT.type) {
         tempAddress = typeAdapter.textT.current;
         typeAdapter.textT.setNextAddress();
-    } 
+    }
     else if (type == typeAdapter.characterT.type) {
         tempAddress = typeAdapter.characterT.current;
         typeAdapter.characterT.setNextAddress();
-    } 
+    }
     else if (type == typeAdapter.flagT.type) {
         tempAddress = typeAdapter.flagT.current;
         typeAdapter.flagT.setNextAddress();
-    } 
-    return tempAddress; 
+    }
+    return tempAddress;
 }
 
 void returnProcess() {
@@ -1051,18 +1201,18 @@ int main(int argc, char **argv)
         printf("Could not open file.\n");
         exit( 1 );
     }
-    
+
     yyparse();
-    
+
 	cout<<"Displaying global variable table"<<endl;
-    (*currTable).displayTable();
+    currTable->displayTable();
 
 	cout<<"Displaying quadruples"<<endl;
     for (int i=0; i<quadruples.size(); i++) {
         cout<<i<<". ";
         quadruples[i].display();
     }
-	
+
     return 0;
 }
 

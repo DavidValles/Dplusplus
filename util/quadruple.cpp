@@ -40,6 +40,7 @@ void Quadruple::display() {
         case 24: operS = "Return"; break;
         case 25: operS = "Endproc"; break;
         case 26: operS = "End"; break;
+        case 27: operS = "Check"; break;
         default: operS = "Not Found"; break;
     }
     cout<<operS<<" "<<operand1<<" "<<operand2<<" "<<result<<endl;

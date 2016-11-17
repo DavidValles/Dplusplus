@@ -67,7 +67,7 @@ extern void yyerror (const char *s);
 \"(\\.|[^"])*\"             return SCONSTANT; 
 \'.\'                       return CCONSTANT; 
 
-[\{\}\=\:\;\,\.\+\-\*\/\<\>\(\)]  return yytext[0];
+[\[\]\{\}\=\:\;\,\.\+\-\*\/\<\>\(\)]  return yytext[0];
 
 [\n]                        {  
                                 yylineno++;  

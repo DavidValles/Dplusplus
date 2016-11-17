@@ -25,6 +25,7 @@ enum Ops {
     GoSub = 23,
     Return = 24,
     Endproc = 25,
-    End = 26
+    End = 26,
+    Check = 27
 };
 

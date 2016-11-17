@@ -1,5 +1,7 @@
 main {
     var decimal id2;
-    var integer id1;
+    var integer id1(2,4), id4, id5(3);
     var integer id3;
+    id1[id3 + id5[id1[0,1]], id4 * 2] = id5[0];
+    id2 = 2;
 }
