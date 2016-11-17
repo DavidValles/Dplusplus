@@ -841,7 +841,6 @@ exp         : term
 
 exp_        : '+'
                 {
-                    cout<<"Pushing +"<<endl;
                     operatorStack.push(Ops::Sum);
                 }
                 exp
@@ -888,7 +887,6 @@ factor      :   {
 constvar    : ID
                 {
                     id = *yylval.stringValue;
-                    cout<<"constvar "<<id<<endl;
                     if (currTable->getDimension(id, 1)) {
                         dimensionStack.push(id);
                         operatorStack.push(Ops::Floor);
