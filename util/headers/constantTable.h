@@ -11,6 +11,7 @@ public:
     void insertConstant(string id, int address);
     bool findConstant(string id);
     int getAddress(string id);
+    string getValue(int address);
 
 private:
     unordered_map<string, Constant> constantTable;
