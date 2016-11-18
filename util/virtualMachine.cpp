@@ -2,7 +2,9 @@
 #define VIRTUALMACHINE_CPP
 
 #include "headers/virtualMachine.h"
-#include "headers/typeAdapter.cpp"
+#include "typeAdapter.cpp"
+#include <string>
+
 using namespace std;
 
 VirtualMachine::VirtualMachine(FunctionTable fTable, vector<Quadruple> prog,
@@ -55,14 +57,14 @@ void VirtualMachine::run(){
 
 void VirtualMachine::sum(){
 	double oper1, oper2;
-	int absdir1, absdir2;
+	int absdir, absdir2;
 
 	switch(typeAdapter.getScope(current.operand1)){
 		case 0:  // global
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: // int;
-					absdir1 = current.operand1 - typeAdapter.integerG.min;
-					oper1 = mGlobal.getGlobalInteger(absdir);
+					absdir = current.operand1 - typeAdapter.integerG.min;
+					oper1 = mGlobal.getInteger(absdir);
 				break;
 				case 1: // dec;
 				break;
@@ -73,9 +75,9 @@ void VirtualMachine::sum(){
 				case 4: // flag;
 				break;
 			} break;
-		case 1: // local 
-		case 2: // temporal
-		case 3: // constante
+		case 1: break;// local
+		case 2: break;// temporal
+		case 3: break;// constante
 	}
 }
 
@@ -101,75 +103,74 @@ void VirtualMachine::print(){
 	switch(typeAdapter.getScope(current.result)){
 		case 0:  // global
 			switch(typeAdapter.getType(current.result)){
-				case 0: // int;
-					absdir1 = current.result - typeAdapter.integerG.min;
+				case 0: { // int;
+					absdir = current.result - typeAdapter.integerG.min;
 					result = to_string(mGlobal.getInteger(absdir));
-
-				break;
-				case 1: // dec;
-					absdir1 = current.result - typeAdapter.decimalG.min;
+                } break;
+				case 1: { // dec;
+					absdir = current.result - typeAdapter.decimalG.min;
 					result = to_string(mGlobal.getDecimal(absdir));
-				break;
-				case 2: // char;
-					absdir1 = current.result - typeAdapter.characterG.min;
-					result = mGlobal.getChar(absdir);
-				break;
+                } break;
+				case 2: { // char;
+					absdir = current.result - typeAdapter.characterG.min;
+					result = mGlobal.getCharacter(absdir);
+                } break;
 				case 3: // text;
 				break;
-				case 4: // flag;
-					absdir1 = current.result - typeAdapter.flagG.min;
+				case 4: { // flag;
+					absdir = current.result - typeAdapter.flagG.min;
 					if(mGlobal.getFlag(absdir) == 1){
 						result = "True";
 					}
 					else{
 						result = "False";
-					}  
-				break;
+					}
+                } break;
 			} break;
 		case 1: // local
 			switch(typeAdapter.getType(current.result)){
-				case 0: // int;
-					absdir1 = current.result - typeAdapter.integerL.min;
+				case 0: { // int;
+					absdir = current.result - typeAdapter.integerL.min;
 					result = to_string(mLocal.getInteger(absdir));
-				break;
-				case 1: // dec;
-					absdir1 = current.result - typeAdapter.decimalL.min;
+                } break;
+				case 1: { // dec;
+					absdir = current.result - typeAdapter.decimalL.min;
 					result = to_string(mLocal.getDecimal(absdir));
-				break;
-				case 2: // char;
-					absdir1 = current.result - typeAdapter.characterL.min;
-					result = mLocal.getChar(absdir);
-				break;
+                } break;
+				case 2: { // char;
+					absdir = current.result - typeAdapter.characterL.min;
+					result = mLocal.getCharacter(absdir);
+                } break;
 				case 3: // text;
 				break;
-				case 4: // flag;
-					absdir1 = current.result - typeAdapter.flagL.min;
+				case 4: { // flag;
+					absdir = current.result - typeAdapter.flagL.min;
 					if(mLocal.getFlag(absdir) == 1){
 						result = "True";
 					}
 					else{
 						result = "False";
 					}
-				break;
-			} break; 
+                } break;
+			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
-				case 0: // int;
-					absdir1 = current.result - typeAdapter.integerT.min;
+				case 0: { // int;
+					absdir = current.result - typeAdapter.integerT.min;
 					result = to_string(mLocal.getTemporalInteger(absdir));
-				break;
-				case 1: // dec;
-					absdir1 = current.result - typeAdapter.decimalT.min;
+                } break;
+				case 1: { // dec;
+					absdir = current.result - typeAdapter.decimalT.min;
 					result = to_string(mLocal.getTemporalDecimal(absdir));
-				break;
-				case 2: // char;
-					absdir1 = current.result - typeAdapter.characterT.min;
-					result = mLocal.getTemporalChar(absdir);
-				break;
+                } break;
+				case 2: { // char;
+					absdir = current.result - typeAdapter.characterT.min;
+					result = mLocal.getTemporalCharacter(absdir);
+                } break;
 				case 3: // text;
 				break;
 				case 4: // flag;
-					absdir1 = current.result - typeAdapter.flagT.min;
+					absdir = current.result - typeAdapter.flagT.min;
 					if(mLocal.getTemporalFlag(absdir) == 1){
 						result = "True";
 					}
@@ -180,34 +181,33 @@ void VirtualMachine::print(){
 			} break;
 		case 3: // constante
 			switch(typeAdapter.getType(current.result)){
-				case 0: // int;
-					absdir1 = current.result - typeAdapter.integerConstant.min;
-					result = to_string(constantTable.getValue(absdir1));
-				break;
-				case 1: // dec;
-					absdir1 = current.result - typeAdapter.decimalConstant.min;
-					result = to_string(constantTable.getValue(absdir1));
-				break;
-				case 2: // char;
-					absdir1 = current.result - typeAdapter.characterConstant.min;
-					result = constantTable.getValue(absdir1);
-				break;
-				case 3: // text;
-					absdir1 = current.result - typeAdapter.textConstant.min;
-					result = constantTable.getValue(absdir1);
-				break;
-				case 4: // flag;
-					absdir1 = current.result - typeAdapter.flagConstant.min;
-					 if(constantTable.getValue(absdir1) == 1){
+				case 0: { // int;
+					absdir = current.result - typeAdapter.integerConstant.min;
+					result = constantTable.getValue(absdir);
+                } break;
+				case 1: { // dec;
+					absdir = current.result - typeAdapter.decimalConstant.min;
+					result = constantTable.getValue(absdir);
+                } break;
+				case 2: { // char;
+					absdir = current.result - typeAdapter.characterConstant.min;
+					result = constantTable.getValue(absdir);
+                } break;
+				case 3: { // text;
+					absdir = current.result - typeAdapter.textConstant.min;
+					result = constantTable.getValue(absdir);
+                } break;
+				case 4: { // flag;
+					absdir = current.result - typeAdapter.flagConstant.min;
+					 if(constantTable.getValue(absdir) == "true"){
 					 	result = "True";
 					 }
 					 else{
 					 	result = "False";
 					 }
-				break;
+                } break;
 			} break;
 	}
-
 	cout<<result<<endl;
 }
 
