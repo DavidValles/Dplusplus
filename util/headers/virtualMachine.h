@@ -18,7 +18,7 @@ public:
 	FunctionTable functionTable;
 	ConstantTable constantTable;
 	Memory mGlobal; 			// global memory
-	Memory mGeneral;			// temporal and local memory
+	Memory mLocal;			    // temporal and local memory
 	Quadruple current;			// quadruple in execution
 	vector<Quadruple> program;	//list of quadruples to execute
 	stack<int> jumpStack; 		//jump stack for quadruples
