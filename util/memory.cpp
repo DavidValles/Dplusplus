@@ -3,7 +3,7 @@
 
 #include "headers/memory.h"
 
-Memory::changeVariablesGlobal(int integer, int decimal, int text, int character, int flag){
+void Memory::changeVariablesGlobal(int integer, int decimal, int text, int character, int flag){
 	gloInt = integer;
 	gloDec = decimal;
 	gloTex =  text;
@@ -11,7 +11,7 @@ Memory::changeVariablesGlobal(int integer, int decimal, int text, int character,
 	gloFla = flag;
 }
 
-Memory::changeVariablesLocal(int integer, int decimal, int text, int character, int flag){
+void Memory::changeVariablesLocal(int integer, int decimal, int text, int character, int flag){
 	locInt = integer;
 	locDec = decimal;
 	locTex =  text;
@@ -19,7 +19,7 @@ Memory::changeVariablesLocal(int integer, int decimal, int text, int character, 
 	locFla = flag;
 }
 
-Memory::changeVariablesGlobal(int integer, int decimal, int text, int character, int flag){
+void Memory::changeVariablesGlobal(int integer, int decimal, int text, int character, int flag){
 	temInt = integer;
 	temDec = decimal;
 	temTex =  text;
@@ -27,7 +27,7 @@ Memory::changeVariablesGlobal(int integer, int decimal, int text, int character,
 	temFla = flag;
 }
 
-Memory::initializeGlobal(){
+void Memory::initializeGlobal(){
 	globalInteger.resize(gloInt);
 	globalDecimal.resize(gloDec);
 	globalText.resize(gloTex);
@@ -35,7 +35,7 @@ Memory::initializeGlobal(){
 	globalFlag.resize(gloFla);
 }
 
-Memory::initializeLocal(){
+void Memory::initializeLocal(){
 	localInteger.resize(locInt);
 	localDecimal.resize(locDec);
 	localText.resize(locTex);
@@ -43,7 +43,7 @@ Memory::initializeLocal(){
 	localFlag.resize(locFla);
 }
 
-Memory::initializeTemporal(){
+void Memory::initializeTemporal(){
 	temporalInteger.resize(temInt);
 	temporalDecimal.resize(temDec);
 	temporalText.resize(temTex);
@@ -51,127 +51,127 @@ Memory::initializeTemporal(){
 	temporalFlag.resize(temFla);
 }
 
-Memory::getGlobalInteger(int dir){
+int Memory::getGlobalInteger(int dir){
 	return globalInteger[dir];
 }
 
-Memory::getGlobalDecimal(int dir){
+double Memory::getGlobalDecimal(int dir){
 	return globalDecimal[dir];
 }
 
-Memory::getGlobalText(int dir){
+string Memory::getGlobalText(int dir){
 	return globalText[dir];
 }
 
-Memory::getGlobalChar(int dir){
+char Memory::getGlobalChar(int dir){
 	return globalChar[dir];
 }
 
-Memory::getGlobalFlag(int dir){
+bool Memory::getGlobalFlag(int dir){
 	return globalFlag[dir];
 }
 
 /////////////////////
-Memory::getLocalInteger(int dir){
+int Memory::getLocalInteger(int dir){
 	return localInteger[dir];
 }
 
-Memory::getLocalDecimal(int dir){
+double Memory::getLocalDecimal(int dir){
 	return localDecimal[dir];
 }
 
-Memory::getLocalText(int dir){
+string Memory::getLocalText(int dir){
 	return localText[dir];
 }
 
-Memory::getLocalChar(int dir){
+char Memory::getLocalChar(int dir){
 	return localChar[dir];
 }
 
-Memory::getLocalFlag(int dir){
+bool Memory::getLocalFlag(int dir){
 	return localFlag[dir];
 }
 
 //////////////////
-Memory::getTemporalInteger(int dir){
+int Memory::getTemporalInteger(int dir){
 	return temporalInteger[dir];
 }
 
-Memory::getTemporalDecimal(int dir){
+double Memory::getTemporalDecimal(int dir){
 	return temporalDecimal[dir];
 }
 
-Memory::getTemporalText(int dir){
+string Memory::getTemporalText(int dir){
 	return temporalText[dir];
 }
 
-Memory::getTemporalChar(int dir){
+char Memory::getTemporalChar(int dir){
 	return temporalChar[dir];
 }
 
-Memory::getTemporalFlag(int dir){
+bool Memory::getTemporalFlag(int dir){
 	return temporalFlag[dir];
 }
 
 /////////////
-Memory::setGlobalInteger(int dir, int val){
+void Memory::setGlobalInteger(int dir, int val){
 	globalInteger[dir] = val;
 }
 
-Memory::setGlobalDecimal(int dir, double val){
+void Memory::setGlobalDecimal(int dir, double val){
 	globalDecimal[dir] = val;
 }
 
-Memory::setGlobalText(int dir, string val){
+void Memory::setGlobalText(int dir, string val){
 	globalText[dir] = val;
 }
 
-Memory::setGlobalChar(int dir, char val){
+void Memory::setGlobalChar(int dir, char val){
 	globalChar[dir] = val;
 }
 
-Memory::setGlobalFlag(int dir, bool val){
+void Memory::setGlobalFlag(int dir, bool val){
 	globalFlag[dir] = val;
 }
 
 ////////////
-Memory::setLocalInteger(int dir, int val){
+void Memory::setLocalInteger(int dir, int val){
 	localInteger[dir] = val;
 }
 
-Memory::setLocalDecimal(int dir, double val){
+void Memory::setLocalDecimal(int dir, double val){
 	localDecimal[dir] = val;
 }
 
-Memory::setLocalText(int dir, string val){
+void Memory::setLocalText(int dir, string val){
 	localText[dir] = val;
 }
 
-Memory::setLocalChar(int dir, char val){
+void Memory::setLocalChar(int dir, char val){
 	localChar[dir] = val;
 }
 
-Memory::setLocalFlag(int dir, bool val){
+void Memory::setLocalFlag(int dir, bool val){
 	localFlag[dir] = val;
 }
 
 ///////////
-Memory::setTemporalInteger(int dir, int val){
+void Memory::setTemporalInteger(int dir, int val){
 	temporalInteger[dir] = val;
 }
 
-Memory::setTemporalDecimal(int dir, double val){
+void Memory::setTemporalDecimal(int dir, double val){
 	temporalDecimal[dir] = val;
 }
 
-Memory::setTemporalText(int dir, string val){
+void Memory::setTemporalText(int dir, string val){
 	temporalText[dir] = val;
 }
 
-Memory::setTemporalChar(int dir, char val){
+void Memory::setTemporalChar(int dir, char val){
 	temporalChar[dir] = val;
 }
 
-Memory::setTemporalFlag(int dir, bool val){
+void Memory::setTemporalFlag(int dir, bool val){
 	temporalFlag[dir] = val;
 }
