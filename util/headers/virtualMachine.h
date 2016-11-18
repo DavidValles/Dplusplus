@@ -3,6 +3,8 @@
 
 #include "util/quadruple.cpp"
 #include "../memory.cpp"
+#include "../FunctionTable.cpp"
+#include "../ConstantTable.cpp"
 #include <vector>
 #include <stack>
 #include <map>
@@ -11,7 +13,8 @@ using namespace std;
 
 class VirtualMachine {
 
-	map<string,int> dirProcedure
+	FunctionTable dirProcedure;
+	ConstantTable dirProcedure;
 	Memory mGlobal; 			// global memory
 	Memory mConstant			// constant memory
 	Memory mGeneral;			// temporal and local memory
@@ -19,10 +22,8 @@ class VirtualMachine {
 	vector<Quadruples> program;	//list of quadruples to execute
 	stack<int> jumpStack; 		//jump stack for quadruples
 	stack<Memory> sMemory;		//stack
-	//tabla de constantes
 
-
-	VirtualMachine(map<string,int> proc, vector<Quadruples> prog, constantTable cTable);
+	VirtualMachine(FunctionTable proc, vector<Quadruples> prog, constantTable cTable);
 	void run();
 	void sum();
 	void minus();

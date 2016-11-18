@@ -7,6 +7,11 @@ using namespace std;
 VirtualMachine::VirtualMachine(){
 
 }
+VirtualMachine::VirtualMachine(FunctionTable procs, vector<Quadruples> prog,
+        constantTable cTable) {
+    program = prog;
+    functionTable = procs;
+}
 
 void VirtualMachine::run(){
 	for(cIt = program.at(0).op1; cIt < program.size(); cIt++){
