@@ -30,12 +30,18 @@ string ConstantTable::getValue(int address) {
     return value;
 }
 
-
 int ConstantTable::getAddress(string id) {
     if (constantTable.find(id) != constantTable.end()) {
         return constantTable[id].address;
     }
     return -1;
+}
+
+void ConstantTable::displayTable() {
+	for(auto it = this->constantTable.begin(); it != this->constantTable.end();
+                it++) {
+		cout<<it->first<<" "<<it->second.address<<endl;
+	}
 }
 
 #endif

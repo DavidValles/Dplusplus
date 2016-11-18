@@ -24,8 +24,8 @@ extern void yyerror (const char *s);
 "array"                     return ARRAY;
 "matrix"                    return MATRIX;
 
-"if"                        return IF; 
-"else"                      return ELSE; 
+"if"                        return IF;
+"else"                      return ELSE;
 "else if"                   return ELSEIF;
 
 "while"                     return WHILE;
@@ -35,47 +35,58 @@ extern void yyerror (const char *s);
 "private"                   return PRIVATE;
 "public"                    return PUBLIC;
 
-"print"                     return PRINT; 
-"read"                      return READ; 
+"print"                     return PRINT;
+"read"                      return READ;
 
-"!="                        return NOTEQUALTO; 
-"=="                        return EQUALTO; 
-"<="                        return LESSTHANOREQUALTO; 
-">="                        return GREATERTHANOREQUALTO; 
-"and"                       return AND; 
-"or"                        return OR; 
-"not"                       return NOT; 
-
-[a-zA-Z][_a-zA-Z0-9]*       {
-                                yylval.stringValue = 
-                                    new std::string(yytext, yyleng); 
-                                return ID; 
+"true"                      {
+                                yylval.stringValue =
+                                    new std::string(yytext, yyleng);
+                                return BCONSTANT;
+                            }
+"false"                     {
+                                yylval.stringValue =
+                                    new std::string(yytext, yyleng);
+                                return BCONSTANT;
                             }
 
-0|[1-9][0-9]*               { 
-                                yylval.stringValue = 
-                                    new std::string(yytext, yyleng); 
-                                return ICONSTANT; 
+"!="                        return NOTEQUALTO;
+"=="                        return EQUALTO;
+"<="                        return LESSTHANOREQUALTO;
+">="                        return GREATERTHANOREQUALTO;
+"and"                       return AND;
+"or"                        return OR;
+"not"                       return NOT;
+
+[a-zA-Z][_a-zA-Z0-9]*       {
+                                yylval.stringValue =
+                                    new std::string(yytext, yyleng);
+                                return ID;
+                            }
+
+0|[1-9][0-9]*               {
+                                yylval.stringValue =
+                                    new std::string(yytext, yyleng);
+                                return ICONSTANT;
                             }
 
 (0|[1-9][0-9]*)\.[0-9]*     {
-                                yylval.stringValue = 
-                                    new std::string(yytext, yyleng); 
-                                return DCONSTANT; 
+                                yylval.stringValue =
+                                    new std::string(yytext, yyleng);
+                                return DCONSTANT;
                             }
 
-\"(\\.|[^"])*\"             return SCONSTANT; 
-\'.\'                       return CCONSTANT; 
+\"(\\.|[^"])*\"             return SCONSTANT;
+\'.\'                       return CCONSTANT;
 
 [\[\]\{\}\=\:\;\,\.\+\-\*\/\<\>\(\)]  return yytext[0];
 
-[\n]                        {  
-                                yylineno++;  
+[\n]                        {
+                                yylineno++;
                             }
-[ \t]                       ; 
-.                           {   
-                                cout<<yytext<<endl; 
-                                yyerror ("Unexpected character"); 
+[ \t]                       ;
+.                           {
+                                cout<<yytext<<endl;
+                                yyerror ("Unexpected character");
                             }
 
 %%

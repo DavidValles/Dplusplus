@@ -135,6 +135,7 @@ unordered_set<int> relationalOperators = {
 %token DCONSTANT
 %token SCONSTANT
 %token CCONSTANT
+%token BCONSTANT
 
 %union {
   string* stringValue;
@@ -218,7 +219,10 @@ program     : includes
 
                 functionTable.setVariableCount("0", globalCounts);
 
+                cout<<"Displaying all funcitons"<<endl;
                 functionTable.displayTable();
+                cout<<"Displaying constan table"<<endl;
+                constantTable.displayTable();
             }
             ;
 
@@ -837,14 +841,17 @@ type        : INT
                         currentType = &typeAdapter.decimalL;
                     }
                 }
+                /*
             | TEXT
                 {
                     if (currTable == &globalTable) {
-                        currentType = &typeAdapter.textG;
+                        // TODO: do strings
+                        currentType = &typeAdapter.none;
                     } else {
-                        currentType = &typeAdapter.textL;
+                        currentType = &typeAdapter.none;
                     }
                 }
+                */
             | CHARACTER
                 {
                     if (currTable == &globalTable) {
@@ -861,7 +868,6 @@ type        : INT
                         currentType = &typeAdapter.flagL;
                     }
                 }
-                /* TODO: Array and Matrix;
             ;
 
 
@@ -1014,6 +1020,10 @@ constvar    : ID
             | DCONSTANT
                 {
                     insertConstantToTable(typeAdapter.decimalConstant);
+                }
+            | BCONSTANT
+                {
+                    insertConstantToTable(typeAdapter.flagConstant);
                 }
             ;
 
@@ -1255,10 +1265,6 @@ int getTemporalAddress(int type) {
     else if (type == typeAdapter.decimalT.type) {
         tempAddress = typeAdapter.decimalT.current;
         typeAdapter.decimalT.setNextAddress();
-    }
-    else if (type == typeAdapter.textT.type) {
-        tempAddress = typeAdapter.textT.current;
-        typeAdapter.textT.setNextAddress();
     }
     else if (type == typeAdapter.characterT.type) {
         tempAddress = typeAdapter.characterT.current;

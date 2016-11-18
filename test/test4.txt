@@ -14,4 +14,8 @@ func none func2() {
 
 main {
     id1 = 3 + 6;
+    var flag f1 = false;
+    var flag f2 = true;
+    var flag f3 = true;
+    print(f1);
 }

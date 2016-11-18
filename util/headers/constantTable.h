@@ -11,6 +11,7 @@ public:
     void insertConstant(string id, int address);
     bool findConstant(string id);
     int getAddress(string id);
+    void displayTable();
     string getValue(int address);
 
 private:

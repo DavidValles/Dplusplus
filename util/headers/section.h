@@ -11,10 +11,10 @@ struct Section {
     }
 
     void setNextAddress(int i = 1) {
-        current += i;
-        if (current == max) {
+        if (current == max + 1) {
             cout<<"Memory limit exceeded"<<endl;
         }
+        current += i;
     }
 
     int min;
