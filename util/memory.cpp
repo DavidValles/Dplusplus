@@ -19,7 +19,7 @@ void Memory::changeVariablesLocal(int integer, int decimal, int text, int charac
 	locFla = flag;
 }
 
-void Memory::changeVariablesGlobal(int integer, int decimal, int text, int character, int flag){
+void Memory::changeVariablesTemporal(int integer, int decimal, int text, int character, int flag){
 	temInt = integer;
 	temDec = decimal;
 	temTex =  text;
@@ -175,3 +175,5 @@ void Memory::setTemporalChar(int dir, char val){
 void Memory::setTemporalFlag(int dir, bool val){
 	temporalFlag[dir] = val;
 }
+
+#endif

@@ -89,3 +89,5 @@ public:
 	void setTemporalFlag(int dir, bool val);
 
 };
+
+#endif

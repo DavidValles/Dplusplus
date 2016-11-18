@@ -20,6 +20,7 @@
 #include "util/cube.cpp"
 #include "util/quadruple.cpp"
 #include "util/typeAdapter.cpp"
+#include "util/virtualMachine.cpp"
 #include "util/operations.h"
 #include "util/headers/section.h"
 
@@ -1326,6 +1327,9 @@ int main(int argc, char **argv)
         cout<<i<<". ";
         quadruples[i].display();
     }
+
+    cout<<"STARTIN VM"<<endl;
+    VirtualMachine vm(functionTable, quadruples, constantTable, typeAdapter);
 
     return 0;
 }

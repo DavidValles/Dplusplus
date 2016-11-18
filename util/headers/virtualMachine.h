@@ -1,10 +1,11 @@
 #ifndef VIRTUALMACHINE_H
 #define VIRTUALMACHINE_H
 
-#include "util/quadruple.cpp"
+#include "../quadruple.cpp"
 #include "../memory.cpp"
 #include "../FunctionTable.cpp"
 #include "../ConstantTable.cpp"
+#include "../operations.h"
 #include <vector>
 #include <stack>
 #include <map>
@@ -13,17 +14,19 @@ using namespace std;
 
 class VirtualMachine {
 
-	FunctionTable dirProcedure;
-	ConstantTable dirProcedure;
+public:
+	FunctionTable functionTable;
+	ConstantTable constantTable;
 	Memory mGlobal; 			// global memory
-	Memory mConstant			// constant memory
 	Memory mGeneral;			// temporal and local memory
-	Quadruples current;			// quadruple in execution
-	vector<Quadruples> program;	//list of quadruples to execute
+	Quadruple current;			// quadruple in execution
+	vector<Quadruple> program;	//list of quadruples to execute
 	stack<int> jumpStack; 		//jump stack for quadruples
 	stack<Memory> sMemory;		//stack
+    TypeAdapter typeAdapter;
+    int cQuad;
 
-	VirtualMachine(FunctionTable proc, vector<Quadruples> prog, constantTable cTable);
+	VirtualMachine(FunctionTable proc, vector<Quadruple> prog, ConstantTable cTable, TypeAdapter& tA);
 	void run();
 	void sum();
 	void minus();
@@ -33,9 +36,9 @@ class VirtualMachine {
 	void greaterThan();
 	void lessThan();
 	void equal();
-	void and();
-	void or();
-	void not();
+	void and_();
+	void or_();
+	void not_();
 	void notEqualTo();
 	void equalTo();
 	void lessThanOrEqualTo();
@@ -43,7 +46,7 @@ class VirtualMachine {
 	void print();
 	void read();
 	void floor();
-	void goto();
+	void goto_();
 	void gotoTrue();
 	void gotoFalse();
 	void era();
@@ -54,3 +57,5 @@ class VirtualMachine {
 	void end();
 	void check();
 };
+
+#endif
