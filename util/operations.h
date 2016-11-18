@@ -1,3 +1,6 @@
+#ifndef ENUM_OPS
+#define ENUM_OPS
+
 enum Ops {
     Sum = 0,
     Minus = 1,
@@ -29,3 +32,4 @@ enum Ops {
     Check = 27
 };
 
+#endif

@@ -9,27 +9,25 @@ class TypeAdapter {
 public:
 	TypeAdapter();
 	int getType(int address);
+	int getScope(int address);
 
 	Section none;
 
     // Global scope variables
 	Section integerG;
 	Section decimalG;
-	Section textG;
 	Section characterG;
 	Section flagG;
 
     // Local scope
 	Section integerL;
 	Section decimalL;
-	Section textL;
 	Section characterL;
 	Section flagL;
 
-    // Temporal 
+    // Temporal
 	Section integerT;
 	Section decimalT;
-	Section textT;
 	Section characterT;
 	Section flagT;
 
@@ -38,6 +36,7 @@ public:
     Section decimalConstant;
     Section textConstant;
     Section characterConstant;
+    Section flagConstant;
 };
 
 #endif
