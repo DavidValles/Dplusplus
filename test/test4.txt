@@ -1,5 +1,17 @@
-main {
+var integer id1 = 2 + 5;
+
+func none func1() {
     var integer id1, id2;
-    if(not (id1 + 2 < id2 * id1)) {
-    }
+    id1 = id2 + 3;
+}
+
+func none func2() {
+    var integer id1, id2;
+    id1 = id2 + 3;
+    id1 = id2 + 3;
+    id1 = id2 + 3;
+}
+
+main {
+    id1 = 3 + 6;
 }

@@ -26,6 +26,7 @@
 using namespace std;
 
 void yyerror (const char *s);
+void setAuxForTemporalVars();
 void addGotoAndFillGotoFalse();
 void insertConstantToTable(Section &constantAddress);
 void checkRedefinition();
@@ -45,6 +46,10 @@ extern int yylineno;
 bool declaring = false;
 string id, dId;
 bool hasDimension = false;
+
+/* To keep track of temporal variable count in functions */
+int integerTaux, decimalTaux, characterTaux, flagTaux;
+map<string, int> globalCounts;
 
 /*
     Utilities to find identifiers
@@ -160,20 +165,61 @@ start       :   program
     A program can have includes, global variables and functions (0...*)
     It should always have a main method with a block
 */
-program     : includes variable_section
-                {
-                    Quadruple mainQ(Ops::Goto, -1, -1, -1);
-                    jumpStack.push(quadruples.size());
-                    quadruples.push_back(mainQ);
-                }
-                functions MAIN
-                {
-                    // Add goto jump for main quadruple
-                    int mainGoTo = jumpStack.top();
-                    jumpStack.pop();
-                    quadruples[mainGoTo].result = quadruples.size();
-                }
-                block
+program     : includes
+            {
+                setAuxForTemporalVars();
+            }
+            variable_section
+            {
+                // Set the amount of variable used in the global vars
+                globalCounts["integerT"] += typeAdapter.integerT.current -
+                        integerTaux;
+                globalCounts["decimalT"] += typeAdapter.decimalT.current -
+                        decimalTaux;
+                globalCounts["characterT"] += typeAdapter.characterT.current -
+                        characterTaux;
+                globalCounts["flagT"] += typeAdapter.flagT.current - flagTaux;
+
+                Quadruple mainQ(Ops::Goto, -1, -1, -1);
+                jumpStack.push(quadruples.size());
+                quadruples.push_back(mainQ);
+            }
+            functions
+            {
+                setAuxForTemporalVars();
+            }
+            MAIN
+            {
+                // Add goto jump for main quadruple
+                int mainGoTo = jumpStack.top();
+                jumpStack.pop();
+                quadruples[mainGoTo].result = quadruples.size();
+            }
+            block
+            {
+                functionTable.insertFunction("0", -1, -1, -1);
+
+                // Set the amount of variable used in the function
+                globalCounts["integerG"] += typeAdapter.integerG.current -
+                        typeAdapter.integerG.min;
+                globalCounts["decimalG"] += typeAdapter.decimalG.current -
+                        typeAdapter.decimalG.min;
+                globalCounts["characterG"] += typeAdapter.characterG.current -
+                        typeAdapter.characterG.min;
+                globalCounts["flagG"] += typeAdapter.flagG.current -
+                        typeAdapter.flagG.min;
+                globalCounts["integerT"] += typeAdapter.integerT.current -
+                        integerTaux;
+                globalCounts["decimalT"] += typeAdapter.decimalT.current -
+                        decimalTaux;
+                globalCounts["characterT"] += typeAdapter.characterT.current -
+                        characterTaux;
+                globalCounts["flagT"] += typeAdapter.flagT.current - flagTaux;
+
+                functionTable.setVariableCount("0", globalCounts);
+
+                functionTable.displayTable();
+            }
             ;
 
 /*
@@ -333,6 +379,19 @@ singlefunction  : FUNC singlefunction_ ID
 
                         // Switch scope to local table
                         currTable = &localTable;
+
+                        // Keep track of where temporal vars where
+                        setAuxForTemporalVars();
+
+                        // Reset temporal vars for function use
+                        typeAdapter.integerT.current =
+                                typeAdapter.integerT.min;
+                        typeAdapter.decimalT.current =
+                                typeAdapter.decimalT.min;
+                        typeAdapter.characterT.current =
+                                typeAdapter.characterT.min;
+                        typeAdapter.flagT.current =
+                                typeAdapter.flagT.min;
                     }
                     '(' params ')' block
                     {
@@ -351,10 +410,50 @@ singlefunction  : FUNC singlefunction_ ID
                         Quadruple qEndproc(Ops::Endproc, -1, -1, -1);
                         quadruples.push_back(qEndproc);
 
+                        // Set the amount of variable used in the function
+                        map<string, int> counts;
+                        counts["integerL"] = typeAdapter.integerL.current -
+                                typeAdapter.integerL.min;
+                        counts["decimalL"] = typeAdapter.decimalL.current -
+                                typeAdapter.decimalL.min;
+                        counts["characterL"] = typeAdapter.characterL.current -
+                                typeAdapter.characterL.min;
+                        counts["flagL"] = typeAdapter.flagL.current -
+                                typeAdapter.flagL.min;
+                        counts["integerT"] = typeAdapter.integerT.current -
+                                typeAdapter.integerT.min;
+                        counts["decimalT"] = typeAdapter.decimalT.current -
+                                typeAdapter.decimalT.min;
+                        counts["characterT"] = typeAdapter.characterT.current -
+                                typeAdapter.characterT.min;
+                        counts["flagT"] = typeAdapter.flagT.current -
+                                typeAdapter.flagT.min;
+
+                        functionTable.setVariableCount(currentFunction,
+                                counts);
+
+                        // Reset variables by function to global value
+                        typeAdapter.integerL.current =
+                                typeAdapter.integerL.min;
+                        typeAdapter.decimalL.current =
+                                typeAdapter.decimalL.min;
+                        typeAdapter.characterL.current =
+                                typeAdapter.characterL.min;
+                        typeAdapter.flagL.current =
+                                typeAdapter.flagL.min;
+
+                        // Reset temp variables by function to global value
+                        typeAdapter.integerT.current =
+                                integerTaux;
+                        typeAdapter.decimalT.current =
+                                decimalTaux;
+                        typeAdapter.characterT.current =
+                                characterTaux;
+                        typeAdapter.flagT.current =
+                                flagTaux;
+
                         // For debugging purposes
-                        cout<<"Displaying function table"<<endl;
-                        functionTable.displayTable();
-	                    cout<<"Displaying local variable table"<<endl;
+                        cout<<"Variable table of "<<currentFunction<<endl;
                         currTable->displayTable();
 
                         // Clear the local variable table and change to global
@@ -1022,6 +1121,16 @@ dim_        : ',' expression
 %%
 
 /*
+    Keeps track of temporal variables
+*/
+void setAuxForTemporalVars() {
+    integerTaux = typeAdapter.integerT.current;
+    decimalTaux = typeAdapter.decimalT.current;
+    characterTaux = typeAdapter.characterT.current;
+    flagTaux = typeAdapter.flagT.current;
+}
+
+/*
     Generates a goto after a condition block and fills its previous GoToFalse.
 */
 void addGotoAndFillGotoFalse() {
@@ -1096,7 +1205,7 @@ void checkOperator(int oper1, int oper2, bool isRelational) {
 */
 void checkRedefinition() {
     string id = *yylval.stringValue;
-    if (currTable->findVariable(id)) {
+    if (currTable->findVariableInCurrentTable(id)) {
         cout<<"Error! Line: "<<yylineno
             <<". Variable has already been defined: "<<id<<"."<<endl;
     }

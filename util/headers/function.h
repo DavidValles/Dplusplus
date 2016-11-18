@@ -2,6 +2,8 @@
 #define FUNCTION_H
 
 #include <vector>
+#include <map>
+#include "section.h"
 
 using namespace std;
 
@@ -13,6 +15,7 @@ public:
     vector<int> getParameters();
 
 	string name;
+    map<string, int> variableCounts;
 	int type;
     int quadruple;
     int returnAddress;

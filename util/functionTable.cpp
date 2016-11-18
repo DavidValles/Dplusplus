@@ -47,6 +47,12 @@ bool FunctionTable::checkTypeOfParameter(string func, int type, int param) {
     return parameters[param] == type;
 }
 
+void FunctionTable::setVariableCount(string id, map<string, int> counts) {
+    if (findFunction(id)) {
+        funcTable[id].variableCounts = counts;
+    }
+}
+
 void FunctionTable::displayTable() {
 	for(auto it = this->funcTable.begin(); it != this->funcTable.end(); it++) {
 		cout<<it->first<<" "<<it->second.type<<" Parameters: ";
@@ -55,6 +61,10 @@ void FunctionTable::displayTable() {
             cout<<parameters[i]<<" ";
         }
         cout<<endl;
+        auto m = it->second.variableCounts;
+        for (auto it2 = m.begin(); it2 != m.end(); it2++) {
+            cout<<it2->first<<" "<<it2->second<<endl;
+        }
 	}
 }
 

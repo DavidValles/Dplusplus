@@ -12,6 +12,7 @@ public:
     VariableTable(VariableTable* parent);
     void insertVariable(string id, int address);
     bool findVariable(string id);
+    bool findVariableInCurrentTable(string id);
     void displayTable();
     void clearVarTable();
     void insertFirstDimension(string id, int dim);
@@ -22,7 +23,7 @@ public:
 private:
     unordered_map<string, Variable> varTable;
     VariableTable* parent;
-}; 
+};
 
 
 #endif

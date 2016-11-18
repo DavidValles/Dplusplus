@@ -30,8 +30,15 @@ bool VariableTable::findVariable(string id) {
     return false;
 }
 
+bool VariableTable::findVariableInCurrentTable(string id) {
+    if(this->varTable.find(id) != this->varTable.end()) {
+        return true;
+    }
+    return false;
+}
+
 void VariableTable::displayTable() {
-	for(unordered_map<string, Variable>::iterator it = this->varTable.begin(); 
+	for(unordered_map<string, Variable>::iterator it = this->varTable.begin();
             it != this->varTable.end(); it++) {
 		cout<<it->first<<" "<<it->second.address<<endl;
 	}
