@@ -20,6 +20,16 @@ bool ConstantTable::findConstant(string id) {
 	return false;
 }
 
+string ConstantTable::getValue(int address) {
+    string value = "";
+    for (auto it = constantTable.begin(); it != constantTable.end(); it++) {
+        if (it->second.address == address) {
+            value = it->first;
+        }
+    }
+    return value;
+}
+
 
 int ConstantTable::getAddress(string id) {
     if (constantTable.find(id) != constantTable.end()) {
