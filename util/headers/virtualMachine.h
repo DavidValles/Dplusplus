@@ -19,6 +19,7 @@ class VirtualMachine {
 	vector<Quadruples> program;	//list of quadruples to execute
 	stack<int> jumpStack; 		//jump stack for quadruples
 	stack<Memory> sMemory;		//stack
+	typeAdapter typeAdapter;
 	//tabla de constantes
 
 
