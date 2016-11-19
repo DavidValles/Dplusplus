@@ -962,7 +962,69 @@ void VirtualMachine::or_(){
 	}
 } //
 
-void VirtualMachine::not_(){}
+void VirtualMachine::not_(){
+	bool oper1;
+	int absdir1, absdir3;
+
+	switch(typeAdapter.getScope(current.operand1)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagG.min;
+					oper1 = mGlobal.getFlag(absdir1);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagL.min;
+					oper1 = mLocal.getFlag(absdir1);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: // flag;
+					absdir1 = current.operand1 - typeAdapter.flagT.min;
+					oper1 = mLocal.getTemporalFlag(absdir1);
+				break;
+			} break;
+		case 3: // constante
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					 if(constantTable.getValue(current.operand1) == "true"){
+					 	oper1 = true;
+					 }
+					 else{
+					 	oper1 = false;
+					 }
+                } break;
+			} break;
+	}
+
+	switch(typeAdapter.getScope(current.result)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagG.min;
+					mGlobal.setFlag(absdir3, (!oper1));
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagL.min;
+					mLocal.setFlag(absdir3, (!oper1));
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.result)){
+				case 4:{// flag;
+					absdir3 = current.result - typeAdapter.flagT.min;
+					mLocal.setTemporalFlag(absdir3, (!oper1));
+				} break;
+			} break;
+	}
+}
 void VirtualMachine::notEqualTo(){}
 void VirtualMachine::equalTo(){} // 
 void VirtualMachine::lessThanOrEqualTo(){} //
