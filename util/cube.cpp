@@ -107,7 +107,7 @@ Cube::Cube() {
 	cube[0][-1][10] = -1;// int not decimal = error
 	cube[0][-1][10] = -1;// int not text = error
 	cube[0][-1][10] = -1;// int not character = error
-	cube[0][-1][10] =  4;// int not flag = error
+	cube[0][-1][10] = -1;// int not flag = error
 
 	//INT notequalto
 	cube[0][0][11] = 4;// int ntq int = error
@@ -201,11 +201,11 @@ Cube::Cube() {
 	cube[1][3][9] = -1;// int or character = error
 	cube[1][4][9] = -1;// int or flag = error
 
-	cube[1][0][10] = -1; // int not int = error
-	cube[1][1][10] = -1;// int not decimal = error
-	cube[1][2][10] = -1;// int not text = error
-	cube[1][3][10] = -1;// int not character = error
-	cube[1][4][10] = -1;// int not flag = error
+	cube[1][-1][10] = -1; // int not int = error
+	cube[1][-1][10] = -1;// int not decimal = error
+	cube[1][-1][10] = -1;// int not text = error
+	cube[1][-1][10] = -1;// int not character = error
+	cube[1][-1][10] = -1;// int not flag = error
 
 	cube[1][0][11] = 4;// int ntq int = error
 	cube[1][1][11] = 4;// int ntq decimal = error
@@ -293,11 +293,11 @@ Cube::Cube() {
 	cube[2][3][9] = -1;// int or character = error
 	cube[2][4][9] = -1;// int or flag = error
 
-	cube[2][0][10] = -1; // int not int = error
-	cube[2][1][10] = -1;// int not decimal = error
-	cube[2][2][10] = -1;// int not text = error
-	cube[2][3][10] = -1;// int not character = error
-	cube[2][4][10] = -1;// int not flag = error
+	cube[2][-1][10] = -1; // int not int = error
+	cube[2][-1][10] = -1;// int not decimal = error
+	cube[2][-1][10] = -1;// int not text = error
+	cube[2][-1][10] = -1;// int not character = error
+	cube[2][-1][10] = -1;// int not flag = error
 
 	cube[2][0][11] = -1;// int ntq int = error
 	cube[2][1][11] = -1;// int ntq decimal = error
@@ -385,11 +385,11 @@ Cube::Cube() {
 	cube[3][3][9] = -1;// int or character = error
 	cube[3][4][9] = -1;// int or flag = error
 
-	cube[3][0][10] = -1; // int not int = error
-	cube[3][1][10] = -1;// int not decimal = error
-	cube[3][2][10] = -1;// int not text = error
-	cube[3][3][10] = -1;// int not character = error
-	cube[3][4][10] = -1;// int not flag = error
+	cube[3][-1][10] = -1; // int not int = error
+	cube[3][-1][10] = -1;// int not decimal = error
+	cube[3][-1][10] = -1;// int not text = error
+	cube[3][-1][10] = -1;// int not character = error
+	cube[3][-1][10] = -1;// int not flag = error
 
 	cube[3][0][11] = -1;// int ntq int = error
 	cube[3][1][11] = -1;// int ntq decimal = error
@@ -477,11 +477,11 @@ Cube::Cube() {
 	cube[4][3][9] = -1;// int or character = error
 	cube[4][4][9] = 4;// int or flag = error
 
-	cube[4][0][10] = -1; // int not int = error
-	cube[4][1][10] = -1;// int not decimal = error
-	cube[4][2][10] = -1;// int not text = error
-	cube[4][3][10] = -1;// int not character = error
-	cube[4][4][10] = 4;// int not flag = error
+	cube[4][-1][10] = -1; // int not int = error
+	cube[4][-1][10] = -1;// int not decimal = error
+	cube[4][-1][10] = -1;// int not text = error
+	cube[4][-1][10] = -1;// int not character = error
+	cube[4][-1][10] = 4;// int not flag = error
 
 	cube[4][0][11] = -1;// int ntq int = error
 	cube[4][1][11] = -1;// int ntq decimal = error
