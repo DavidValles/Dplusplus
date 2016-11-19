@@ -1396,7 +1396,128 @@ void VirtualMachine::lessThanOrEqualTo(){
 	}
 } //
 
-void VirtualMachine::greaterThanOrEqualTo(){} //
+void VirtualMachine::greaterThanOrEqualTo(){
+	double oper1, oper2;
+	int absdir1, absdir2, absdir3;
+
+	switch(typeAdapter.getScope(current.operand1)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand1)){
+				case 0: { // int;
+					absdir1 = current.operand1 - typeAdapter.integerG.min;
+					oper1 = mGlobal.getInteger(absdir1);
+				} break;
+				case 1: { // dec;
+					absdir1 = current.operand1 - typeAdapter.decimalG.min;
+					oper1 = mGlobal.getDecimal(absdir1);
+				} break;
+			} break;
+		case 1:  // local
+			switch(typeAdapter.getType(current.operand1)){
+				case 0: { // int;
+					absdir1 = current.operand1 - typeAdapter.integerL.min;
+					oper1 = mLocal.getInteger(absdir1);
+				} break;
+				case 1: { // dec;
+					absdir1 = current.operand1 - typeAdapter.decimalL.min;
+					oper1 = mLocal.getDecimal(absdir1);
+				} break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand1)){
+				case 0: { // int;
+					absdir1 = current.operand1 - typeAdapter.decimalT.min;
+					oper1 = mLocal.getTemporalInteger(absdir1);
+				} break;
+				case 1: { // dec;
+					absdir1 = current.operand1 - typeAdapter.integerT.min;
+					oper1 = mLocal.getTemporalDecimal(absdir1);
+				} break;
+			} break;
+		case 3:// constante
+			switch(typeAdapter.getType(current.operand1)){
+				case 0: { // int;
+					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					oper1 = stoi(constantTable.getValue(absdir1));
+				} break;
+				case 1: { // dec;
+					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					oper1 = stod(constantTable.getValue(absdir1));
+				} break;
+			} break;
+	}
+
+	switch(typeAdapter.getScope(current.operand2)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand2)){
+				case 0: { // int;
+					absdir2 = current.operand2 - typeAdapter.integerG.min;
+					oper2 = mGlobal.getInteger(absdir2);
+				} break;
+				case 1: { // dec;
+					absdir2 = current.operand2 - typeAdapter.decimalG.min;
+					oper2 = mGlobal.getDecimal(absdir2);
+				} break;
+			} break;
+		case 1:  // local
+			switch(typeAdapter.getType(current.operand2)){
+				case 0: { // int;
+					absdir2 = current.operand2 - typeAdapter.integerL.min;
+					oper2 = mLocal.getInteger(absdir2);
+				} break;
+				case 1: { // dec;
+					absdir2 = current.operand2 - typeAdapter.decimalL.min;
+					oper2 = mLocal.getDecimal(absdir2);
+				} break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand2)){
+				case 0: { // int;
+					absdir2 = current.operand2 - typeAdapter.integerT.min;
+					oper2 = mLocal.getTemporalInteger(absdir2);
+				} break;
+				case 1: { // dec;
+					absdir2 = current.operand2 - typeAdapter.decimalT.min;
+					oper2 = mLocal.getTemporalDecimal(absdir2);
+				} break;
+			} break;
+		case 3:// constante
+			switch(typeAdapter.getType(current.operand2)){
+				case 0: { // int;
+					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					oper2 = stoi(constantTable.getValue(absdir2));
+				} break;
+				case 1: { // dec;
+					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					oper2 = stod(constantTable.getValue(absdir2));
+				} break;
+			} break;
+	}
+
+	switch(typeAdapter.getScope(current.result)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagG.min;
+					mGlobal.setFlag(absdir3, oper1 >= oper2);
+				} break;
+			} break;
+		case 1:  // local
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagL.min;
+					mLocal.setFlag(absdir3, oper1 >= oper2);
+				} break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagT.min;
+					mLocal.setTemporalFlag(absdir3, oper1 >= oper2);
+				} break;
+			} break;
+	}
+} //
 
 void VirtualMachine::print(){
 	string result;
