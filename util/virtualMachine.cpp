@@ -604,8 +604,8 @@ void VirtualMachine::multiplication(){
 }
 
 void VirtualMachine::modulo(){}
-void VirtualMachine::greaterThan(){}
-void VirtualMachine::lessThan(){}
+void VirtualMachine::greaterThan(){} //
+void VirtualMachine::lessThan(){} //
 
 void VirtualMachine::equal(){
 	double dOper1;
@@ -756,21 +756,217 @@ void VirtualMachine::equal(){
 					absdir3 = current.result - typeAdapter.characterT.min;
 					mLocal.setTemporalCharacter(absdir3, cOper1);
                 } break;
-				case 4: // flag;
+				case 4: { // flag;
 					absdir3 = current.result - typeAdapter.flagT.min;
 					mLocal.setTemporalFlag(absdir3, bOper1);
-				break;
+				} break;
 			} break;
 	}
 }
 
-void VirtualMachine::and_(){}
-void VirtualMachine::or_(){}
+void VirtualMachine::and_(){
+	bool oper1, oper2;
+	int absdir1, absdir2, absdir3;
+
+	switch(typeAdapter.getScope(current.operand1)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagG.min;
+					oper1 = mGlobal.getFlag(absdir1);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagL.min;
+					oper1 = mLocal.getFlag(absdir1);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: // flag;
+					absdir1 = current.operand1 - typeAdapter.flagT.min;
+					oper1 = mLocal.getTemporalFlag(absdir1);
+				break;
+			} break;
+		case 3: // constante
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					 if(constantTable.getValue(current.operand1) == "true"){
+					 	oper1 = true;
+					 }
+					 else{
+					 	oper1 = false;
+					 }
+                } break;
+			} break;
+	}
+
+	switch(typeAdapter.getScope(current.operand2)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand2)){
+				case 4: { // flag;
+					absdir2 = current.operand2 - typeAdapter.flagG.min;
+					oper2 = mGlobal.getFlag(absdir2);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.operand2)){
+				case 4: { // flag;
+					absdir2 = current.operand2 - typeAdapter.flagL.min;
+					oper2 = mLocal.getFlag(absdir2);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand2)){
+				case 4: // flag;
+					absdir2 = current.operand2 - typeAdapter.flagT.min;
+					oper2 = mLocal.getTemporalFlag(absdir2);
+				break;
+			} break;
+		case 3: // constante
+			switch(typeAdapter.getType(current.operand2)){
+				case 4: { // flag;
+					 if(constantTable.getValue(current.operand2) == "true"){
+					 	oper2 = true;
+					 }
+					 else{
+					 	oper2 = false;
+					 }
+                } break;
+			} break;
+	}
+
+	switch(typeAdapter.getScope(current.result)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagG.min;
+					mGlobal.setFlag(absdir3, oper1 && oper2);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagL.min;
+					mLocal.setFlag(absdir3, oper1 && oper2);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.result)){
+				case 4:{// flag;
+					absdir3 = current.result - typeAdapter.flagT.min;
+					mLocal.setTemporalFlag(absdir3, oper1 && oper2);
+				} break;
+			} break;
+	}
+} //
+
+void VirtualMachine::or_(){
+	bool oper1, oper2;
+	int absdir1, absdir2, absdir3;
+
+	switch(typeAdapter.getScope(current.operand1)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagG.min;
+					oper1 = mGlobal.getFlag(absdir1);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagL.min;
+					oper1 = mLocal.getFlag(absdir1);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: // flag;
+					absdir1 = current.operand1 - typeAdapter.flagT.min;
+					oper1 = mLocal.getTemporalFlag(absdir1);
+				break;
+			} break;
+		case 3: // constante
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					 if(constantTable.getValue(current.operand1) == "true"){
+					 	oper1 = true;
+					 }
+					 else{
+					 	oper1 = false;
+					 }
+                } break;
+			} break;
+	}
+
+	switch(typeAdapter.getScope(current.operand2)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand2)){
+				case 4: { // flag;
+					absdir2 = current.operand2 - typeAdapter.flagG.min;
+					oper2 = mGlobal.getFlag(absdir2);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.operand2)){
+				case 4: { // flag;
+					absdir2 = current.operand2 - typeAdapter.flagL.min;
+					oper2 = mLocal.getFlag(absdir2);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand2)){
+				case 4: // flag;
+					absdir2 = current.operand2 - typeAdapter.flagT.min;
+					oper2 = mLocal.getTemporalFlag(absdir2);
+				break;
+			} break;
+		case 3: // constante
+			switch(typeAdapter.getType(current.operand2)){
+				case 4: { // flag;
+					 if(constantTable.getValue(current.operand2) == "true"){
+					 	oper2 = true;
+					 }
+					 else{
+					 	oper2 = false;
+					 }
+                } break;
+			} break;
+	}
+
+	switch(typeAdapter.getScope(current.result)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagG.min;
+					mGlobal.setFlag(absdir3, oper1 || oper2);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.result)){
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagL.min;
+					mLocal.setFlag(absdir3, oper1 || oper2);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.result)){
+				case 4:{// flag;
+					absdir3 = current.result - typeAdapter.flagT.min;
+					mLocal.setTemporalFlag(absdir3, oper1 || oper2);
+				} break;
+			} break;
+	}
+} //
+
 void VirtualMachine::not_(){}
 void VirtualMachine::notEqualTo(){}
-void VirtualMachine::equalTo(){}
-void VirtualMachine::lessThanOrEqualTo(){}
-void VirtualMachine::greaterThanOrEqualTo(){}
+void VirtualMachine::equalTo(){} // 
+void VirtualMachine::lessThanOrEqualTo(){} //
+void VirtualMachine::greaterThanOrEqualTo(){} //
 
 void VirtualMachine::print(){
 	string result;
@@ -883,7 +1079,7 @@ void VirtualMachine::print(){
 	cout<<result<<endl;
 }
 
-void VirtualMachine::read(){}
+void VirtualMachine::read(){} //
 void VirtualMachine::floor(){}
 void VirtualMachine::goto_(){}
 void VirtualMachine::gotoTrue(){}
