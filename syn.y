@@ -230,6 +230,7 @@ program     : includes
 /*
     Include section for global scope
     E.g. include "myClass.h"
+    // TODO:
 */
 includes    : INCLUDE SCONSTANT includes
             |
@@ -769,7 +770,16 @@ print_      : expression
                     quadruples.push_back(quadruple);
                 }
                 print__
-            | SCONSTANT print__
+            | SCONSTANT
+                {
+                    insertConstantToTable(typeAdapter.textConstant);
+                    int address = operandStack.top();
+                    operandStack.pop();
+                    // TODO Check cube for print
+                    Quadruple quadruple(Ops::Print, -1, -1, address);
+                    quadruples.push_back(quadruple);
+                }
+                print__
             ;
 
 print__     : ',' print_
@@ -1328,7 +1338,7 @@ int main(int argc, char **argv)
         quadruples[i].display();
     }
 
-    cout<<"STARTIN VM"<<endl;
+    cout<<"STARTING PROGRAM (VM)"<<endl;
     VirtualMachine vm(functionTable, quadruples, constantTable, typeAdapter);
 
     return 0;

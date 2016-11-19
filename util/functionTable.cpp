@@ -41,6 +41,14 @@ Function FunctionTable::getFunction(string id) {
 	return emptyFunction;
 }
 
+map<string, int> FunctionTable::getVariableCounts(string id) {
+    map<string, int> counts;
+	if(this->findFunction(id)) {
+		counts = this->funcTable[id].variableCounts;
+	}
+	return counts;
+}
+
 bool FunctionTable::checkTypeOfParameter(string func, int type, int param) {
     auto parameters = funcTable[func].getParameters();
     if (param >= parameters.size()) return false;
