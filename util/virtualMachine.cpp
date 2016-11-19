@@ -840,35 +840,23 @@ void VirtualMachine::lessThan(){
 	switch(typeAdapter.getScope(current.result)){
 		case 0:  // global
 			switch(typeAdapter.getType(current.result)){
-				case 0: { // int;
-					absdir3 = current.result - typeAdapter.integerG.min;
-					mGlobal.setInteger(absdir3, oper1 < oper2);
-				} break;
-				case 1: { // dec;
-					absdir3 = current.result - typeAdapter.decimalG.min;
-					mGlobal.setDecimal(absdir3, oper1 < oper2);
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagG.min;
+					mGlobal.setFlag(absdir3, oper1 < oper2);
 				} break;
 			} break;
 		case 1:  // local
 			switch(typeAdapter.getType(current.result)){
-				case 0: { // int;
-					absdir3 = current.result - typeAdapter.integerL.min;
-					mLocal.setInteger(absdir3, oper1 < oper2);
-				} break;
-				case 1: { // dec;
-					absdir3 = current.result - typeAdapter.decimalL.min;
-					mLocal.setDecimal(absdir3, oper1 < oper2);
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagL.min;
+					mLocal.setFlag(absdir3, oper1 < oper2);
 				} break;
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
-				case 0: { // int;
-					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalInteger(absdir3, oper1 < oper2);
-				} break;
-				case 1: { // dec;
-					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalDecimal(absdir3, oper1 < oper2);
+				case 1: { // flag
+					absdir3 = current.result - typeAdapter.flagT.min;
+					mLocal.setTemporalFlag(absdir3, oper1 < oper2);
 				} break;
 			} break;
 	}
