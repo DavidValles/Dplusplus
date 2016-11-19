@@ -14,6 +14,7 @@ public:
     void addParameterToFunction(string id, int type);
 	bool findFunction(string id);
     Function getFunction(string id);
+    map<string, int> getVariableCounts(string id);
     bool checkTypeOfParameter(string func, int type, int param);
     void setVariableCount(string id, map<string, int> counts);
 	void displayTable();

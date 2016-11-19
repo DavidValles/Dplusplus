@@ -75,7 +75,15 @@ extern void yyerror (const char *s);
                                 return DCONSTANT;
                             }
 
-\"(\\.|[^"])*\"             return SCONSTANT;
+\"(\\.|[^"])*\"             {
+                                string* aux =
+                                    new std::string(yytext, yyleng);
+                                string aux2 = *aux;
+                                aux2 = aux2.substr(1, aux2.size() - 2);
+                                yylval.stringValue = &aux2;
+                                return SCONSTANT;
+                            }
+
 \'.\'                       return CCONSTANT;
 
 [\[\]\{\}\=\:\;\,\.\+\-\*\/\<\>\(\)]  return yytext[0];

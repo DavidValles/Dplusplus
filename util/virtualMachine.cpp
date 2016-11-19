@@ -14,12 +14,20 @@ VirtualMachine::VirtualMachine(FunctionTable fTable, vector<Quadruple> prog,
     constantTable = cTable;
     typeAdapter = tA;
     cQuad = 0;
-    this->current = prog[cQuad];
+
+    auto variableCount = functionTable.getVariableCounts("0");
+    mGlobal.changeVariables(
+            variableCount["integerG"],
+            variableCount["decimalG"],
+            variableCount["characterG"],
+            variableCount["flagG"]);
+
+    run();
 }
 
 void VirtualMachine::run(){
 	for(; cQuad < program.size(); cQuad++){
-		current = program.at(cQuad);
+		current = program[cQuad];
 		    switch (current.oper) {
 		        case Ops::Sum : sum(); break;
 		        case Ops::Minus : minus(); break;
@@ -68,9 +76,9 @@ void VirtualMachine::sum(){
 				break;
 				case 1: // dec;
 				break;
-				case 2: // char;
+				case 2: // text;
 				break;
-				case 3: // text;
+				case 3: // char;
 				break;
 				case 4: // flag;
 				break;
@@ -111,12 +119,12 @@ void VirtualMachine::print(){
 					absdir = current.result - typeAdapter.decimalG.min;
 					result = to_string(mGlobal.getDecimal(absdir));
                 } break;
-				case 2: { // char;
+				case 2: // text;
+				break;
+				case 3: { // char;
 					absdir = current.result - typeAdapter.characterG.min;
 					result = mGlobal.getCharacter(absdir);
                 } break;
-				case 3: // text;
-				break;
 				case 4: { // flag;
 					absdir = current.result - typeAdapter.flagG.min;
 					if(mGlobal.getFlag(absdir) == 1){
@@ -137,12 +145,12 @@ void VirtualMachine::print(){
 					absdir = current.result - typeAdapter.decimalL.min;
 					result = to_string(mLocal.getDecimal(absdir));
                 } break;
-				case 2: { // char;
+				case 2: // text;
+				break;
+				case 3: { // char;
 					absdir = current.result - typeAdapter.characterL.min;
 					result = mLocal.getCharacter(absdir);
                 } break;
-				case 3: // text;
-				break;
 				case 4: { // flag;
 					absdir = current.result - typeAdapter.flagL.min;
 					if(mLocal.getFlag(absdir) == 1){
@@ -163,12 +171,12 @@ void VirtualMachine::print(){
 					absdir = current.result - typeAdapter.decimalT.min;
 					result = to_string(mLocal.getTemporalDecimal(absdir));
                 } break;
-				case 2: { // char;
+				case 2: // text;
+				break;
+				case 3: { // char;
 					absdir = current.result - typeAdapter.characterT.min;
 					result = mLocal.getTemporalCharacter(absdir);
                 } break;
-				case 3: // text;
-				break;
 				case 4: // flag;
 					absdir = current.result - typeAdapter.flagT.min;
 					if(mLocal.getTemporalFlag(absdir) == 1){
@@ -182,24 +190,19 @@ void VirtualMachine::print(){
 		case 3: // constante
 			switch(typeAdapter.getType(current.result)){
 				case 0: { // int;
-					absdir = current.result - typeAdapter.integerConstant.min;
-					result = constantTable.getValue(absdir);
+					result = constantTable.getValue(current.result);
                 } break;
 				case 1: { // dec;
-					absdir = current.result - typeAdapter.decimalConstant.min;
-					result = constantTable.getValue(absdir);
+					result = constantTable.getValue(current.result);
                 } break;
-				case 2: { // char;
-					absdir = current.result - typeAdapter.characterConstant.min;
-					result = constantTable.getValue(absdir);
+				case 2: { // text;
+					result = constantTable.getValue(current.result);
                 } break;
-				case 3: { // text;
-					absdir = current.result - typeAdapter.textConstant.min;
-					result = constantTable.getValue(absdir);
+				case 3: { // char;
+					result = constantTable.getValue(current.result);
                 } break;
 				case 4: { // flag;
-					absdir = current.result - typeAdapter.flagConstant.min;
-					 if(constantTable.getValue(absdir) == "true"){
+					 if(constantTable.getValue(current.result) == "true"){
 					 	result = "True";
 					 }
 					 else{
@@ -207,6 +210,7 @@ void VirtualMachine::print(){
 					 }
                 } break;
 			} break;
+        defualt: cout<<"Scope not found"<<endl;
 	}
 	cout<<result<<endl;
 }
