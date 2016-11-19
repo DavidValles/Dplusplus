@@ -606,7 +606,164 @@ void VirtualMachine::multiplication(){
 void VirtualMachine::modulo(){}
 void VirtualMachine::greaterThan(){}
 void VirtualMachine::lessThan(){}
-void VirtualMachine::equal(){}
+
+void VirtualMachine::equal(){
+	double dOper1;
+	char cOper1;
+	bool bOper1;
+	int absdir1, absdir3;
+
+	switch(typeAdapter.getScope(current.operand1)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand1)){
+				case 0: { // int;
+					absdir1 = current.operand1 - typeAdapter.integerG.min;
+					dOper1 = mGlobal.getInteger(absdir1);
+                } break;
+				case 1: { // dec;
+					absdir1 = current.operand1 - typeAdapter.decimalG.min;
+					dOper1 = mGlobal.getDecimal(absdir1);
+                } break;
+				case 2: // text;
+				break;
+				case 3: { // char;
+					absdir1 = current.operand1 - typeAdapter.characterG.min;
+					cOper1 = mGlobal.getCharacter(absdir1);
+                } break;
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagG.min;
+					bOper1 = mGlobal.getFlag(absdir1);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.operand1)){
+				case 0: { // int;
+					absdir1 = current.operand1 - typeAdapter.integerL.min;
+					dOper1 = mLocal.getInteger(absdir1);
+                } break;
+				case 1: { // dec;
+					absdir1 = current.operand1 - typeAdapter.decimalL.min;
+					dOper1 = mLocal.getDecimal(absdir1);
+                } break;
+				case 2: // text;
+				break;
+				case 3: { // char;
+					absdir1 = current.operand1 - typeAdapter.characterL.min;
+					cOper1 = mLocal.getCharacter(absdir1);
+                } break;
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagL.min;
+					bOper1 = mLocal.getFlag(absdir1);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand1)){
+				case 0: { // int;
+					absdir1 = current.operand1 - typeAdapter.integerT.min;
+					dOper1 = mLocal.getTemporalInteger(absdir1);
+                } break;
+				case 1: { // dec;
+					absdir1 = current.operand1 - typeAdapter.decimalT.min;
+					dOper1 = mLocal.getTemporalDecimal(absdir1);
+                } break;
+				case 2: // text;
+				break;
+				case 3: { // char;
+					absdir1 = current.operand1 - typeAdapter.characterT.min;
+					cOper1 = mLocal.getTemporalCharacter(absdir1);
+                } break;
+				case 4: // flag;
+					absdir1 = current.operand1 - typeAdapter.flagT.min;
+					bOper1 = mLocal.getTemporalFlag(absdir1);
+				break;
+			} break;
+		case 3: // constante
+			switch(typeAdapter.getType(current.operand1)){
+				case 0: { // int;
+					dOper1 = stoi(constantTable.getValue(current.operand1));
+                } break;
+				case 1: { // dec;
+					dOper1 = stod(constantTable.getValue(current.operand1));
+                } break;
+				case 2: { // text;
+					//result = constantTable.getValue(current.result);
+                } break;
+				case 3: { // char;
+					//cOper1 = constantTable.getValue(current.operand1);
+                } break;
+				case 4: { // flag;
+					 //bOper1 = constantTable.getValue(current.operand1);
+                } break;
+			} break;
+	}
+
+	switch(typeAdapter.getScope(current.result)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.result)){
+				case 0: { // int;
+					absdir3 = current.result - typeAdapter.integerG.min;
+					mGlobal.setInteger(absdir3, dOper1);
+                } break;
+				case 1: { // dec;
+					absdir3 = current.result - typeAdapter.decimalG.min;
+					mGlobal.setDecimal(absdir3, dOper1);
+                } break;
+				case 2: // text;
+				break;
+				case 3: { // char;
+					absdir3 = current.result - typeAdapter.characterG.min;
+					mGlobal.setCharacter(absdir3, cOper1);
+                } break;
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagG.min;
+					mGlobal.setFlag(absdir3, bOper1);
+                } break;
+			} break;
+		case 1: // local
+			switch(typeAdapter.getType(current.result)){
+				case 0: { // int;
+					absdir3 = current.result - typeAdapter.integerL.min;
+					mLocal.setInteger(absdir3, dOper1);
+                } break;
+				case 1: { // dec;
+					absdir3 = current.result - typeAdapter.decimalL.min;
+					mLocal.setDecimal(absdir3, dOper1);
+                } break;
+				case 2: // text;
+				break;
+				case 3: { // char;
+					absdir3 = current.result - typeAdapter.characterL.min;
+					mLocal.setCharacter(absdir3, cOper1);
+                } break;
+				case 4: { // flag;
+					absdir3 = current.result - typeAdapter.flagL.min;
+					mLocal.setFlag(absdir3, bOper1);
+                } break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.result)){
+				case 0: { // int;
+					absdir3 = current.result - typeAdapter.integerT.min;
+					mLocal.setTemporalInteger(absdir3, dOper1);
+                } break;
+				case 1: { // dec;
+					absdir3 = current.result - typeAdapter.decimalT.min;
+					mLocal.setTemporalDecimal(absdir3, dOper1);
+                } break;
+				case 2: // text;
+				break;
+				case 3: { // char;
+					absdir3 = current.result - typeAdapter.characterT.min;
+					mLocal.setTemporalCharacter(absdir3, cOper1);
+                } break;
+				case 4: // flag;
+					absdir3 = current.result - typeAdapter.flagT.min;
+					mLocal.setTemporalFlag(absdir3, bOper1);
+				break;
+			} break;
+	}
+}
+
 void VirtualMachine::and_(){}
 void VirtualMachine::or_(){}
 void VirtualMachine::not_(){}
