@@ -58,9 +58,11 @@ int TypeAdapter::getType(int address){
     }
     else if((flagG.min <= address && address <= flagG.max) ||
        (flagL.min <= address && address <= flagL.max) ||
-       (flagT.min <= address && address <= flagT.max)) {
+       (flagT.min <= address && address <= flagT.max) ||
+       (flagConstant.min <= address && address <= flagConstant.max)) {
         return 4;
     }
+    cout<<"Type not found"<<endl;
     return -1;
 }
 
@@ -90,6 +92,7 @@ int TypeAdapter::getScope(int address) {
        (flagConstant.min <= address && address <= flagConstant.max)) {
         return 3;
     }
+    cout<<"Scope not found"<<endl;
     return -1;
 }
 

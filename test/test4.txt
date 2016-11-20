@@ -1,3 +1,4 @@
 main {
-    print("Hello world");
+    var integer f1 = 56;
+    print(f1 + 4);
 }

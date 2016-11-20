@@ -21,6 +21,13 @@ VirtualMachine::VirtualMachine(FunctionTable fTable, vector<Quadruple> prog,
             variableCount["decimalG"],
             variableCount["characterG"],
             variableCount["flagG"]);
+    mGlobal.changeVariablesTemporal(
+            variableCount["integerT"],
+            variableCount["decimalT"],
+            variableCount["characterT"],
+            variableCount["flagT"]);
+    mGlobal.initialize();
+    mGlobal.initializeTemporal();
 
     run();
 }
@@ -94,21 +101,21 @@ void VirtualMachine::sum(){
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
 					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					oper1 = mLocal.getTemporalInteger(absdir1);
+					oper1 = mGlobal.getTemporalInteger(absdir1);
 				} break;
 				case 1: { // dec;
 					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					oper1 = mLocal.getTemporalDecimal(absdir1);
+					oper1 = mGlobal.getTemporalDecimal(absdir1);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stoi(constantTable.getValue(absdir1));
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stod(constantTable.getValue(absdir1));
 				} break;
 			} break;
@@ -141,21 +148,21 @@ void VirtualMachine::sum(){
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
 					absdir2 = current.operand2 - typeAdapter.integerT.min;
-					oper2 = mLocal.getTemporalInteger(absdir2);
+					oper2 = mGlobal.getTemporalInteger(absdir2);
 				} break;
 				case 1: { // dec;
 					absdir2 = current.operand2 - typeAdapter.decimalT.min;
-					oper2 = mLocal.getTemporalDecimal(absdir2);
+					oper2 = mGlobal.getTemporalDecimal(absdir2);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
-					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stoi(constantTable.getValue(absdir2));
 				} break;
 				case 1: { // dec;
-					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stod(constantTable.getValue(absdir2));
 				} break;
 			} break;
@@ -187,12 +194,12 @@ void VirtualMachine::sum(){
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
 				case 0: { // int;
-					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalInteger(absdir3, oper1 + oper2);
+					absdir3 = current.result - typeAdapter.integerT.min;
+					mGlobal.setTemporalInteger(absdir3, oper1 + oper2);
 				} break;
 				case 1: { // dec;
 					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalDecimal(absdir3, oper1 + oper2);
+					mGlobal.setTemporalDecimal(absdir3, oper1 + oper2);
 				} break;
 			} break;
 	}
@@ -229,21 +236,21 @@ void VirtualMachine::minus(){
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
 					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					oper1 = mLocal.getTemporalInteger(absdir1);
+					oper1 = mGlobal.getTemporalInteger(absdir1);
 				} break;
 				case 1: { // dec;
 					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					oper1 = mLocal.getTemporalDecimal(absdir1);
+					oper1 = mGlobal.getTemporalDecimal(absdir1);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stoi(constantTable.getValue(absdir1));
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stod(constantTable.getValue(absdir1));
 				} break;
 			} break;
@@ -276,21 +283,21 @@ void VirtualMachine::minus(){
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
 					absdir2 = current.operand2 - typeAdapter.integerT.min;
-					oper2 = mLocal.getTemporalInteger(absdir2);
+					oper2 = mGlobal.getTemporalInteger(absdir2);
 				} break;
 				case 1: { // dec;
 					absdir2 = current.operand2 - typeAdapter.decimalT.min;
-					oper2 = mLocal.getTemporalDecimal(absdir2);
+					oper2 = mGlobal.getTemporalDecimal(absdir2);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
-					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stoi(constantTable.getValue(absdir2));
 				} break;
 				case 1: { // dec;
-					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stod(constantTable.getValue(absdir2));
 				} break;
 			} break;
@@ -322,12 +329,12 @@ void VirtualMachine::minus(){
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
 				case 0: { // int;
-					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalInteger(absdir3, oper1 - oper2);
+					absdir3 = current.result - typeAdapter.integerT.min;
+					mGlobal.setTemporalInteger(absdir3, oper1 - oper2);
 				} break;
 				case 1: { // dec;
 					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalDecimal(absdir3, oper1 - oper2);
+					mGlobal.setTemporalDecimal(absdir3, oper1 - oper2);
 				} break;
 			} break;
 	}
@@ -364,21 +371,21 @@ void VirtualMachine::division(){
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
 					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					oper1 = mLocal.getTemporalInteger(absdir1);
+					oper1 = mGlobal.getTemporalInteger(absdir1);
 				} break;
 				case 1: { // dec;
 					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					oper1 = mLocal.getTemporalDecimal(absdir1);
+					oper1 = mGlobal.getTemporalDecimal(absdir1);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stoi(constantTable.getValue(absdir1));
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stod(constantTable.getValue(absdir1));
 				} break;
 			} break;
@@ -411,21 +418,21 @@ void VirtualMachine::division(){
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
 					absdir2 = current.operand2 - typeAdapter.integerT.min;
-					oper2 = mLocal.getTemporalInteger(absdir2);
+					oper2 = mGlobal.getTemporalInteger(absdir2);
 				} break;
 				case 1: { // dec;
 					absdir2 = current.operand2 - typeAdapter.decimalT.min;
-					oper2 = mLocal.getTemporalDecimal(absdir2);
+					oper2 = mGlobal.getTemporalDecimal(absdir2);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
-					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stoi(constantTable.getValue(absdir2));
 				} break;
 				case 1: { // dec;
-					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stod(constantTable.getValue(absdir2));
 				} break;
 			} break;
@@ -457,12 +464,12 @@ void VirtualMachine::division(){
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
 				case 0: { // int;
-					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalInteger(absdir3, oper1 / oper2);
+					absdir3 = current.result - typeAdapter.integerT.min;
+					mGlobal.setTemporalInteger(absdir3, oper1 / oper2);
 				} break;
 				case 1: { // dec;
 					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalDecimal(absdir3, oper1 / oper2);
+					mGlobal.setTemporalDecimal(absdir3, oper1 / oper2);
 				} break;
 			} break;
 	}
@@ -499,21 +506,21 @@ void VirtualMachine::multiplication(){
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
 					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					oper1 = mLocal.getTemporalInteger(absdir1);
+					oper1 = mGlobal.getTemporalInteger(absdir1);
 				} break;
 				case 1: { // dec;
 					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					oper1 = mLocal.getTemporalDecimal(absdir1);
+					oper1 = mGlobal.getTemporalDecimal(absdir1);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stoi(constantTable.getValue(absdir1));
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stod(constantTable.getValue(absdir1));
 				} break;
 			} break;
@@ -546,21 +553,21 @@ void VirtualMachine::multiplication(){
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
 					absdir2 = current.operand2 - typeAdapter.integerT.min;
-					oper2 = mLocal.getTemporalInteger(absdir2);
+					oper2 = mGlobal.getTemporalInteger(absdir2);
 				} break;
 				case 1: { // dec;
 					absdir2 = current.operand2 - typeAdapter.decimalT.min;
-					oper2 = mLocal.getTemporalDecimal(absdir2);
+					oper2 = mGlobal.getTemporalDecimal(absdir2);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
-					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stoi(constantTable.getValue(absdir2));
 				} break;
 				case 1: { // dec;
-					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stod(constantTable.getValue(absdir2));
 				} break;
 			} break;
@@ -592,12 +599,12 @@ void VirtualMachine::multiplication(){
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
 				case 0: { // int;
-					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalInteger(absdir3, oper1 * oper2);
+					absdir3 = current.result - typeAdapter.integerT.min;
+					mGlobal.setTemporalInteger(absdir3, oper1 * oper2);
 				} break;
 				case 1: { // dec;
 					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalDecimal(absdir3, oper1 * oper2);
+					mGlobal.setTemporalDecimal(absdir3, oper1 * oper2);
 				} break;
 			} break;
 	}
@@ -635,22 +642,22 @@ void VirtualMachine::greaterThan(){
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					oper1 = mLocal.getTemporalInteger(absdir1);
+					absdir1 = current.operand1 - typeAdapter.integerT.min;
+					oper1 = mGlobal.getTemporalInteger(absdir1);
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					oper1 = mLocal.getTemporalDecimal(absdir1);
+					absdir1 = current.operand1 - typeAdapter.decimalT.min;
+					oper1 = mGlobal.getTemporalDecimal(absdir1);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stoi(constantTable.getValue(absdir1));
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stod(constantTable.getValue(absdir1));
 				} break;
 			} break;
@@ -683,21 +690,21 @@ void VirtualMachine::greaterThan(){
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
 					absdir2 = current.operand2 - typeAdapter.integerT.min;
-					oper2 = mLocal.getTemporalInteger(absdir2);
+					oper2 = mGlobal.getTemporalInteger(absdir2);
 				} break;
 				case 1: { // dec;
 					absdir2 = current.operand2 - typeAdapter.decimalT.min;
-					oper2 = mLocal.getTemporalDecimal(absdir2);
+					oper2 = mGlobal.getTemporalDecimal(absdir2);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
-					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stoi(constantTable.getValue(absdir2));
 				} break;
 				case 1: { // dec;
-					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stod(constantTable.getValue(absdir2));
 				} break;
 			} break;
@@ -720,13 +727,14 @@ void VirtualMachine::greaterThan(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
-				case 4: { // flag;
+				case 4: { // flag
 					absdir3 = current.result - typeAdapter.flagT.min;
-					mLocal.setTemporalFlag(absdir3, oper1 > oper2);
+					mGlobal.setTemporalFlag(absdir3, oper1 > oper2);
 				} break;
 			} break;
 	}
 } //
+
 void VirtualMachine::lessThan(){
 	double oper1, oper2;
 	int absdir1, absdir2, absdir3;
@@ -757,22 +765,22 @@ void VirtualMachine::lessThan(){
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					oper1 = mLocal.getTemporalInteger(absdir1);
+					absdir1 = current.operand1 - typeAdapter.integerT.min;
+					oper1 = mGlobal.getTemporalInteger(absdir1);
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					oper1 = mLocal.getTemporalDecimal(absdir1);
+					absdir1 = current.operand1 - typeAdapter.decimalT.min;
+					oper1 = mGlobal.getTemporalDecimal(absdir1);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stoi(constantTable.getValue(absdir1));
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stod(constantTable.getValue(absdir1));
 				} break;
 			} break;
@@ -805,21 +813,21 @@ void VirtualMachine::lessThan(){
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
 					absdir2 = current.operand2 - typeAdapter.integerT.min;
-					oper2 = mLocal.getTemporalInteger(absdir2);
+					oper2 = mGlobal.getTemporalInteger(absdir2);
 				} break;
 				case 1: { // dec;
 					absdir2 = current.operand2 - typeAdapter.decimalT.min;
-					oper2 = mLocal.getTemporalDecimal(absdir2);
+					oper2 = mGlobal.getTemporalDecimal(absdir2);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
-					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stoi(constantTable.getValue(absdir2));
 				} break;
 				case 1: { // dec;
-					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stod(constantTable.getValue(absdir2));
 				} break;
 			} break;
@@ -842,9 +850,9 @@ void VirtualMachine::lessThan(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
-				case 1: { // flag
+				case 4: { // flag
 					absdir3 = current.result - typeAdapter.flagT.min;
-					mLocal.setTemporalFlag(absdir3, oper1 < oper2);
+					mGlobal.setTemporalFlag(absdir3, oper1 < oper2);
 				} break;
 			} break;
 	}
@@ -903,22 +911,22 @@ void VirtualMachine::equal(){
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
 					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					dOper1 = mLocal.getTemporalInteger(absdir1);
+					dOper1 = mGlobal.getTemporalInteger(absdir1);
                 } break;
 				case 1: { // dec;
 					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					dOper1 = mLocal.getTemporalDecimal(absdir1);
+					dOper1 = mGlobal.getTemporalDecimal(absdir1);
                 } break;
 				case 2: // text;
 				break;
 				case 3: { // char;
 					absdir1 = current.operand1 - typeAdapter.characterT.min;
-					cOper1 = mLocal.getTemporalCharacter(absdir1);
+					cOper1 = mGlobal.getTemporalCharacter(absdir1);
                 } break;
-				case 4: // flag;
+				case 4: { // flag;
 					absdir1 = current.operand1 - typeAdapter.flagT.min;
-					bOper1 = mLocal.getTemporalFlag(absdir1);
-				break;
+					bOper1 = mGlobal.getTemporalFlag(absdir1);
+                } break;
 			} break;
 		case 3: // constante
 			switch(typeAdapter.getType(current.operand1)){
@@ -929,13 +937,18 @@ void VirtualMachine::equal(){
 					dOper1 = stod(constantTable.getValue(current.operand1));
                 } break;
 				case 2: { // text;
-					//result = constantTable.getValue(current.result);
+					// TODO: result = constantTable.getValue(current.result);
                 } break;
 				case 3: { // char;
-					//cOper1 = constantTable.getValue(current.operand1);
+					cOper1 = constantTable.getValue(current.operand1)[0];
                 } break;
 				case 4: { // flag;
-					 //bOper1 = constantTable.getValue(current.operand1);
+					if (constantTable.getValue(current.operand1) == "true") {
+                        bOper1 = true;
+                    }
+                    else {
+                        bOper1 = false;
+                    }
                 } break;
 			} break;
 	}
@@ -987,21 +1000,21 @@ void VirtualMachine::equal(){
 			switch(typeAdapter.getType(current.result)){
 				case 0: { // int;
 					absdir3 = current.result - typeAdapter.integerT.min;
-					mLocal.setTemporalInteger(absdir3, dOper1);
+					mGlobal.setTemporalInteger(absdir3, dOper1);
                 } break;
 				case 1: { // dec;
 					absdir3 = current.result - typeAdapter.decimalT.min;
-					mLocal.setTemporalDecimal(absdir3, dOper1);
+					mGlobal.setTemporalDecimal(absdir3, dOper1);
                 } break;
 				case 2: // text;
 				break;
 				case 3: { // char;
 					absdir3 = current.result - typeAdapter.characterT.min;
-					mLocal.setTemporalCharacter(absdir3, cOper1);
+					mGlobal.setTemporalCharacter(absdir3, cOper1);
                 } break;
 				case 4: { // flag;
 					absdir3 = current.result - typeAdapter.flagT.min;
-					mLocal.setTemporalFlag(absdir3, bOper1);
+					mGlobal.setTemporalFlag(absdir3, bOper1);
 				} break;
 			} break;
 	}
@@ -1028,10 +1041,10 @@ void VirtualMachine::and_(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand1)){
-				case 4: // flag;
+				case 4: { // flag;
 					absdir1 = current.operand1 - typeAdapter.flagT.min;
-					oper1 = mLocal.getTemporalFlag(absdir1);
-				break;
+					oper1 = mGlobal.getTemporalFlag(absdir1);
+                } break;
 			} break;
 		case 3: // constante
 			switch(typeAdapter.getType(current.operand1)){
@@ -1063,10 +1076,10 @@ void VirtualMachine::and_(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand2)){
-				case 4: // flag;
+				case 4: { // flag;
 					absdir2 = current.operand2 - typeAdapter.flagT.min;
-					oper2 = mLocal.getTemporalFlag(absdir2);
-				break;
+					oper2 = mGlobal.getTemporalFlag(absdir2);
+                } break;
 			} break;
 		case 3: // constante
 			switch(typeAdapter.getType(current.operand2)){
@@ -1098,9 +1111,9 @@ void VirtualMachine::and_(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
-				case 4:{// flag;
+				case 4:{ // flag;
 					absdir3 = current.result - typeAdapter.flagT.min;
-					mLocal.setTemporalFlag(absdir3, oper1 && oper2);
+					mGlobal.setTemporalFlag(absdir3, oper1 && oper2);
 				} break;
 			} break;
 	}
@@ -1127,10 +1140,10 @@ void VirtualMachine::or_(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand1)){
-				case 4: // flag;
+				case 4: { // flag;
 					absdir1 = current.operand1 - typeAdapter.flagT.min;
-					oper1 = mLocal.getTemporalFlag(absdir1);
-				break;
+					oper1 = mGlobal.getTemporalFlag(absdir1);
+                } break;
 			} break;
 		case 3: // constante
 			switch(typeAdapter.getType(current.operand1)){
@@ -1162,10 +1175,10 @@ void VirtualMachine::or_(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand2)){
-				case 4: // flag;
+				case 4: { // flag;
 					absdir2 = current.operand2 - typeAdapter.flagT.min;
-					oper2 = mLocal.getTemporalFlag(absdir2);
-				break;
+					oper2 = mGlobal.getTemporalFlag(absdir2);
+                } break;
 			} break;
 		case 3: // constante
 			switch(typeAdapter.getType(current.operand2)){
@@ -1199,7 +1212,7 @@ void VirtualMachine::or_(){
 			switch(typeAdapter.getType(current.result)){
 				case 4:{// flag;
 					absdir3 = current.result - typeAdapter.flagT.min;
-					mLocal.setTemporalFlag(absdir3, oper1 || oper2);
+					mGlobal.setTemporalFlag(absdir3, oper1 || oper2);
 				} break;
 			} break;
 	}
@@ -1226,10 +1239,10 @@ void VirtualMachine::not_(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand1)){
-				case 4: // flag;
+				case 4: { // flag;
 					absdir1 = current.operand1 - typeAdapter.flagT.min;
-					oper1 = mLocal.getTemporalFlag(absdir1);
-				break;
+					oper1 = mGlobal.getTemporalFlag(absdir1);
+                } break;
 			} break;
 		case 3: // constante
 			switch(typeAdapter.getType(current.operand1)){
@@ -1263,7 +1276,7 @@ void VirtualMachine::not_(){
 			switch(typeAdapter.getType(current.result)){
 				case 4:{// flag;
 					absdir3 = current.result - typeAdapter.flagT.min;
-					mLocal.setTemporalFlag(absdir3, (!oper1));
+					mGlobal.setTemporalFlag(absdir3, (!oper1));
 				} break;
 			} break;
 	}
@@ -1271,7 +1284,7 @@ void VirtualMachine::not_(){
 
 void VirtualMachine::notEqualTo(){}
 
-void VirtualMachine::equalTo(){} // 
+void VirtualMachine::equalTo(){} //
 
 void VirtualMachine::lessThanOrEqualTo(){
 	double oper1, oper2;
@@ -1303,22 +1316,22 @@ void VirtualMachine::lessThanOrEqualTo(){
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					oper1 = mLocal.getTemporalInteger(absdir1);
+					absdir1 = current.operand1 - typeAdapter.integerT.min;
+					oper1 = mGlobal.getTemporalInteger(absdir1);
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					oper1 = mLocal.getTemporalDecimal(absdir1);
+					absdir1 = current.operand1 - typeAdapter.decimalT.min;
+					oper1 = mGlobal.getTemporalDecimal(absdir1);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stoi(constantTable.getValue(absdir1));
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stod(constantTable.getValue(absdir1));
 				} break;
 			} break;
@@ -1351,21 +1364,21 @@ void VirtualMachine::lessThanOrEqualTo(){
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
 					absdir2 = current.operand2 - typeAdapter.integerT.min;
-					oper2 = mLocal.getTemporalInteger(absdir2);
+					oper2 = mGlobal.getTemporalInteger(absdir2);
 				} break;
 				case 1: { // dec;
 					absdir2 = current.operand2 - typeAdapter.decimalT.min;
-					oper2 = mLocal.getTemporalDecimal(absdir2);
+					oper2 = mGlobal.getTemporalDecimal(absdir2);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
-					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stoi(constantTable.getValue(absdir2));
 				} break;
 				case 1: { // dec;
-					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stod(constantTable.getValue(absdir2));
 				} break;
 			} break;
@@ -1388,9 +1401,9 @@ void VirtualMachine::lessThanOrEqualTo(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
-				case 4: { // flag;
+				case 4: { // flag
 					absdir3 = current.result - typeAdapter.flagT.min;
-					mLocal.setTemporalFlag(absdir3, oper1 <= oper2);
+					mGlobal.setTemporalFlag(absdir3, oper1 <= oper2);
 				} break;
 			} break;
 	}
@@ -1426,22 +1439,22 @@ void VirtualMachine::greaterThanOrEqualTo(){
 		case 2: // temporal
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.decimalT.min;
-					oper1 = mLocal.getTemporalInteger(absdir1);
+					absdir1 = current.operand1 - typeAdapter.integerT.min;
+					oper1 = mGlobal.getTemporalInteger(absdir1);
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.integerT.min;
-					oper1 = mLocal.getTemporalDecimal(absdir1);
+					absdir1 = current.operand1 - typeAdapter.decimalT.min;
+					oper1 = mGlobal.getTemporalDecimal(absdir1);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand1)){
 				case 0: { // int;
-					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stoi(constantTable.getValue(absdir1));
 				} break;
 				case 1: { // dec;
-					absdir1 = current.operand1 - typeAdapter.decimalConstant.min;
+					absdir1 = current.operand1;
 					oper1 = stod(constantTable.getValue(absdir1));
 				} break;
 			} break;
@@ -1474,21 +1487,21 @@ void VirtualMachine::greaterThanOrEqualTo(){
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
 					absdir2 = current.operand2 - typeAdapter.integerT.min;
-					oper2 = mLocal.getTemporalInteger(absdir2);
+					oper2 = mGlobal.getTemporalInteger(absdir2);
 				} break;
 				case 1: { // dec;
 					absdir2 = current.operand2 - typeAdapter.decimalT.min;
-					oper2 = mLocal.getTemporalDecimal(absdir2);
+					oper2 = mGlobal.getTemporalDecimal(absdir2);
 				} break;
 			} break;
 		case 3:// constante
 			switch(typeAdapter.getType(current.operand2)){
 				case 0: { // int;
-					absdir2 = current.operand2 - typeAdapter.integerConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stoi(constantTable.getValue(absdir2));
 				} break;
 				case 1: { // dec;
-					absdir2 = current.operand2 - typeAdapter.decimalConstant.min;
+					absdir2 = current.operand2;
 					oper2 = stod(constantTable.getValue(absdir2));
 				} break;
 			} break;
@@ -1511,9 +1524,9 @@ void VirtualMachine::greaterThanOrEqualTo(){
 			} break;
 		case 2: // temporal
 			switch(typeAdapter.getType(current.result)){
-				case 4: { // flag;
+				case 4: { // flag
 					absdir3 = current.result - typeAdapter.flagT.min;
-					mLocal.setTemporalFlag(absdir3, oper1 >= oper2);
+					mGlobal.setTemporalFlag(absdir3, oper1 >= oper2);
 				} break;
 			} break;
 	}
@@ -1580,27 +1593,27 @@ void VirtualMachine::print(){
 			switch(typeAdapter.getType(current.result)){
 				case 0: { // int;
 					absdir = current.result - typeAdapter.integerT.min;
-					result = to_string(mLocal.getTemporalInteger(absdir));
+					result = to_string(mGlobal.getTemporalInteger(absdir));
                 } break;
 				case 1: { // dec;
 					absdir = current.result - typeAdapter.decimalT.min;
-					result = to_string(mLocal.getTemporalDecimal(absdir));
+					result = to_string(mGlobal.getTemporalDecimal(absdir));
                 } break;
 				case 2: // text;
 				break;
 				case 3: { // char;
 					absdir = current.result - typeAdapter.characterT.min;
-					result = mLocal.getTemporalCharacter(absdir);
+					result = mGlobal.getTemporalCharacter(absdir);
                 } break;
-				case 4: // flag;
+				case 4: { // flag;
 					absdir = current.result - typeAdapter.flagT.min;
-					if(mLocal.getTemporalFlag(absdir) == 1){
+					if(mGlobal.getTemporalFlag(absdir) == 1){
 						result = "True";
 					}
 					else{
 						result = "False";
 					}
-				break;
+                } break;
 			} break;
 		case 3: // constante
 			switch(typeAdapter.getType(current.result)){
@@ -1634,9 +1647,98 @@ void VirtualMachine::read(){} //
 
 void VirtualMachine::floor(){}
 
-void VirtualMachine::goto_(){}
-void VirtualMachine::gotoTrue(){}
-void VirtualMachine::gotoFalse(){}
+void VirtualMachine::goto_(){
+    cQuad = current.result - 1;
+}
+
+void VirtualMachine::gotoTrue(){
+    int oper1, absdir1;
+
+	switch(typeAdapter.getScope(current.operand1)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagG.min;
+					oper1 = mGlobal.getFlag(absdir1);
+				} break;
+			} break;
+		case 1:  // local
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagL.min;
+					oper1 = mLocal.getFlag(absdir1);
+				} break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagT.min;
+					oper1 = mGlobal.getTemporalFlag(absdir1);
+				} break;
+			} break;
+		case 3:// constante
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					if (constantTable.getValue(absdir1) == "true") {
+                        oper1 = 1;
+                    }
+                    else {
+                        oper1 = 0;
+                    }
+				} break;
+			} break;
+	}
+
+    if (oper1 == 1) {
+        cQuad = current.result - 1;
+    }
+}
+
+void VirtualMachine::gotoFalse(){
+    int oper1, absdir1;
+
+	switch(typeAdapter.getScope(current.operand1)){
+		case 0:  // global
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagG.min;
+					oper1 = mGlobal.getFlag(absdir1);
+				} break;
+			} break;
+		case 1:  // local
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagL.min;
+					oper1 = mLocal.getFlag(absdir1);
+				} break;
+			} break;
+		case 2: // temporal
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.flagT.min;
+					oper1 = mGlobal.getTemporalFlag(absdir1);
+				} break;
+			} break;
+		case 3:// constante
+			switch(typeAdapter.getType(current.operand1)){
+				case 4: { // flag;
+					absdir1 = current.operand1 - typeAdapter.integerConstant.min;
+					if (constantTable.getValue(absdir1) == "true") {
+                        oper1 = 1;
+                    }
+                    else {
+                        oper1 = 0;
+                    }
+				} break;
+			} break;
+	}
+
+    if (oper1 == 0) {
+        cQuad = current.result - 1;
+    }
+}
+
 void VirtualMachine::era(){}
 void VirtualMachine::param(){}
 void VirtualMachine::gosub(){}
