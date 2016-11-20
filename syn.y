@@ -816,6 +816,13 @@ read_      : ID
                         Quadruple quadruple(Ops::Read, -1, -1, address);
                         quadruples.push_back(quadruple);
                     }
+                    else {
+                        int address = operandStack.top();
+                        operandStack.pop();
+
+                        Quadruple quadruple(Ops::Read, -1, -1, address);
+                        quadruples.push_back(quadruple);
+                    }
                 }
                 read__
             ;
@@ -1005,17 +1012,26 @@ factor      :   {
                 }
             | constvar
             | '+' constvar /* TODO: solve this */
-            | '-' constvar
+            | '-'
+                {
+                    operatorStack.push(Ops::Multiplication);
+                    *yylval.stringValue = "-1";
+                    insertConstantToTable(typeAdapter.integerConstant);
+                }
+                constvar
+                {
+                    checkOperator(Ops::Multiplication, Ops::Division);
+                }
             ;
 
 constvar    : ID
                 {
                     id = *yylval.stringValue;
+                    checkVariable();
                     if (currTable->getDimension(id, 1)) {
                         dimensionStack.push(id);
                         operatorStack.push(Ops::Floor);
                     }
-                    checkVariable();
                 }
                 dim
                 {
@@ -1070,13 +1086,21 @@ dim         : '[' expression
                     if (!dim2) {
                         int baseAddress = currTable->getAddress(dId);
                         int result = typeAdapter.integerT.current * -1;
-                        Quadruple qS1(Ops::Sum, baseAddress, index, result);
+
+                        *yylval.stringValue = to_string(baseAddress);
+                        insertConstantToTable(typeAdapter.integerConstant);
+
+                        int baseAddressAsConstant = operandStack.top();
+                        operandStack.pop();
+                        typeStack.pop();
+
+                        Quadruple qS1(Ops::Sum, baseAddressAsConstant, index, result);
                         quadruples.push_back(qS1);
 
                         typeAdapter.integerT.setNextAddress();
 
                         operandStack.push(result);
-                        typeStack.push(typeAdapter.integerT.type);
+                        typeStack.push(typeAdapter.getType(baseAddress));
                     }
                     else {
                         Quadruple qS1D2(Ops::Multiplication, index, dim2,
@@ -1130,12 +1154,19 @@ dim_        : ',' expression
                     int baseAddress = currTable->getAddress(dId);
                     int result = typeAdapter.integerT.current * -1;
 
+                    *yylval.stringValue = to_string(baseAddress);
+                    insertConstantToTable(typeAdapter.integerConstant);
+
+                    int baseAddressAsConstant = operandStack.top();
+                    operandStack.pop();
+                    typeStack.pop();
+
                     typeAdapter.integerT.setNextAddress();
-                    Quadruple qS1(Ops::Sum, baseAddress, s1d2s2, result);
+                    Quadruple qS1(Ops::Sum, baseAddressAsConstant, s1d2s2, result);
                     quadruples.push_back(qS1);
 
                     operandStack.push(result);
-                    typeStack.push(typeAdapter.integerT.type);
+                    typeStack.push(typeAdapter.getType(baseAddress));
                 }
             |
                 {

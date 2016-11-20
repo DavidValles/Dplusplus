@@ -71,9 +71,27 @@ void VirtualMachine::run(){
     }
 }
 
+void VirtualMachine::getPointerContent(int& pointer) {
+    int absdir;
+    if (pointer <= typeAdapter.integerG.min * -1) { // Scope is always temporal
+        pointer *= -1;
+        switch (typeAdapter.getType(pointer)) {
+            case 0: { // int
+                absdir = pointer - typeAdapter.integerT.min;
+                pointer = mGlobal.getTemporalInteger(absdir);
+            } break;
+            default: cout<<"Type not found (Pointer)"<<endl; break;
+        }
+    }
+}
+
 void VirtualMachine::sum(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
+
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
 
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
@@ -169,6 +187,10 @@ void VirtualMachine::sum(){
             } break;
     }
 
+    if (current.result <= typeAdapter.integerG.min) {
+        current.result *= -1;
+    }
+
     switch(typeAdapter.getScope(current.result)){
         case 0:  // global
             switch(typeAdapter.getType(current.result)){
@@ -209,6 +231,10 @@ void VirtualMachine::sum(){
 void VirtualMachine::minus(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
+
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
 
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
@@ -345,6 +371,10 @@ void VirtualMachine::division(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
 
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
+
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
             switch(typeAdapter.getType(current.operand1)){
@@ -479,6 +509,10 @@ void VirtualMachine::division(){
 void VirtualMachine::multiplication(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
+
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
 
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
@@ -617,6 +651,10 @@ void VirtualMachine::greaterThan(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
 
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
+
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
             switch(typeAdapter.getType(current.operand1)){
@@ -739,6 +777,10 @@ void VirtualMachine::greaterThan(){
 void VirtualMachine::lessThan(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
+
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
 
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
@@ -864,6 +906,9 @@ void VirtualMachine::equal(){
     char cOper1;
     bool bOper1;
     int absdir1, absdir3;
+
+    getPointerContent(current.operand1);
+    getPointerContent(current.result);
 
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
@@ -1025,6 +1070,10 @@ void VirtualMachine::and_(){
     bool oper1, oper2;
     int absdir1, absdir2, absdir3;
 
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
+
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
             switch(typeAdapter.getType(current.operand1)){
@@ -1123,6 +1172,10 @@ void VirtualMachine::and_(){
 void VirtualMachine::or_(){
     bool oper1, oper2;
     int absdir1, absdir2, absdir3;
+
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
 
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
@@ -1223,32 +1276,35 @@ void VirtualMachine::not_(){
     bool oper1;
     int absdir1, absdir3;
 
-    switch(typeAdapter.getScope(current.operand1)){
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand2);
+
+    switch(typeAdapter.getScope(current.operand2)){
         case 0:  // global
-            switch(typeAdapter.getType(current.operand1)){
+            switch(typeAdapter.getType(current.operand2)){
                 case 4: { // flag;
-                    absdir1 = current.operand1 - typeAdapter.flagG.min;
+                    absdir1 = current.operand2 - typeAdapter.flagG.min;
                     oper1 = mGlobal.getFlag(absdir1);
                 } break;
             } break;
         case 1: // local
-            switch(typeAdapter.getType(current.operand1)){
+            switch(typeAdapter.getType(current.operand2)){
                 case 4: { // flag;
-                    absdir1 = current.operand1 - typeAdapter.flagL.min;
+                    absdir1 = current.operand2 - typeAdapter.flagL.min;
                     oper1 = mLocal.getFlag(absdir1);
                 } break;
             } break;
         case 2: // temporal
-            switch(typeAdapter.getType(current.operand1)){
+            switch(typeAdapter.getType(current.operand2)){
                 case 4: { // flag;
-                    absdir1 = current.operand1 - typeAdapter.flagT.min;
+                    absdir1 = current.operand2 - typeAdapter.flagT.min;
                     oper1 = mGlobal.getTemporalFlag(absdir1);
                 } break;
             } break;
         case 3: // constante
-            switch(typeAdapter.getType(current.operand1)){
+            switch(typeAdapter.getType(current.operand2)){
                 case 4: { // flag;
-                     if(constantTable.getValue(current.operand1) == "true"){
+                     if(constantTable.getValue(current.operand2) == "true"){
                         oper1 = true;
                      }
                      else{
@@ -1287,6 +1343,10 @@ void VirtualMachine::notEqualTo(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
 
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
+
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
             switch(typeAdapter.getType(current.operand1)){
@@ -1297,6 +1357,10 @@ void VirtualMachine::notEqualTo(){
                 case 1: { // dec;
                     absdir1 = current.operand1 - typeAdapter.decimalG.min;
                     oper1 = mGlobal.getDecimal(absdir1);
+                } break;
+                case 4: { // flag;
+                    absdir1 = current.operand1 - typeAdapter.flagG.min;
+                    oper1 = mGlobal.getFlag(absdir1);
                 } break;
             } break;
         case 1:  // local
@@ -1309,6 +1373,10 @@ void VirtualMachine::notEqualTo(){
                     absdir1 = current.operand1 - typeAdapter.decimalL.min;
                     oper1 = mLocal.getDecimal(absdir1);
                 } break;
+                case 4: { // flag;
+                    absdir1 = current.operand1 - typeAdapter.flagL.min;
+                    oper1 = mLocal.getFlag(absdir1);
+                } break;
             } break;
         case 2: // temporal
             switch(typeAdapter.getType(current.operand1)){
@@ -1320,6 +1388,10 @@ void VirtualMachine::notEqualTo(){
                     absdir1 = current.operand1 - typeAdapter.decimalT.min;
                     oper1 = mGlobal.getTemporalDecimal(absdir1);
                 } break;
+                case 4: { // flag;
+                    absdir1 = current.operand1 - typeAdapter.flagT.min;
+                    oper1 = mGlobal.getTemporalFlag(absdir1);
+                } break;
             } break;
         case 3:// constante
             switch(typeAdapter.getType(current.operand1)){
@@ -1330,6 +1402,14 @@ void VirtualMachine::notEqualTo(){
                 case 1: { // dec;
                     absdir1 = current.operand1;
                     oper1 = stod(constantTable.getValue(absdir1));
+                } break;
+                case 4: { // flag;
+                    absdir1 = current.operand1;
+                    if (constantTable.getValue(absdir1) == "true") {
+                        oper1 = 1;
+                    } else if (constantTable.getValue(absdir1) == "false") {
+                        oper1 = 0;
+                    }
                 } break;
             } break;
     }
@@ -1345,6 +1425,10 @@ void VirtualMachine::notEqualTo(){
                     absdir2 = current.operand2 - typeAdapter.decimalG.min;
                     oper2 = mGlobal.getDecimal(absdir2);
                 } break;
+                case 4: { // flag;
+                    absdir2 = current.operand2 - typeAdapter.flagG.min;
+                    oper2 = mGlobal.getFlag(absdir2);
+                } break;
             } break;
         case 1:  // local
             switch(typeAdapter.getType(current.operand2)){
@@ -1355,6 +1439,10 @@ void VirtualMachine::notEqualTo(){
                 case 1: { // dec;
                     absdir2 = current.operand2 - typeAdapter.decimalL.min;
                     oper2 = mLocal.getDecimal(absdir2);
+                } break;
+                case 4: { // flag;
+                    absdir2 = current.operand2 - typeAdapter.flagL.min;
+                    oper2 = mLocal.getFlag(absdir2);
                 } break;
             } break;
         case 2: // temporal
@@ -1367,6 +1455,10 @@ void VirtualMachine::notEqualTo(){
                     absdir2 = current.operand2 - typeAdapter.decimalT.min;
                     oper2 = mGlobal.getTemporalDecimal(absdir2);
                 } break;
+                case 4: { // flag;
+                    absdir2 = current.operand2 - typeAdapter.flagT.min;
+                    oper2 = mGlobal.getTemporalFlag(absdir2);
+                } break;
             } break;
         case 3:// constante
             switch(typeAdapter.getType(current.operand2)){
@@ -1377,6 +1469,14 @@ void VirtualMachine::notEqualTo(){
                 case 1: { // dec;
                     absdir2 = current.operand2;
                     oper2 = stod(constantTable.getValue(absdir2));
+                } break;
+                case 4: { // flag;
+                    absdir2 = current.operand2;
+                    if (constantTable.getValue(absdir2) == "true") {
+                        oper2 = 1;
+                    } else if (constantTable.getValue(absdir2) == "false") {
+                        oper2 = 0;
+                    }
                 } break;
             } break;
     }
@@ -1410,6 +1510,10 @@ void VirtualMachine::equalTo(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
 
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
+
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
             switch(typeAdapter.getType(current.operand1)){
@@ -1420,6 +1524,10 @@ void VirtualMachine::equalTo(){
                 case 1: { // dec;
                     absdir1 = current.operand1 - typeAdapter.decimalG.min;
                     oper1 = mGlobal.getDecimal(absdir1);
+                } break;
+                case 4: { // flag;
+                    absdir1 = current.operand1 - typeAdapter.flagG.min;
+                    oper1 = mGlobal.getFlag(absdir1);
                 } break;
             } break;
         case 1:  // local
@@ -1432,6 +1540,10 @@ void VirtualMachine::equalTo(){
                     absdir1 = current.operand1 - typeAdapter.decimalL.min;
                     oper1 = mLocal.getDecimal(absdir1);
                 } break;
+                case 4: { // flag;
+                    absdir1 = current.operand1 - typeAdapter.flagL.min;
+                    oper1 = mLocal.getFlag(absdir1);
+                } break;
             } break;
         case 2: // temporal
             switch(typeAdapter.getType(current.operand1)){
@@ -1443,6 +1555,10 @@ void VirtualMachine::equalTo(){
                     absdir1 = current.operand1 - typeAdapter.decimalT.min;
                     oper1 = mGlobal.getTemporalDecimal(absdir1);
                 } break;
+                case 4: { // flag;
+                    absdir1 = current.operand1 - typeAdapter.flagT.min;
+                    oper1 = mGlobal.getTemporalFlag(absdir1);
+                } break;
             } break;
         case 3:// constante
             switch(typeAdapter.getType(current.operand1)){
@@ -1453,6 +1569,14 @@ void VirtualMachine::equalTo(){
                 case 1: { // dec;
                     absdir1 = current.operand1;
                     oper1 = stod(constantTable.getValue(absdir1));
+                } break;
+                case 4: { // flag;
+                    absdir1 = current.operand1;
+                    if (constantTable.getValue(absdir1) == "true") {
+                        oper1 = 1;
+                    } else if (constantTable.getValue(absdir1) == "false") {
+                        oper1 = 0;
+                    }
                 } break;
             } break;
     }
@@ -1468,6 +1592,10 @@ void VirtualMachine::equalTo(){
                     absdir2 = current.operand2 - typeAdapter.decimalG.min;
                     oper2 = mGlobal.getDecimal(absdir2);
                 } break;
+                case 4: { // flag;
+                    absdir2 = current.operand2 - typeAdapter.flagG.min;
+                    oper2 = mGlobal.getFlag(absdir2);
+                } break;
             } break;
         case 1:  // local
             switch(typeAdapter.getType(current.operand2)){
@@ -1478,6 +1606,10 @@ void VirtualMachine::equalTo(){
                 case 1: { // dec;
                     absdir2 = current.operand2 - typeAdapter.decimalL.min;
                     oper2 = mLocal.getDecimal(absdir2);
+                } break;
+                case 4: { // flag;
+                    absdir2 = current.operand2 - typeAdapter.flagL.min;
+                    oper2 = mLocal.getFlag(absdir2);
                 } break;
             } break;
         case 2: // temporal
@@ -1490,6 +1622,10 @@ void VirtualMachine::equalTo(){
                     absdir2 = current.operand2 - typeAdapter.decimalT.min;
                     oper2 = mGlobal.getTemporalDecimal(absdir2);
                 } break;
+                case 4: { // flag;
+                    absdir2 = current.operand2 - typeAdapter.flagT.min;
+                    oper2 = mGlobal.getTemporalFlag(absdir2);
+                } break;
             } break;
         case 3:// constante
             switch(typeAdapter.getType(current.operand2)){
@@ -1500,6 +1636,14 @@ void VirtualMachine::equalTo(){
                 case 1: { // dec;
                     absdir2 = current.operand2;
                     oper2 = stod(constantTable.getValue(absdir2));
+                } break;
+                case 4: { // flag;
+                    absdir2 = current.operand2;
+                    if (constantTable.getValue(absdir2) == "true") {
+                        oper2 = 1;
+                    } else if (constantTable.getValue(absdir2) == "false") {
+                        oper2 = 0;
+                    }
                 } break;
             } break;
     }
@@ -1532,6 +1676,10 @@ void VirtualMachine::equalTo(){
 void VirtualMachine::lessThanOrEqualTo(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
+
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
 
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
@@ -1656,6 +1804,10 @@ void VirtualMachine::greaterThanOrEqualTo(){
     double oper1, oper2;
     int absdir1, absdir2, absdir3;
 
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+    getPointerContent(current.operand2);
+
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
             switch(typeAdapter.getType(current.operand1)){
@@ -1779,6 +1931,8 @@ void VirtualMachine::print(){
     string result;
     int absdir;
 
+    getPointerContent(current.result);
+
     switch(typeAdapter.getScope(current.result)){
         case 0:  // global
             switch(typeAdapter.getType(current.result)){
@@ -1891,6 +2045,9 @@ void VirtualMachine::print(){
 
 void VirtualMachine::read(){
     int absdir;
+
+    // If the operands are pointers, get their directions
+    getPointerContent(current.result);
 
     switch(typeAdapter.getScope(current.result)){
         case 0:  // global
@@ -2062,6 +2219,9 @@ void VirtualMachine::goto_(){
 void VirtualMachine::gotoTrue(){
     int oper1, absdir1;
 
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
+
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
             switch(typeAdapter.getType(current.operand1)){
@@ -2105,6 +2265,9 @@ void VirtualMachine::gotoTrue(){
 
 void VirtualMachine::gotoFalse(){
     int oper1, absdir1;
+
+    // If the operands are pointers, get their directions
+    getPointerContent(current.operand1);
 
     switch(typeAdapter.getScope(current.operand1)){
         case 0:  // global
@@ -2153,6 +2316,32 @@ void VirtualMachine::gosub(){}
 void VirtualMachine::ret(){}
 void VirtualMachine::endproc(){}
 void VirtualMachine::end(){}
-void VirtualMachine::check(){}
+void VirtualMachine::check() {
+    int absdir, index;
+
+    switch (typeAdapter.getScope(current.result)) {
+        case 0: {
+            absdir = current.result - typeAdapter.integerG.min;
+            index = mGlobal.getInteger(absdir);
+        } break;
+        case 1: {
+            absdir = current.result - typeAdapter.integerL.min;
+            index = mLocal.getInteger(absdir);
+        } break;
+        case 2: {
+            absdir = current.result - typeAdapter.integerT.min;
+            index = mGlobal.getTemporalInteger(absdir);
+        } break;
+        case 3: {
+            absdir = current.result;
+            index = stoi(constantTable.getValue(absdir));
+        } break;
+    }
+
+    if (index < current.operand1 || index >= current.operand2) {
+        cout<<"Index out of bounds"<<endl;
+        cQuad = program.size() - 2;
+    }
+}
 
 #endif

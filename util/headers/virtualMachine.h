@@ -27,6 +27,7 @@ public:
     int cQuad;
 
 	VirtualMachine(FunctionTable proc, vector<Quadruple> prog, ConstantTable cTable, TypeAdapter& tA);
+    void getPointerContent(int& pointer);
 	void run();
 	void sum();
 	void minus();

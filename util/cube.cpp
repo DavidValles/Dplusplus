@@ -477,11 +477,11 @@ Cube::Cube() {
 	cube[4][3][9] = -1;// int or character = error
 	cube[4][4][9] = 4;// int or flag = error
 
-	cube[4][-1][10] = -1; // int not int = error
-	cube[4][-1][10] = -1;// int not decimal = error
-	cube[4][-1][10] = -1;// int not text = error
-	cube[4][-1][10] = -1;// int not character = error
-	cube[4][-1][10] = 4;// int not flag = error
+	cube[4][0][10] = -1; // int not int = error
+	cube[4][1][10] = -1;// int not decimal = error
+	cube[4][2][10] = -1;// int not text = error
+	cube[4][3][10] = -1;// int not character = error
+	cube[4][4][10] = 4;// int not flag = error
 
 	cube[4][0][11] = -1;// int ntq int = error
 	cube[4][1][11] = -1;// int ntq decimal = error

@@ -5,8 +5,9 @@
 
 using namespace std;
 
+// For design reasons first address must start at 1000
 TypeAdapter::TypeAdapter() {
-    none.set(0, 1000, 7);
+    none.set(1000, 1000, 7);
 
     // Global scope
     integerG.set(none.max + 1, 1000, 0);
@@ -92,7 +93,7 @@ int TypeAdapter::getScope(int address) {
        (flagConstant.min <= address && address <= flagConstant.max)) {
         return 3;
     }
-    cout<<"Scope not found"<<endl;
+    cout<<"Scope not found for address "<<address<<endl;
     return -1;
 }
 
