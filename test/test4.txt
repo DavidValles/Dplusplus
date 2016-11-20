@@ -1,5 +1,6 @@
 main {
-    var flag f1 = true;
-    read(f1);
+    var integer f1, f2;
+    read(f1, f2);
     print("Value for f1: ", f1);
+    print("Value for f2: ", f2);
 }

@@ -759,7 +759,14 @@ else        : ELSE
 /*
     Print structure
 */
-print       : PRINT '(' print_ ')' ';'
+print       : PRINT '(' print_ ')'
+                {
+                    // This floor is to indicate end of function, vm then
+                    //      prints an endline.
+                    Quadruple quadruple(Ops::Floor, -1, -1, -1);
+                    quadruples.push_back(quadruple);
+                }
+                ';'
             ;
 
 print_      : expression
