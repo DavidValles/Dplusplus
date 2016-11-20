@@ -1642,7 +1642,7 @@ void VirtualMachine::print(){
         defualt: cout<<"Scope not found"<<endl;
     }
     cout<<result;
-    if (program[cQuad + 1].oper != Ops::Print) {
+    if (program[cQuad + 1].oper == Ops::Floor) {
         cout<<endl;
     }
 }
