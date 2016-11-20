@@ -1,5 +1,5 @@
 main {
-    var integer f1(2);
-    read(f1[0], f1[1]);
-    print(f1[0] / f1[1]);
+    var integer f1(2, 2);
+    read(f1[0, 0], f1[1, 0]);
+    print(f1[0, 0] / f1[1, 0]);
 }

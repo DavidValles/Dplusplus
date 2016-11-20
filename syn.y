@@ -1103,8 +1103,15 @@ dim         : '[' expression
                         typeStack.push(typeAdapter.getType(baseAddress));
                     }
                     else {
-                        Quadruple qS1D2(Ops::Multiplication, index, dim2,
-                                typeAdapter.integerT.current);
+                        *yylval.stringValue = to_string(dim2);
+                        insertConstantToTable(typeAdapter.integerConstant);
+
+                        int dim2AsConstant = operandStack.top();
+                        operandStack.pop();
+                        typeStack.pop();
+
+                        Quadruple qS1D2(Ops::Multiplication, index,
+                                dim2AsConstant, typeAdapter.integerT.current);
                         quadruples.push_back(qS1D2);
 
                         operandStack.push(typeAdapter.integerT.current);
