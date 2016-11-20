@@ -44,6 +44,7 @@ extern "C"
 }
 
 extern int yylineno;
+extern FILE *yyin;
 bool declaring = false;
 string id, dId;
 bool hasDimension = false;
@@ -1321,11 +1322,16 @@ void returnProcess() {
 
 int main(int argc, char **argv)
 {
-    if ((argc > 1) && (freopen(argv[1], "r", stdin) == NULL))
+    FILE *myfile;
+    if ((argc > 1))
     {
-        printf("Could not open file.\n");
-        exit( 1 );
+        myfile = fopen(argv[1], "r");
+        if (!myfile) {
+            printf("Could not open file.\n");
+            exit( 1 );
+        }
     }
+    yyin = myfile;
 
     yyparse();
 
