@@ -18,13 +18,19 @@ public:
 	FunctionTable functionTable;
 	ConstantTable constantTable;
 	Memory mGlobal; 			// global memory
-	Memory mLocal;			    // temporal and local memory
+	Memory* mLocal;			    // temporal and local memory
+	Memory* mTemporal;			// temporal and local memory
 	Quadruple current;			// quadruple in execution
 	vector<Quadruple> program;	//list of quadruples to execute
 	stack<int> jumpStack; 		//jump stack for quadruples
 	stack<Memory> sMemory;		//stack
     TypeAdapter typeAdapter;
     int cQuad;
+    vector<int> integerParams;
+    vector<float> decimalParams;
+    vector<string> textParams;
+    vector<char> characterParams;
+    vector<bool> flagParams;
 
 	VirtualMachine(FunctionTable proc, vector<Quadruple> prog, ConstantTable cTable, TypeAdapter& tA);
     void getPointerContent(int& pointer);

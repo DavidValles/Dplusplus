@@ -49,35 +49,43 @@ bool Memory::getFlag(int dir){
 
 //////////////////
 int Memory::getTemporalInteger(int dir){
+    if (dir >= temporalInteger.size()) cout<<"Memory out of bounds "<<dir<<endl;
 	return temporalInteger[dir];
 }
 
 double Memory::getTemporalDecimal(int dir){
+    if (dir >= temporalDecimal.size()) cout<<"Memory out of bounds "<<dir<<endl;
 	return temporalDecimal[dir];
 }
 
 char Memory::getTemporalCharacter(int dir){
+    if (dir >= temporalCharacter.size()) cout<<"Memory out of bounds "<<dir<<endl;
 	return temporalCharacter[dir];
 }
 
 bool Memory::getTemporalFlag(int dir){
+    if (dir >= temporalFlag.size()) cout<<"Memory out of bounds "<<dir<<endl;
 	return temporalFlag[dir];
 }
 
 /////////////
 void Memory::setInteger(int dir, int val){
+    if (dir >= vinteger.size()) cout<<"Memory out of bounds "<<dir<<endl;
 	vinteger[dir] = val;
 }
 
 void Memory::setDecimal(int dir, double val){
+    if (dir >= vdecimal.size()) cout<<"Memory out of bounds "<<dir<<endl;
 	vdecimal[dir] = val;
 }
 
 void Memory::setCharacter(int dir, char val){
+    if (dir >= vcharacter.size()) cout<<"Memory out of bounds "<<dir<<endl;
 	vcharacter[dir] = val;
 }
 
 void Memory::setFlag(int dir, bool val){
+    if (dir >= vflag.size()) cout<<"Memory out of bounds "<<dir<<endl;
 	vflag[dir] = val;
 }
 

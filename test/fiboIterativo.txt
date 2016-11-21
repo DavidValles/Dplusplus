@@ -1,0 +1,22 @@
+main {
+    var integer fibo(40);
+    var integer i = 2, input;
+    fibo[0] = 1;
+    fibo[1] = 1;
+    while (i < 40) {
+        fibo[i] = fibo[i-1] + fibo[i-2];
+        i = i + 1;
+    }
+
+    print("Enter fibo number from 1 - 40");
+    read(input);
+    while (input != -1) {
+        if (input < 1 or input > 40) {
+            print("Incorrect range");
+        }
+        else {
+            print("Answer ", fibo[input - 1]);
+        }
+        read(input);
+    }
+}

@@ -37,6 +37,18 @@ Function FunctionTable::getFunction(string id) {
 	if(this->findFunction(id)) {
 		return this->funcTable[id];
 	}
+    cout<<"Function not found"<<endl;
+    Function emptyFunction;
+	return emptyFunction;
+}
+
+Function FunctionTable::getFunction(int address) {
+    for (auto it = funcTable.begin(); it != funcTable.end(); it++) {
+        if (it->second.returnAddress == address) {
+            return funcTable[it->first];
+        }
+    }
+    cout<<"Function not found"<<endl;
     Function emptyFunction;
 	return emptyFunction;
 }

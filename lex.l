@@ -21,8 +21,6 @@ extern void yyerror (const char *s);
 "text"                      return TEXT;
 "character"                 return CHARACTER;
 "flag"                      return FLAG;
-"array"                     return ARRAY;
-"matrix"                    return MATRIX;
 
 "if"                        return IF;
 "else"                      return ELSE;

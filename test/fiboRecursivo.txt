@@ -1,0 +1,27 @@
+func integer fibo(integer n) {
+    if (n < 1) {
+        return -1;
+    }
+    if (n == 1 or n == 2) {
+        return 1;
+    }
+    var integer n1 = fibo(n - 1);
+    var integer n2 = fibo(n - 2);
+    return n1 + n2;
+}
+
+main {
+    var integer input;
+
+    print("Enter fibo number from 1 - 40");
+    read(input);
+    while (input != -1) {
+        if (input < 1 or input > 40) {
+            print("Incorrect range");
+        }
+        else {
+            print("Answer ", fibo(input));
+        }
+        read(input);
+    }
+}

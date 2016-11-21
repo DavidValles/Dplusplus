@@ -19,6 +19,7 @@ public:
     void insertSecondDimension(string id, int dim);
     int getDimension(string id, int dim);
     int getAddress(string id);
+    Variable getVariable(string id);
 
 private:
     unordered_map<string, Variable> varTable;

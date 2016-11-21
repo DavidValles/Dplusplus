@@ -15,6 +15,7 @@
 #include <stack>
 
 #include "util/variableTable.cpp"
+#include "util/variable.cpp"
 #include "util/functionTable.cpp"
 #include "util/constantTable.cpp"
 #include "util/cube.cpp"
@@ -67,6 +68,7 @@ Section* currentType;
 */
 FunctionTable functionTable;
 string currentFunction;
+string currentFunctionInCall;
 int currentParameter;
 
 /*
@@ -107,8 +109,6 @@ unordered_set<int> relationalOperators = {
 %token TEXT
 %token CHARACTER
 %token FLAG
-%token ARRAY
-%token MATRIX
 
 %token IF
 %token ELSE
@@ -316,9 +316,6 @@ assignment  : ID
                     // be checked and if it has a dimension, pushed to stack.
                     if (!declaring) {
                         checkVariable();
-                        if (currTable->getDimension(id, 1)) {
-                            dimensionStack.push(id);
-                        }
                     }
                 }
                 dim
@@ -399,6 +396,7 @@ singlefunction  : FUNC singlefunction_ ID
                                 typeAdapter.characterT.min;
                         typeAdapter.flagT.current =
                                 typeAdapter.flagT.min;
+
                     }
                     '(' params ')' block
                     {
@@ -409,7 +407,7 @@ singlefunction  : FUNC singlefunction_ ID
                         //      return value
                         if (cFunction.type != typeAdapter.none.type &&
                                 quadruples[quadruples.size() - 1].oper !=
-                                Ops::Return) {
+                                Ops::Endproc) {
                             cout<<"Error: function should have return value"<<
                                     endl;
                         }
@@ -556,24 +554,24 @@ functioncall    : ID
                         checkFunction();
 
                         // Set current values for parameter checking
-                        currentFunction = *yylval.stringValue;
+                        currentFunctionInCall = *yylval.stringValue;
                         currentParameter = 0;
                         // TODO: El era deberia ser con un tag de la func
                         Quadruple eraQ(Ops::Era, functionTable.getFunction
-                                (currentFunction).quadruple, -1, -1);
+                                (currentFunctionInCall).returnAddress, -1, -1);
                         quadruples.push_back(eraQ);
                     }
                     '(' functioncall_ ')'
                     {
                         Function cFunction =
-                                functionTable.getFunction(currentFunction);
+                                functionTable.getFunction(currentFunctionInCall);
 
                         // Check if parameters in function call match
                         //    the necessary in the declaration
-                        if (functionTable.getParametersSize(currentFunction)
+                        if (functionTable.getParametersSize(currentFunctionInCall)
                                 != currentParameter) {
                             cout<<"Incorrect number of parameters in function "
-                                <<currentFunction<<" in line "<<yylineno
+                                <<currentFunctionInCall<<" in line "<<yylineno
                                 <<endl;
                         }
 
@@ -607,9 +605,9 @@ functioncall_   : expression
 
                         // Check if parameter matches type from function def
                         if (!functionTable.checkTypeOfParameter(
-                                    currentFunction, type, currentParameter)) {
+                                    currentFunctionInCall, type, currentParameter)) {
                             cout<<"Wrong parameter type in function "<<
-                                currentFunction<<", parameter #"<<
+                                currentFunctionInCall<<", parameter #"<<
                                 currentParameter + 1<<" in line "<<yylineno<<endl;
                         }
                         Quadruple paramQ(Ops::Param, address, -1, -1);
@@ -681,7 +679,7 @@ cycle       : DO
                     // Where to return after while block.
                     int returnTop = jumpStack.top();
                     jumpStack.pop();
-                    Quadruple quadruple(Ops::Goto, -1, -1, returnTop);
+                    Quadruple quadruple(Ops::Goto, -1, -1, returnTop - 1);
                     quadruples.push_back(quadruple);
 
                     // Fill out goToFalse
@@ -788,6 +786,15 @@ print_      : expression
                     quadruples.push_back(quadruple);
                 }
                 print__
+            | functioncall
+                {
+                    int address = operandStack.top();
+                    operandStack.pop();
+                    // TODO Check cube for print
+                    Quadruple quadruple(Ops::Print, -1, -1, address);
+                    quadruples.push_back(quadruple);
+                }
+                print__
             ;
 
 print__     : ',' print_
@@ -804,9 +811,6 @@ read_      : ID
                 {
                     checkVariable();
                     id = *yylval.stringValue;
-                    if (currTable->getDimension(id, 1)) {
-                        dimensionStack.push(id);
-                    }
                 }
                 dim
                 {
@@ -1028,10 +1032,6 @@ constvar    : ID
                 {
                     id = *yylval.stringValue;
                     checkVariable();
-                    if (currTable->getDimension(id, 1)) {
-                        dimensionStack.push(id);
-                        operatorStack.push(Ops::Floor);
-                    }
                 }
                 dim
                 {
@@ -1062,7 +1062,14 @@ constvar    : ID
                 }
             ;
 
-dim         : '[' expression
+dim         : '['
+                {
+                    if (currTable->getDimension(id, 1)) {
+                        dimensionStack.push(id);
+                        operatorStack.push(Ops::Floor);
+                    }
+                }
+                expression
                 {
                     dId = dimensionStack.top();
                     int dim1 = currTable->getDimension(dId, 1);
@@ -1122,10 +1129,10 @@ dim         : '[' expression
                 dim_ ']'
             |
                 {
+                    hasDimension = false;
                     if (currTable->findVariable(id)) {
-                        hasDimension = false;
-                        int dim1 = currTable->getDimension(id, 1);
-                        if (dim1) {
+                        Variable var = currTable->getVariable(id);
+                        if (var.dimension1 != 0) {
                             cout<<"Error! Line "<<yylineno<<". Specify index for"
                                 <<" first dimension of variable "<<id<<endl;
                         }
@@ -1361,7 +1368,7 @@ void returnProcess() {
     typeStack.push(function.type);
 
     //Generate return quadruple
-    Quadruple returnQ(Ops::Return, -1, -1, -1);
+    Quadruple returnQ(Ops::Endproc, -1, -1, -1);
     quadruples.push_back(returnQ);
 }
 

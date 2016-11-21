@@ -73,4 +73,15 @@ int VariableTable::getAddress(string id) {
     return -1;
 }
 
+Variable VariableTable::getVariable(string id) {
+    Variable var;
+    if (this->varTable.find(id) != this->varTable.end()) {
+        var = this->varTable[id];
+    }
+    if (this->parent) {
+        var = this->parent->getVariable(id);
+    }
+    return var;
+}
+
 #endif
