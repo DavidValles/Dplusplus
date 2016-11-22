@@ -28,6 +28,8 @@
 using namespace std;
 
 void yyerror (const char *s);
+
+/* Function specification in implementation */
 void setAuxForTemporalVars();
 void addGotoAndFillGotoFalse();
 void insertConstantToTable(Section &constantAddress);
@@ -44,8 +46,13 @@ extern "C"
     int yylex();
 }
 
+/* Keeps track of line number in file */
 extern int yylineno;
 extern FILE *yyin;
+
+bool debug = false;
+
+/* Helpers for dimension checking */
 bool declaring = false;
 string id, dId;
 bool hasDimension = false;
@@ -76,7 +83,9 @@ int currentParameter;
 */
 ConstantTable constantTable;
 
-// Quadruples
+/*
+    Utilities for quadruples
+*/
 Cube cube;
 vector<Quadruple> quadruples;
 TypeAdapter typeAdapter;
@@ -153,7 +162,9 @@ unordered_set<int> relationalOperators = {
 */
 start       :   program
                 {
-                    cout<<"Main class compiled."<<endl;
+                    if (debug) {
+                        cout<<"Main class compiled."<<endl;
+                    }
                     Quadruple qEnd(Ops::End, -1 , -1, -1);
                     quadruples.push_back(qEnd);
                 }
@@ -183,6 +194,7 @@ program     : includes
                         characterTaux;
                 globalCounts["flagT"] += typeAdapter.flagT.current - flagTaux;
 
+                // Jump to main function
                 Quadruple mainQ(Ops::Goto, -1, -1, -1);
                 jumpStack.push(quadruples.size());
                 quadruples.push_back(mainQ);
@@ -221,10 +233,12 @@ program     : includes
 
                 functionTable.setVariableCount("0", globalCounts);
 
-                cout<<"Displaying all funcitons"<<endl;
-                functionTable.displayTable();
-                cout<<"Displaying constan table"<<endl;
-                constantTable.displayTable();
+                if (debug) {
+                    cout<<"Displaying all funcitons"<<endl;
+                    functionTable.displayTable();
+                    cout<<"Displaying constan table"<<endl;
+                    constantTable.displayTable();
+                }
             }
             ;
 
@@ -458,8 +472,10 @@ singlefunction  : FUNC singlefunction_ ID
                                 flagTaux;
 
                         // For debugging purposes
-                        cout<<"Variable table of "<<currentFunction<<endl;
-                        currTable->displayTable();
+                        if (debug) {
+                            cout<<"Variable table of "<<currentFunction<<endl;
+                            currTable->displayTable();
+                        }
 
                         // Clear the local variable table and change to global
                         //      scope
@@ -1385,18 +1401,24 @@ int main(int argc, char **argv)
     }
     yyin = myfile;
 
-    yyparse();
-
-	cout<<"Displaying global variable table"<<endl;
-    currTable->displayTable();
-
-	cout<<"Displaying quadruples"<<endl;
-    for (int i=0; i<quadruples.size(); i++) {
-        cout<<i<<". ";
-        quadruples[i].display();
+    if (argc > 2) {
+        debug = argv[2];
     }
 
-    cout<<"STARTING PROGRAM (VM)"<<endl;
+    yyparse();
+
+    if (debug) {
+	    cout<<"Displaying global variable table"<<endl;
+        currTable->displayTable();
+
+	    cout<<"Displaying quadruples"<<endl;
+        for (int i=0; i<quadruples.size(); i++) {
+            cout<<i<<". ";
+            quadruples[i].display();
+        }
+        cout<<"STARTING PROGRAM (VM)"<<endl;
+    }
+
     VirtualMachine vm(functionTable, quadruples, constantTable, typeAdapter);
 
     return 0;
