@@ -818,7 +818,7 @@ print__     : ',' print_
             ;
 
 /*
-    Print structure
+    Read structure
 */
 read       : READ '(' read_ ')' ';'
             ;
@@ -853,7 +853,7 @@ read__     : ',' read_
 
 /*
     Class structure
-*/
+/
 
 class       : CLASS ID '{' classblock '}'
             ;
@@ -867,6 +867,7 @@ classblock_ : PRIVATE ':'
             | variables
             | singlefunction
             ;
+/**/
 
 /*
     Various accepted types
@@ -1078,6 +1079,9 @@ constvar    : ID
                 }
             ;
 
+/*
+    Rules for determining if variable is dimensionated
+*/
 dim         : '['
                 {
                     if (currTable->getDimension(id, 1)) {
@@ -1357,6 +1361,9 @@ int getTemporalAddress(int type) {
     return tempAddress;
 }
 
+/*
+    Steps required for when a retun is found
+*/
 void returnProcess() {
     Function function =
             functionTable.getFunction(currentFunction);

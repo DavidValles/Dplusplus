@@ -12,6 +12,18 @@
 
 using namespace std;
 
+/*
+ * Virtual machine
+ *
+ * Parameters:
+ *  FunctionTable - for memory allocation
+ *  ConstantTable - for constant accessing
+ *  vector<Quadruple> - all quadruples
+ *  typeAdapter - to properly allocate and access memory
+ *
+ * Out:
+ *  Yields a program excecution
+ */
 class VirtualMachine {
 
 public:
