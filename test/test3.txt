@@ -1,9 +1,0 @@
-var integer a, b;
-
-func none uno(integer a) {
-    a = a+b*a;
-}
-
-main {
-    a = a+b*a;
-}
