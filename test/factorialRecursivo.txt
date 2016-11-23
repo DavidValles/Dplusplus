@@ -5,8 +5,7 @@ func integer factorial(integer n) {
     if (n == 1) {
         return 1;
     }
-    var integer n1 = factorial(n - 1);
-    return n * n1;
+    return n * factorial(n-1);
 }
 
 main {

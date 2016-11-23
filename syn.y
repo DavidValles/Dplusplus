@@ -357,6 +357,7 @@ assignment  : ID
                         if (cube.cube[toType][assignType][Ops::Equal] == -1 ) {
                             cout<<"Error in assignment with type. Line "<<
                                     yylineno<<endl;
+                            if (!debug)  exit (1);
                         }
                         Quadruple quadruple(Ops::Equal, assign, -1, to);
                         quadruples.push_back(quadruple);
@@ -410,6 +411,7 @@ singlefunction  : FUNC singlefunction_ ID
                                 Ops::Endproc) {
                             cout<<"Error: function should have return value"<<
                                     endl;
+                            if (!debug)  exit (1);
                         }
 
                         Quadruple qEndproc(Ops::Endproc, -1, -1, -1);
@@ -510,6 +512,7 @@ return      : RETURN expression
                 {
                     if (currTable == &globalTable) {
                         cout<<"Error: cannot have return in main."<<endl;
+                        if (!debug)  exit (1);
                     }
                     returnProcess();
                 }
@@ -575,6 +578,7 @@ functioncall    : ID
                             cout<<"Incorrect number of parameters in function "
                                 <<currentFunctionInCall<<" in line "<<yylineno
                                 <<endl;
+                            if (!debug)  exit (1);
                         }
 
                         Quadruple goSubQ(Ops::GoSub, cFunction.quadruple,
@@ -612,6 +616,7 @@ functioncall_   : expression
                             cout<<"Wrong parameter type in function "<<
                                 currentFunctionInCall<<", parameter #"<<
                                 currentParameter + 1<<" in line "<<yylineno<<endl;
+                            if (!debug)  exit (1);
                         }
                         Quadruple paramQ(Ops::Param, address, -1, -1);
                         quadruples.push_back(paramQ);
@@ -639,6 +644,7 @@ cycle       : DO
                     if (typeStack.top() != typeAdapter.flagG.type) {
                         cout<<"Error! Line "<<yylineno<<". Condition in while"
                                 <<" must be a flag."<<endl;
+                        if (!debug)  exit (1);
                     }
                     else {
                         // Quadruple index of where to return
@@ -661,6 +667,7 @@ cycle       : DO
                     if (typeStack.top() != typeAdapter.flagG.type) {
                         cout<<"Error! Line "<<yylineno<<". Condition in while"
                                 <<" must be a flag."<<endl;
+                        if (!debug)  exit (1);
                     }
                     else{
                         // Keep track of GoToFalse
@@ -725,6 +732,7 @@ if_         : '(' expression ')'
                     if(typeStack.top() != typeAdapter.flagG.type){
                         cout<<"Error! Line "<<yylineno<<". Condition in if"
                                 <<" must be a flag."<<endl;
+                        if (!debug)  exit (1);
                     }
                     else {
                         // Gotofalse after if or else if expression
@@ -1057,10 +1065,12 @@ dim         : '['
                     if (!dim1) {
                         cout<<"Error! Line "<<yylineno<<". Variable has no "
                             <<"such dimension: "<<dId<<endl;
+                        if (!debug)  exit (1);
                     }
                     if (typeStack.top() != typeAdapter.integerG.type) {
                         cout<<"Error! Line "<<yylineno<<". Index must be an"
                             <<" integer."<<endl;
+                        if (!debug)  exit (1);
                     }
                     hasDimension = true;
                     int dim2 = currTable->getDimension(dId, 2);
@@ -1116,6 +1126,7 @@ dim         : '['
                         if (var.dimension1 != 0) {
                             cout<<"Error! Line "<<yylineno<<". Specify index for"
                                 <<" first dimension of variable "<<id<<endl;
+                            if (!debug)  exit (1);
                         }
                     }
                 }
@@ -1127,6 +1138,7 @@ dim_        : ',' expression
                     if (!dim2) {
                         cout<<"Error! Line "<<yylineno<<". Variable has no "
                             <<"such dimension: "<<dId<<endl;
+                        if (!debug)  exit (1);
                     }
                     hasDimension = true;
                     // Get the result from the expression
@@ -1169,6 +1181,7 @@ dim_        : ',' expression
                     if (dim2) {
                         cout<<"Error! Line "<<yylineno<<". Specify index for"
                             <<" second dimension of variable "<<id<<endl;
+                        if (!debug)  exit (1);
                     }
                 }
             ;
@@ -1250,6 +1263,7 @@ void checkOperator(int oper1, int oper2, bool isRelational) {
             }
             else {
                 cout<<"Type mismatch in line: "<<yylineno<<endl;
+                if (!debug)  exit (1);
             }
         }
     }
@@ -1263,6 +1277,7 @@ void checkRedefinition() {
     if (currTable->findVariableInCurrentTable(id)) {
         cout<<"Error! Line: "<<yylineno
             <<". Variable has already been defined: "<<id<<"."<<endl;
+        if (!debug)  exit (1);
     }
 }
 
@@ -1274,6 +1289,7 @@ void checkVariable() {
     if (!currTable->findVariable(id)) {
         cout<<"Error! Line: "<<yylineno<<". Variable not defined: "<<id<<
             "."<<endl;
+        if (!debug)  exit (1);
     }
 }
 
@@ -1285,6 +1301,7 @@ void checkFunction() {
     if(!functionTable.findFunction(id)) {
         cout<<"Error! Line: "<<yylineno<<". Function not defined: "<<
             id<<"."<<endl;
+        if (!debug)  exit (1);
     }
 }
 
@@ -1332,6 +1349,7 @@ void returnProcess() {
     if (function.type == typeAdapter.none.type) {
         cout<<"None functions cannot have a return statement"
                 <<endl;
+        if (!debug)  exit (1);
     }
 
     int returnAddress = operandStack.top();
@@ -1342,6 +1360,7 @@ void returnProcess() {
     if (function.type != returnType) {
         cout<<"Error in line "<<yylineno<<
                 ": Incorrect return type."<<endl;
+        if (!debug)  exit (1);
     }
 
     Quadruple assignReturn(Ops::Equal, returnAddress, -1,
