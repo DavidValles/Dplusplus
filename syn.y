@@ -1117,7 +1117,7 @@ dim         : '['
                         typeAdapter.integerT.setNextAddress();
                     }
                 }
-                dim_ ']'
+                ']' dim_
             |
                 {
                     hasDimension = false;
@@ -1132,7 +1132,7 @@ dim         : '['
                 }
             ;
 
-dim_        : ',' expression
+dim_        : '[' expression ']'
                 {
                     int dim2 = currTable->getDimension(dId, 2);
                     if (!dim2) {
@@ -1413,4 +1413,5 @@ int main(int argc, char **argv)
 
 void yyerror (const char *s) {
     fprintf (stderr, "%s at line %d.\n", s, yylineno);
+    if (!debug) exit(1);
 }

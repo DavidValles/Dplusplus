@@ -1,0 +1,33 @@
+main {
+    var integer array(5), size = 5;
+
+    print("Introduzca 5 valores");
+    var integer i = 0;
+    while (i < size) {
+        read(array[i]);
+        i = i + 1;
+    }
+
+    var flag swapped = true;
+    while (swapped == true) {
+        swapped = false;
+        i = 1;
+        while (i < size) {
+            if (array[i-1] > array[i]) {
+                var integer aux = array[i-1];
+                array[i-1] = array[i];
+                array[i] = aux;
+                swapped = true;
+            }
+            i = i + 1;
+        }
+    }
+
+    print ("Valores sorteados");
+    i = 0;
+    while (i < size) {
+        print(array[i]);
+        i = i + 1;
+    }
+}
+
