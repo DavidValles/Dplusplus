@@ -6,6 +6,13 @@
 
 using namespace std;
 
+/*
+ * Function Table
+ *
+ * Maps Functions to ids. Has utilities for accessing and modifying Functions,
+ * parametrization and insertion.
+ */
+
 class FunctionTable {
 public:
 	FunctionTable();

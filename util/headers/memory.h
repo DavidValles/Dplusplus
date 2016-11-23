@@ -4,6 +4,17 @@
 #include <vector>
 using namespace std;
 
+/*
+ * Memory
+ *
+ * A scopeless memory, simply has static variables and temporal variables.
+ *
+ * VM uses this class, vm is in charge of giving scope to this class object
+ * through instantiation.
+ *
+ * Simple functions to access, extend and modify memeory.
+ */
+
 class Memory {
 private:
 	vector<int> vinteger;

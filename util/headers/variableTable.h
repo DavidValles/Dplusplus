@@ -15,6 +15,7 @@ using namespace std;
  * display it, clear it, define dimensions of a variable, and other getters.
  *
  */
+
 class VariableTable {
 public:
     VariableTable();

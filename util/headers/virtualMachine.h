@@ -24,6 +24,7 @@ using namespace std;
  * Out:
  *  Yields a program excecution
  */
+
 class VirtualMachine {
 
 public:

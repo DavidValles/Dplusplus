@@ -12,6 +12,8 @@ using namespace std;
  * relative directions and is used to calculate absolute directions in the
  * virtual machine.
  *
+ * Contains information between compile time and excecution to determine
+ * relative and absolute memory addresses.
  */
 
 class TypeAdapter {

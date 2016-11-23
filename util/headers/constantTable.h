@@ -5,6 +5,13 @@
 
 using namespace std;
 
+/*
+ * ConstantTable
+ *
+ * Maps constants with ids, also has some utility functions for accessing and
+ * inserting
+ */
+
 class ConstantTable {
 public:
     ConstantTable();

@@ -3,6 +3,11 @@
 
 using namespace std;
 
+/*
+ * Constant
+ *
+ * Contains all information pertaining a constant
+ */
 class Constant {
 public:
     Constant();

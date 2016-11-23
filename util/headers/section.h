@@ -1,6 +1,14 @@
 #ifndef SECTION_H
 #define SECTION_H
 
+/*
+ * Section
+ *
+ * A section of memory, used to keep track of next memory address.
+ *
+ * Used mainly by type Adapter.
+ */
+
 struct Section {
     void set(int a, int b, int c) {
         min = a;

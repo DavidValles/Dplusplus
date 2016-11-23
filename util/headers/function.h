@@ -7,6 +7,12 @@
 
 using namespace std;
 
+/*
+ * Function
+ *
+ * Contains all information for functions. Also has some utility for
+ * parametrization.
+ */
 class Function {
 public:
 	Function();
