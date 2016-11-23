@@ -648,6 +648,7 @@ cycle       : DO
                     }
                     else {
                         // Quadruple index of where to return
+                        jumpStack.pop();
                         int gotoTrue = jumpStack.top();
                         jumpStack.pop();
 

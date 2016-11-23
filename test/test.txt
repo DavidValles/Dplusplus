@@ -3,12 +3,12 @@ main {
     var integer id2 = 0;
     var integer id3 = 0;
     var integer id4 = 0;
-    while(1 < 2 and 1 > 2) {
+    do {
         print("chekc");
         print("chekc");
         print("chekc");
         print("chekc");
-    }
+    } while(1 < 2 and 1 > 2)
     var integer id5 = 0;
     var integer id6 = 0;
 }
