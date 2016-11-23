@@ -678,28 +678,30 @@ cycle       : DO
                         typeStack.pop();
                         Quadruple quadruple(Ops::GotoFalse, address, -1, -1);
                         quadruples.push_back(quadruple);
-
-                        // Keep track of where to return at the end of while
-                        //      block.
-                        jumpStack.push(quadruples.size() - 1);
                     }
                 }
                 block
                 {
+                    // Fill out goToFalse
+                    int gotoFalse = jumpStack.top();
+                    jumpStack.pop();
+                    quadruples[gotoFalse].result = quadruples.size() + 1;
+
                     // Where to return after while block.
                     int returnTop = jumpStack.top();
                     jumpStack.pop();
                     Quadruple quadruple(Ops::Goto, -1, -1, returnTop - 1);
                     quadruples.push_back(quadruple);
-
-                    // Fill out goToFalse
-                    int gotoFalse = jumpStack.top();
-                    jumpStack.pop();
-                    quadruples[gotoFalse].result = quadruples.size();
                 }
             ;
 
-while       : WHILE '(' expression ')'
+while       : WHILE '('
+                {
+                    // Keep track of where to return at the end of while
+                    //      block.
+                    jumpStack.push(quadruples.size() + 1);
+                }
+                expression ')'
             ;
 
 /*

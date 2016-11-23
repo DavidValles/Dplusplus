@@ -1,0 +1,14 @@
+main {
+    var integer id1 = 0;
+    var integer id2 = 0;
+    var integer id3 = 0;
+    var integer id4 = 0;
+    while(1 < 2 and 1 > 2) {
+        print("chekc");
+        print("chekc");
+        print("chekc");
+        print("chekc");
+    }
+    var integer id5 = 0;
+    var integer id6 = 0;
+}
