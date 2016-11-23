@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>D++ Playground</title>
+<script src="blockly_uncompressed.js"></script>
+<script src="generators/javascript.js"></script>
+<script src="generators/javascript/logic.js"></script>
+<script src="generators/javascript/loops.js"></script>
+<script src="generators/javascript/math.js"></script>
+<script src="generators/javascript/text.js"></script>
+<script src="generators/javascript/lists.js"></script>
+<script src="generators/javascript/colour.js"></script>
+<script src="generators/javascript/variables.js"></script>
+<script src="generators/javascript/procedures.js"></script>
+<script src="generators/javascript/d++.js"></script>
+<script src="blocks/d++.js"></script>
+<script src="msg/messages.js"></script>
+<script src="blocks/logic.js"></script>
+<script src="blocks/loops.js"></script>
+<script src="blocks/math.js"></script>
+<script src="blocks/text.js"></script>
+<script src="blocks/lists.js"></script>
+<script src="blocks/colour.js"></script>
+<script src="blocks/variables.js"></script>
+<script src="blocks/procedures.js"></script>
+<script>
+'use strict';
+var workspace = null;
+
+function start() {
+  // Parse the URL arguments.
+  var match = location.search.match(/dir=([^&]+)/);
+  var rtl = match && match[1] == 'rtl';
+  document.forms.options.elements.dir.selectedIndex = Number(rtl);
+  var toolbox = getToolboxElement();
+  document.forms.options.elements.toolbox.selectedIndex =
+      Number(toolbox.getElementsByTagName('category').length == 0);
+  match = location.search.match(/side=([^&]+)/);
+  var side = match ? match[1] : 'start';
+  document.forms.options.elements.side.value = side;
+  // Create main workspace.
+  workspace = Blockly.inject('blocklyDiv',
+          {comments: true,
+           disable: true,
+           collapse: true,
+           grid:
+             {spacing: 25,
+              length: 3,
+              colour: '#ccc',
+              snap: true},
+           horizontalLayout: side == 'top' || side == 'bottom',
+           maxBlocks: Infinity,
+           media: 'media/',
+           readOnly: false,
+           rtl: rtl,
+           scrollbars: true,
+           toolbox: toolbox,
+           toolboxPosition: side == 'top' || side == 'start' ? 'start' : 'end',
+           zoom:
+             {controls: true,
+              wheel: true,
+              startScale: 1.0,
+              maxScale: 4,
+              minScale: .25,
+              scaleSpeed: 1.1}
+          });
+  // Restore previously displayed text.
+  if (sessionStorage) {
+    var text = sessionStorage.getItem('textarea');
+    if (text) {
+      document.getElementById('importExport').value = text;
+    }
+    // Restore event logging state.
+    var state = sessionStorage.getItem('logEvents');
+    logEvents(Boolean(Number(state)));
+  } else {
+    // MSIE 11 does not support sessionStorage on file:// URLs.
+    logEvents(false);
+  }
+  taChange();
+}
+
+function getToolboxElement() {
+  var match = location.search.match(/toolbox=([^&]+)/);
+  return document.getElementById('toolbox-' + (match ? match[1] : 'categories'));
+}
+
+function toXml() {
+  var output = document.getElementById('importExport');
+  var xml = Blockly.Xml.workspaceToDom(workspace);
+  output.value = Blockly.Xml.domToPrettyText(xml);
+  output.focus();
+  output.select();
+  taChange();
+}
+
+function fromXml() {
+  var input = document.getElementById('importExport');
+  var xml = Blockly.Xml.textToDom(input.value);
+  Blockly.Xml.domToWorkspace(xml, workspace);
+  taChange();
+}
+
+function toCode(lang) {
+  var output = document.getElementById('importExport');
+  output.value = Blockly[lang].workspaceToCode(workspace);
+  taChange();
+}
+
+// Disable the "Import from XML" button if the XML is invalid.
+// Preserve text between page reloads.
+function taChange() {
+  var textarea = document.getElementById('importExport');
+  if (sessionStorage) {
+    sessionStorage.setItem('textarea', textarea.value);
+  }
+  var valid = true;
+  try {
+    Blockly.Xml.textToDom(textarea.value);
+  } catch (e) {
+    valid = false;
+  }
+  document.getElementById('import').disabled = !valid;
+}
+
+function logEvents(state) {
+  var checkbox = document.getElementById('logCheck');
+  checkbox.checked = state;
+  if (sessionStorage) {
+    sessionStorage.setItem('logEvents', Number(state));
+  }
+  if (state) {
+    workspace.addChangeListener(logger);
+  } else {
+    workspace.removeChangeListener(logger);
+  }
+}
+
+function logger(e) {
+  console.log(e);
+}
+
+
+</script>
+
+<style>
+html, body {
+  height: 100%;
+}
+body {
+  background-color: #fff;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+h1 {
+  font-weight: normal;
+  font-size: 140%;
+}
+#blocklyDiv {
+  float: right;
+  height: 95%;
+  width: 70%;
+}
+#importExport {
+  font-family: monospace;
+}
+</style>
+</head>
+<body onload="start()">
+
+  <div id="blocklyDiv"></div>
+
+  <h1>D++ Playground</h1>
+
+  <p><a href="javascript:void(workspace.setVisible(true))">Show</a>
+   - <a href="javascript:void(workspace.setVisible(false))">Hide</a></p>
+
+  <form id="options">
+    <select name="dir" onchange="document.forms.options.submit()">
+      <option value="ltr">LTR</option>
+    </select>
+    <select name="toolbox" onchange="document.forms.options.submit()">
+      <option value="categories">Categories</option>
+    </select>
+    <select name="side" onchange="document.forms.options.submit()">
+      <option value="start">Start</option>
+    </select>
+  </form>
+
+  <p>
+    <br>
+     <input type="button" value="Export to XML" onclick="toXml()">
+    &nbsp;
+    <input type="button" value="Import from XML" onclick="fromXml()" id="import">
+    <br>
+    <input type="button" value="To D++" onclick="toCode('JavaScript')">
+    <br>
+    <br>
+    <textarea id="importExport" style="width: 332px; height: 347px"
+      onchange="taChange();" onkeyup="taChange()"></textarea>
+  </p>
+
+  <xml id="toolbox-categories" style="display: none">
+    <category name="Main" colour="20">
+        <block type="main"></block>
+    </category>
+    <category name="Boolean Logic" colour="210">
+      <block type="controls_if"></block>
+      <block type="logic_compare"></block>
+      <block type="logic_operation"></block>
+      <block type="logic_negate"></block>
+      <block type="logic_boolean"></block>
+      <block type="parenthesis"></block>
+    </category>
+    <category name="Functions" colour="120">
+        <block type="function_with_params"></block>
+        <block type="function_without_params"></block>
+        <block type="param_continue"></block>
+        <block type="param_stop"></block>
+        <block type="return"></block>
+    </category>
+    <category name="Function call" colour="210">
+        <block type="functioncall_params"></block>
+        <block type="functioncall_no_param"></block>
+    </category>
+    <category name="Variables" colour="210">
+        <block type="var_def_stop"></block>
+        <block type="var_def_continue"></block>
+        <block type="var_continue"></block>
+        <block type="var_stop"></block>
+        <block type="var_assignment"></block>
+    </category>
+    <category name="Values" colour="120">
+        <block type="id_continue"></block>
+        <block type="id_stop"></block>
+    </category>
+    <category name="Arrays" colour="225">
+        <block type="array_definition"></block>
+        <block type="array_assignment"></block>
+        <block type="array_access"></block>
+    </category>
+    <category name="Matrices" colour="225">
+        <block type="matrix_definition"></block>
+        <block type="matrix_assignment"></block>
+        <block type="matrix_access"></block>
+    </category>
+    <category name="Read" colour="250">
+        <block type="read"></block>
+    </category>
+    <category name="Print" colour="250">
+        <block type="print"></block>
+    </category>
+    <category name="While" colour="120">
+      <block type="controls_whileUntil"></block>
+    </category>
+    <sep></sep>
+  </xml>
+</body>
+</html>
