@@ -1,26 +1,18 @@
-func integer factorial(integer n) {
-    if (n < 1) {
-        return -1;
-    }
-    if (n == 1) {
-        return 1;
-    }
-    var integer n1 = factorial(n - 1);
-    return n * n1;
+func integer fibo (integer n){
+      if (n <= 2) {
+              return 1;
+                }
+        var integer n1=fibo(n-1);
+          var integer n2=fibo(n-2);
+            return n1 + n2;
 }
-
 main {
-    var integer input;
-
-    print("Enter factorial number from 1 - 12");
-    read(input);
-    while (input != -1) {
-        if (input < 1 or input > 12) {
-            print("Incorrect range");
-        }
-        else {
-            print("Answer ", factorial(input));
-        }
-        read(input);
-    }
+      print("Choose fibo 1 - 40");
+        var integer decision=0;
+          read (decision);
+            while (decision != -1) {
+                        print(fibo (decision));
+                    read (decision);
+                          }
 }
+

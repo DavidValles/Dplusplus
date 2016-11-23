@@ -44,7 +44,8 @@ public:
     vector<char> characterParams;
     vector<bool> flagParams;
 
-	VirtualMachine(FunctionTable proc, vector<Quadruple> prog, ConstantTable cTable, TypeAdapter& tA);
+	VirtualMachine(FunctionTable proc, vector<Quadruple> prog,
+            ConstantTable cTable, TypeAdapter& tA);
     void getPointerContent(int& pointer);
 	void run();
 	void sum();

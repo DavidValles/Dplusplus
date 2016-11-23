@@ -126,7 +126,6 @@ unordered_set<int> relationalOperators = {
 %token WHILE
 %token DO
 
-%token CLASS
 %token PRIVATE
 %token PUBLIC
 
@@ -157,8 +156,7 @@ unordered_set<int> relationalOperators = {
 %%
 
 /*
-    A file in D++ can either be a program file with a main function or a
-    class file with a class definition.
+    A file in D++ can either be a program file with a main function 
 */
 start       :   program
                 {
@@ -168,10 +166,6 @@ start       :   program
                     Quadruple qEnd(Ops::End, -1 , -1, -1);
                     quadruples.push_back(qEnd);
                 }
-            | class
-                {
-                    cout<<"User defined class compiled."<<endl;
-                }
             ;
 
 /*
@@ -179,7 +173,7 @@ start       :   program
     A program can have includes, global variables and functions (0...*)
     It should always have a main method with a block
 */
-program     : includes
+program     : 
             {
                 setAuxForTemporalVars();
             }
@@ -242,14 +236,6 @@ program     : includes
             }
             ;
 
-/*
-    Include section for global scope
-    E.g. include "myClass.h"
-    // TODO:
-*/
-includes    : INCLUDE SCONSTANT includes
-            |
-            ;
 
 /*
     Variable section for global scope
@@ -850,24 +836,6 @@ read_      : ID
 read__     : ',' read_
             |
             ;
-
-/*
-    Class structure
-/
-
-class       : CLASS ID '{' classblock '}'
-            ;
-
-classblock  : classblock_ classblock
-            |
-            ;
-
-classblock_ : PRIVATE ':'
-            | PUBLIC ':'
-            | variables
-            | singlefunction
-            ;
-/**/
 
 /*
     Various accepted types

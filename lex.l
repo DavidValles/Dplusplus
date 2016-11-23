@@ -29,7 +29,6 @@ extern void yyerror (const char *s);
 "while"                     return WHILE;
 "do"                        return DO;
 
-"class"                     return CLASS;
 "private"                   return PRIVATE;
 "public"                    return PUBLIC;
 

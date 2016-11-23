@@ -3,6 +3,11 @@
 
 using namespace std;
 
+/*
+ * Variable
+ *
+ * Contains all information pertaining a variable
+ */
 class Variable {
 public:
     Variable();

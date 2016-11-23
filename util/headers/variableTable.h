@@ -6,6 +6,15 @@
 
 using namespace std;
 
+/*
+ * VariableTable
+ *
+ * Structure to keep track of variables.
+ *
+ * It can insert a variable, find a variable in current table and aprent table,
+ * display it, clear it, define dimensions of a variable, and other getters.
+ *
+ */
 class VariableTable {
 public:
     VariableTable();

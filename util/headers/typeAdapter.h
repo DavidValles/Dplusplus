@@ -5,6 +5,15 @@
 
 using namespace std;
 
+/*
+ * TypeAdapter
+ *
+ * This is a bridge between compilation and memory, it is what defines all
+ * relative directions and is used to calculate absolute directions in the
+ * virtual machine.
+ *
+ */
+
 class TypeAdapter {
 public:
 	TypeAdapter();

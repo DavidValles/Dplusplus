@@ -82,20 +82,7 @@ Blockly.Blocks['param_continue'] = {
   }
 };
 
-Blockly.Blocks['functioncall_params'] = {
-  init: function() {
-    this.appendValueInput("NAME")
-        .setCheck(null)
-        .appendField(new Blockly.FieldTextInput("'functionID'"), "FUNCNAME");
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour(230);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.Blocks['functioncall_no_param'] = {
+Blockly.Blocks['functioncall'] = {
   init: function() {
     this.appendDummyInput()
         .appendField(new Blockly.FieldTextInput("'functionID'"), "FUNCNAME");
@@ -379,21 +366,6 @@ Blockly.Blocks['print'] = {
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(250);
-    this.setTooltip('');
-    this.setHelpUrl('http://www.example.com/');
-  }
-};
-
-Blockly.Blocks['parenthesis'] = {
-  init: function() {
-    this.appendValueInput("VALUE")
-        .setCheck(null)
-        .appendField("(");
-    this.appendDummyInput()
-        .appendField(")");
-    this.setInputsInline(true);
-    this.setOutput(true, null);
-    this.setColour(120);
     this.setTooltip('');
     this.setHelpUrl('http://www.example.com/');
   }

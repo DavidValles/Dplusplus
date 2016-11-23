@@ -1,0 +1,98 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">
+  <block type="function_with_params" id="8Jx:N+nPTt*Q,6BSMyT_" x="150" y="334">
+    <field name="TYPE">integer</field>
+    <field name="ID">fibo</field>
+    <value name="PARAMS">
+      <block type="param_stop" id=":2@}u5azil]t:u?dvKCc">
+        <field name="TYPE">integer</field>
+        <field name="name_param">n</field>
+      </block>
+    </value>
+    <statement name="NAME">
+      <block type="controls_if" id="(f]sV#[8}w*Z%6#s4uP8">
+        <value name="IF0">
+          <block type="id_stop" id="p,o~#38txm*^heH2tUjX">
+            <field name="ID">n &lt;= 2</field>
+          </block>
+        </value>
+        <statement name="DO0">
+          <block type="return" id=")9!dfV:9]gFTLlX-YhcR">
+            <value name="RETURN">
+              <block type="id_stop" id="R[ka3+*74_]H2(d=z~(0">
+                <field name="ID">1</field>
+              </block>
+            </value>
+          </block>
+        </statement>
+        <next>
+          <block type="var_def_stop" id="5g@8ixsf?}=h2|`FW53V">
+            <field name="TYPE">integer</field>
+            <field name="ID">n1</field>
+            <field name="VALUE">fibo(n-1)</field>
+            <next>
+              <block type="var_def_stop" id="N,Iq#i2;FX);uEOA=n^r">
+                <field name="TYPE">integer</field>
+                <field name="ID">n2</field>
+                <field name="VALUE">fibo(n-2)</field>
+                <next>
+                  <block type="return" id="VW-*g8.I~hQ`}g!tk!tU">
+                    <value name="RETURN">
+                      <block type="id_stop" id="Q?bfUUPc3J0(dg%qr=u?">
+                        <field name="ID">n1 + n2</field>
+                      </block>
+                    </value>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <next>
+      <block type="main" id=":e$9S+u1XD8g!{qvKK}=">
+        <statement name="main_method">
+          <block type="print" id="PDrwoJ:sKF{KL,sn+TiV">
+            <value name="VALUE">
+              <block type="id_stop" id="y?}(!Ea4VTpsh;WUl=#S">
+                <field name="ID">"Choose fibo 1 - 40"</field>
+              </block>
+            </value>
+            <next>
+              <block type="var_def_stop" id="a!mO06~u`OuL%8xam^E$">
+                <field name="TYPE">integer</field>
+                <field name="ID">decision</field>
+                <field name="VALUE">0</field>
+                <next>
+                  <block type="read" id="[_LwJ)}Tf34%`bhof8pF">
+                    <field name="ID">decision</field>
+                    <next>
+                      <block type="controls_whileUntil" id="#i:j:^w|O%*9]A=@m9Sb">
+                        <field name="MODE">WHILE</field>
+                        <value name="BOOL">
+                          <block type="id_stop" id="-m^dIp3iAAi-^}A3^v%I">
+                            <field name="ID">decision != -1</field>
+                          </block>
+                        </value>
+                        <statement name="DO">
+                          <block type="functioncall" id="qN,i~Ml-J)KLu~J#CNjT">
+                            <field name="FUNCNAME">fibo (decision)</field>
+                            <next>
+                              <block type="read" id="khEBNY[Ui1B/Pxysr#%z">
+                                <field name="ID">decision</field>
+                              </block>
+                            </next>
+                          </block>
+                        </statement>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </next>
+          </block>
+        </statement>
+      </block>
+    </next>
+  </block>
+</xml>

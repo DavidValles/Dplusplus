@@ -4,7 +4,7 @@
 
 Blockly.JavaScript['main'] = function(block) {
   var statements_main_method = Blockly.JavaScript.statementToCode(block, 'main_method');
-  var code = 'main {\n' + statements_main_method + '\n}\n';
+  var code = 'main {\n' + statements_main_method + '}\n';
   return code;
 };
 
@@ -18,7 +18,7 @@ Blockly.JavaScript['function_with_params'] = function(block) {
   var value_params = Blockly.JavaScript.valueToCode(block, 'PARAMS', Blockly.JavaScript.ORDER_ATOMIC);
   var statements_name = Blockly.JavaScript.statementToCode(block, 'NAME');
   value_params = value_params.replace(/[()]/g,'');
-  var code = 'func '+ dropdown_type + ' ' + text_id + ' (' + value_params +')' + '{\n' + statements_name + '\n}\n';
+  var code = 'func '+ dropdown_type + ' ' + text_id + ' (' + value_params +')' + '{\n' + statements_name + '}\n';
   return code;
 };
 
@@ -45,16 +45,9 @@ Blockly.JavaScript['param_stop'] = function(block) {
   return [code, Blockly.JavaScript.ORDER_NONE];
 };
 
-Blockly.JavaScript['functioncall_params'] = function(block) {
+Blockly.JavaScript['functioncall'] = function(block) {
   var text_funcname = block.getFieldValue('FUNCNAME');
-  var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = text_funcname + value_name + ';\n';
-  return code;
-};
-
-Blockly.JavaScript['functioncall_no_param'] = function(block) {
-  var text_funcname = block.getFieldValue('FUNCNAME');
-  var code = text_funcname + '();';
+  var code = text_funcname + ';\n';
   return code;
 };
 
@@ -72,7 +65,7 @@ Blockly.JavaScript['var_def_stop'] = function(block) {
   var dropdown_type = block.getFieldValue('TYPE');
   var text_id = block.getFieldValue('ID');
   var text_value = block.getFieldValue('VALUE');
-  var code = dropdown_type + ' ' + text_id + '=' + text_value +';\n';
+  var code = 'var ' + dropdown_type + ' ' + text_id + '=' + text_value +';\n';
   return code;
 };
 
@@ -81,7 +74,7 @@ Blockly.JavaScript['var_def_continue'] = function(block) {
   var text_id = block.getFieldValue('ID');
   var text_value = block.getFieldValue('VALUE');
   var value_name = Blockly.JavaScript.valueToCode(block, 'NAME', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = dropdown_type + ' ' + text_id + '=' + text_value +',' + value_name;
+  var code = 'var ' + dropdown_type + ' ' + text_id + '=' + text_value +',' + value_name;
   return code;
 };
 
@@ -145,7 +138,7 @@ Blockly.JavaScript['array_definition'] = function(block) {
   var dropdown_type = block.getFieldValue('TYPE');
   var text_id = block.getFieldValue('ID');
   var number_size = block.getFieldValue('SIZE');
-  var code = dropdown_type +' ' + text_id + '[' + number_size + '];\n';
+  var code = dropdown_type +' ' + text_id + '(' + number_size + ');\n';
   return code;
 };
 
@@ -169,7 +162,7 @@ Blockly.JavaScript['matrix_definition'] = function(block) {
   var text_id = block.getFieldValue('ID');
   var number_size1 = block.getFieldValue('SIZE1');
   var number_size2 = block.getFieldValue('SIZE2');
-  var code = dropdown_type +' ' + text_id + '[' + number_size1 + ']' + '[' + number_size2 +'];\n';
+  var code = dropdown_type +' ' + text_id + '(' + number_size1 + ',' + number_size2 +');\n';
   return code;
 };
 
@@ -205,10 +198,4 @@ Blockly.JavaScript['print'] = function(block) {
   var value_value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
   var code = 'print(' + value_value + ');\n';
   return code;
-};
-
-Blockly.JavaScript['parenthesis'] = function(block) {
-  var value_value = Blockly.JavaScript.valueToCode(block, 'VALUE', Blockly.JavaScript.ORDER_ATOMIC);
-  var code = value_value;
-  return [code, Blockly.JavaScript.ORDER_NONE];
 };
