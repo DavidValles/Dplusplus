@@ -156,7 +156,7 @@ unordered_set<int> relationalOperators = {
 %%
 
 /*
-    A file in D++ can either be a program file with a main function 
+    A file in D++ can either be a program file with a main function
 */
 start       :   program
                 {
@@ -173,7 +173,7 @@ start       :   program
     A program can have includes, global variables and functions (0...*)
     It should always have a main method with a block
 */
-program     : 
+program     :
             {
                 setAuxForTemporalVars();
             }
@@ -545,7 +545,6 @@ assignment__: expression
                 {
                     insertConstantToTable(typeAdapter.characterConstant);
                 }
-            | functioncall
             ;
 
 /*
@@ -553,6 +552,7 @@ assignment__: expression
 */
 functioncall    : ID
                     {
+                        operatorStack.push(Ops::Floor);
                         checkFunction();
 
                         // Set current values for parameter checking
@@ -594,6 +594,7 @@ functioncall    : ID
                             operandStack.push(tempReturn);
                             typeStack.push(cFunction.type);
                         }
+                        operatorStack.pop();
                     }
                 ;
 
@@ -781,15 +782,6 @@ print_      : expression
             | SCONSTANT
                 {
                     insertConstantToTable(typeAdapter.textConstant);
-                    int address = operandStack.top();
-                    operandStack.pop();
-                    // TODO Check cube for print
-                    Quadruple quadruple(Ops::Print, -1, -1, address);
-                    quadruples.push_back(quadruple);
-                }
-                print__
-            | functioncall
-                {
                     int address = operandStack.top();
                     operandStack.pop();
                     // TODO Check cube for print
@@ -1045,6 +1037,7 @@ constvar    : ID
                 {
                     insertConstantToTable(typeAdapter.flagConstant);
                 }
+            | functioncall
             ;
 
 /*

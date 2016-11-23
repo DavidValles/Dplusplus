@@ -121,11 +121,11 @@ void VirtualMachine::sum(){
         case 2: // temporal
             switch(typeAdapter.getType(current.operand1)){
                 case 0: { // int;
-                    absdir1 = current.operand1 - typeAdapter.decimalT.min;
+                    absdir1 = current.operand1 - typeAdapter.integerT.min;
                     oper1 = mTemporal->getTemporalInteger(absdir1);
                 } break;
                 case 1: { // dec;
-                    absdir1 = current.operand1 - typeAdapter.integerT.min;
+                    absdir1 = current.operand1 - typeAdapter.decimalT.min;
                     oper1 = mTemporal->getTemporalDecimal(absdir1);
                 } break;
             } break;
@@ -264,11 +264,11 @@ void VirtualMachine::minus(){
         case 2: // temporal
             switch(typeAdapter.getType(current.operand1)){
                 case 0: { // int;
-                    absdir1 = current.operand1 - typeAdapter.decimalT.min;
+                    absdir1 = current.operand1 - typeAdapter.integerT.min;
                     oper1 = mTemporal->getTemporalInteger(absdir1);
                 } break;
                 case 1: { // dec;
-                    absdir1 = current.operand1 - typeAdapter.integerT.min;
+                    absdir1 = current.operand1 - typeAdapter.decimalT.min;
                     oper1 = mTemporal->getTemporalDecimal(absdir1);
                 } break;
             } break;
@@ -403,11 +403,11 @@ void VirtualMachine::division(){
         case 2: // temporal
             switch(typeAdapter.getType(current.operand1)){
                 case 0: { // int;
-                    absdir1 = current.operand1 - typeAdapter.decimalT.min;
+                    absdir1 = current.operand1 - typeAdapter.integerT.min;
                     oper1 = mTemporal->getTemporalInteger(absdir1);
                 } break;
                 case 1: { // dec;
-                    absdir1 = current.operand1 - typeAdapter.integerT.min;
+                    absdir1 = current.operand1 - typeAdapter.decimalT.min;
                     oper1 = mTemporal->getTemporalDecimal(absdir1);
                 } break;
             } break;
@@ -542,11 +542,11 @@ void VirtualMachine::multiplication(){
         case 2: // temporal
             switch(typeAdapter.getType(current.operand1)){
                 case 0: { // int;
-                    absdir1 = current.operand1 - typeAdapter.decimalT.min;
+                    absdir1 = current.operand1 - typeAdapter.integerT.min;
                     oper1 = mTemporal->getTemporalInteger(absdir1);
                 } break;
                 case 1: { // dec;
-                    absdir1 = current.operand1 - typeAdapter.integerT.min;
+                    absdir1 = current.operand1 - typeAdapter.decimalT.min;
                     oper1 = mTemporal->getTemporalDecimal(absdir1);
                 } break;
             } break;
